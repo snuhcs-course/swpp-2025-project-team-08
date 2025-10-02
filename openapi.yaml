@@ -1,0 +1,371 @@
+openapi: 3.1.0
+info:
+  title: ITDA
+  description: ITDA API docs
+  version: 0.0.0
+servers:
+  - url: https://0.0.0.0/api/v1
+tags:
+  - name: Auth
+    description: Authentication Operations
+  - name: My Profile
+    description: User Profile related Operations
+  - name: Programs
+    description: Government Program related Operations
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Sign up for the service
+      description: Sign up for the service
+      requestBody:
+        required: true
+        description: Signup credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        '200':
+          description: Sign up successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user
+      description: Log in with email and password to receive JWT tokens.
+      requestBody:
+        required: true
+        description: Login credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        default:
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Log out current user
+      description: Invalidate current user token
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Logout successful
+        default:
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /my-profile:
+    get:
+      tags:
+        - My Profile
+      summary: Get user profile
+      description: Get user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - My Profile
+      summary: Update user profile
+      description: Update user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: Updated user profile
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+      responses:
+        '200':
+          description: Success
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /programs:
+    get:
+      tags:
+        - Programs
+      summary: Get programs
+      description: Get programs specific for the user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramSummary'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /programs/{id}:
+    get:
+      tags:
+        - Programs
+      summary: Get program details
+      description: Retrieve detailed information about a program by its ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the program to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    AuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: this-is-password
+      required:
+        - email
+        - password
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+      required:
+        - code
+        - message
+
+    ProfileResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        email:
+          type: string
+          example: john@email.com
+        name:
+          type: string
+          example: John Doe
+        age:
+          type: integer
+          format: int32
+          description: 사용자 나이
+          example: 35
+        gender:
+          type: string
+          description: 성별 (남성/여성/비공개 등)
+          enum:
+            - Male
+            - Female
+            - Other
+          example: Female
+        address:
+          type: string
+          description: 사용자의 주소지
+          example: 서울특별시 강남구 테헤란로 123
+        marital_status:
+          type: string
+          description: 결혼 여부
+          enum:
+            - Single
+            - Married
+            - Divorced
+          example: Married
+        education_level:
+          type: string
+          description: 최종 학력
+          enum:
+            - HighSchool
+            - Associate
+            - Bachelor
+            - Master
+            - PhD
+          example: Bachelor
+        household_size:
+          type: integer
+          format: int32
+          description: 가구원 수
+          minimum: 1
+          example: 4
+        household_income:
+          type: integer
+          format: int64
+          description: 연간 가구원 소득(만원)
+          example: 7500
+      required:
+        - email
+        - password
+        - name
+    ProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        age:
+          type: integer
+          format: int32
+          description: 사용자 나이
+          example: 35
+        gender:
+          type: string
+          description: 성별 (남성/여성/비공개 등)
+          enum:
+            - Male
+            - Female
+            - Other
+          example: Female
+        address:
+          type: string
+          description: 사용자의 주소지
+          example: 서울특별시 강남구 테헤란로 123
+        marital_status:
+          type: string
+          description: 결혼 여부
+          enum:
+            - Single
+            - Married
+            - Divorced
+          example: Married
+        education_level:
+          type: string
+          description: 최종 학력
+          enum:
+            - HighSchool
+            - Associate
+            - Bachelor
+            - Master
+            - PhD
+          example: Bachelor
+        household_size:
+          type: integer
+          format: int32
+          description: 가구원 수
+          minimum: 1
+          example: 4
+        household_income:
+          type: integer
+          format: int64
+          description: 연간 가구원 소득(만원)
+          example: 7500
+
+    Program:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        title:
+          type: string
+          example: "민생지원금 2차"
+        content:
+          type: string
+          example: "민생지원금 2차"
+    ProgramSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        title:
+          type: string
+          example: "민생지원금 2차"
+        content:
+          type: string
+          example: "민생지원금 2차"
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
