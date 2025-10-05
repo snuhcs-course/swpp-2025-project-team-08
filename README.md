@@ -4,11 +4,14 @@ A significant portion of government support policy budgets often fails to reach 
 
 To solve this problem, '잇다' is developing a service that helps individuals easily and conveniently find and utilize support policies tailored specifically to them. We use a ReAct-based LLM approach to unify and automate policy data crawling across all levels of government, creating a single, comprehensive source. Based on user-provided data (age, income, residency, etc.), the system provides personalized policy recommendations, supports keyword search, and simplifies complex government announcements. This includes clear guidance on application procedures and a direct link to the official application page, ultimately maximizing citizen convenience and utilization.
 
-![Application Screenshot](path_to_screenshot.png)
 
-## Features
+## What demo demonstrates - Iteration 1
 
-### What features are implemented
+### Showcasing demo video
+
+https://youtu.be/Z_AnJLYR0aw
+
+### Features implemented
 
 In iteration 1, We focuses on establishing a robust architectural foundation using the modern Android development stack (Kotlin and Jetpack Compose) to prepare the further development.
 
@@ -24,7 +27,7 @@ In iteration 1, We focuses on establishing a robust architectural foundation usi
 3. Basic User Interaction (Refresh Action)
    - The "Policy Refresh" button triggers the state transition, proving the basic data re-fetching mechanism is functional and properly integrated with the ViewModel.
 
-### What demo demonstrates (goals achieved)
+### Goals achieved
 - Completion of the initial setup for a modern Android app based on Jetpack Compose.
 - Verification of the basic implementation of Android's officially recommended architecture (MVVM + Coroutines/Flow).
 - Successful demonstration of screen transition logic between the data loading state (Loading) and the content display state (HomeContent).
