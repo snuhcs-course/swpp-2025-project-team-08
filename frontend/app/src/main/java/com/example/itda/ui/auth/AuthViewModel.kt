@@ -1,4 +1,4 @@
-package com.example.itda.viewmodels
+package com.example.itda.ui.auth
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

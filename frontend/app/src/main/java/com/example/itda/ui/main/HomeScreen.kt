@@ -1,4 +1,4 @@
-package com.example.itda.views
+package com.example.itda.ui.main
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

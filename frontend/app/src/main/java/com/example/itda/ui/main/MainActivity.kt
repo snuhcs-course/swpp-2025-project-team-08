@@ -16,10 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.itda.ui.auth.*
-import com.example.itda.viewmodels.AuthViewModel
-import com.example.itda.viewmodels.MainViewModel
-import com.example.itda.viewmodels.MainViewState
-import com.example.itda.views.HomeView
+import com.example.itda.ui.auth.AuthViewModel
+import com.example.itda.ui.main.MainViewModel
+import com.example.itda.ui.main.MainViewState
+import com.example.itda.ui.main.HomeView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

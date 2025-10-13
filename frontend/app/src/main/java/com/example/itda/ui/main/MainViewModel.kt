@@ -1,9 +1,10 @@
-package com.example.itda.viewmodels
+package com.example.itda.ui.main
 
 // mainviewmodel.kt
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             // 실제 데이터 로딩 로직 (예: Repository 호출)
             // 여기서는 2초 후 HomeContent로 전환한다고 가정합니다.
-            kotlinx.coroutines.delay(2000)
+            delay(2000)
             _viewState.value = MainViewState.HomeContent
         }
     }

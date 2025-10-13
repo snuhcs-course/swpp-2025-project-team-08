@@ -1,4 +1,4 @@
-package com.example.itda.ui.theme
+package com.example.itda.ui.common.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
