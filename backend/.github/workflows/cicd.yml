@@ -1,0 +1,93 @@
+name: CI/CD Pipeline
+
+# event trigger
+# main이나 backend 브랜치에 push가 되었을 때 실행
+on:
+  push:
+    branches:
+      - "main"
+      - "backend/*"
+  pull_request:
+    branches:
+      - "main"
+      - "backend/*"
+
+permissions:
+  contents: read
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+
+      # JDK setting - github actions에서 사용할 JDK 설정 (프로젝트나 AWS의 java 버전과 달라도 무방)
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17 and Eclipse Temurin
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # gradlew에 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 린트 체크 실행
+      - name: Lint Check
+        run: ./gradlew ktlintCheck
+
+      # AccessToken 발급시
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build and run application
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          ./gradlew build
+          ./gradlew test
+
+      # Docker 로그인
+      - name: Docker login
+        if: contains(github.ref, 'main')
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      # Docker 이미지 빌드 및 푸시
+      - name: Docker build & push
+        if: contains(github.ref, 'main')
+        run: |
+          docker build -f ./Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/itda .
+          docker push ${{ secrets.DOCKER_USERNAME }}/itda  
+
+  CD:
+    runs-on: ubuntu-latest
+    needs: CI
+    if: contains(github.ref, 'main')
+    steps:
+
+      # 다시 checkout
+      - name: Checkout again
+        uses: actions/checkout@v3
+
+      # GCP에 배포
+      - name: Deploy to prod
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: dev
+          key: ${{ secrets.PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+            sudo docker stop $(sudo docker ps -q)
+            sudo docker rm $(sudo docker ps -aq)
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
+            sudo docker run -d -p 8080:8080 \
+              --memory="768m" --cpus="0.8" \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ${{ secrets.DOCKER_USERNAME }}/itda
+            sudo docker system prune -a -f --volumes
