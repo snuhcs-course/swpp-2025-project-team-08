@@ -39,6 +39,7 @@ dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("com.google.cloud.sql:postgres-socket-factory:1.25.3")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
