@@ -1,4 +1,4 @@
-package com.example.itda
+package com.example.itda.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,13 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.itda.viewmodels.MainViewModel
-import com.example.itda.viewmodels.MainViewState
-import com.example.itda.views.HomeView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +21,7 @@ class MainActivity : ComponentActivity() {
             // MaterialTheme 안에 앱의 UI를 정의합니다.
             MaterialTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.Companion.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     // ViewModel 인스턴스를 얻습니다.
@@ -38,26 +34,31 @@ class MainActivity : ComponentActivity() {
                         is MainViewState.Loading -> {
                             // 로딩 상태: 중앙에 로딩 인디케이터 표시
                             Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                modifier = Modifier.Companion.fillMaxSize(),
+                                contentAlignment = Alignment.Companion.Center
                             ) {
                                 CircularProgressIndicator()
                             }
                         }
+
                         is MainViewState.HomeContent -> {
                             // 홈 화면 상태: HomeView를 표시
                             HomeView(
                                 onRefresh = viewModel::refreshData // 새로고침 액션 전달
                             )
                         }
+
                         is MainViewState.Error -> {
                             // 에러 상태: 에러 메시지 표시
                             val errorState = viewState as MainViewState.Error
                             Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                modifier = Modifier.Companion.fillMaxSize(),
+                                contentAlignment = Alignment.Companion.Center
                             ) {
-                                Text("오류 발생: ${errorState.message}", color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    "오류 발생: ${errorState.message}",
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                         }
                     }

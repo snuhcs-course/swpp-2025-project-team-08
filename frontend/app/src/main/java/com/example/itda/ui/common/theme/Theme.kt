@@ -1,6 +1,5 @@
-package com.example.itda.ui.theme
+package com.example.itda.ui.common.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
