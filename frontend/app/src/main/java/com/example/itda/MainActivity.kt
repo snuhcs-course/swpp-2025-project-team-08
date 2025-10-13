@@ -9,11 +9,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.itda.ui.auth.*
+import com.example.itda.viewmodels.AuthViewModel
 import com.example.itda.viewmodels.MainViewModel
 import com.example.itda.viewmodels.MainViewState
 import com.example.itda.views.HomeView
@@ -28,10 +31,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // AuthFlow()
                     // ViewModel 인스턴스를 얻습니다.
                     val viewModel: MainViewModel = viewModel()
                     // ViewModel의 상태를 State로 수집하여 상태 변화를 감지합니다.
                     val viewState by viewModel.viewState.collectAsState()
+
+                    // AuthViewModel 추가
+//                    val authViewModel: AuthViewModel = viewModel()
+//                    val authState by authViewModel.currentScreen.collectAsState()
 
                     // 뷰 상태(viewState)에 따라 화면을 분기합니다.
                     when (viewState) {
@@ -65,4 +73,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@Composable
+fun AuthFlow() {
+    // 로그인-회원가입 페이지 연결하는 로직 짜는 중이었습니다!
 }
