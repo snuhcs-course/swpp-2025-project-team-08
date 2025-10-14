@@ -1,0 +1,82 @@
+package com.example.itda.user
+
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import java.nio.charset.StandardCharsets
+import java.util.Date
+
+object UserAccessTokenUtil {
+    private val SECRET_KEY =
+        System.getenv("JWT_SECRET_KEY")
+            ?.let { Keys.hmacShaKeyFor(it.toByteArray(StandardCharsets.UTF_8)) }
+            ?: throw IllegalStateException("JWT_SECRET_KEY is not set!")
+    private const val ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 // 1 day
+    private const val REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7 // 7 days
+
+    fun generateAccessToken(id: Int): String {
+        val now = Date()
+        val expiryDate = Date(now.time + ACCESS_TOKEN_EXPIRATION_TIME)
+        return Jwts.builder()
+            .signWith(SECRET_KEY)
+            .setSubject(id.toString())
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .compact()
+    }
+
+    fun generateRefreshToken(id: Int): String {
+        val now = Date()
+        val expiryDate = Date(now.time + REFRESH_TOKEN_EXPIRATION_TIME)
+        return Jwts.builder()
+            .signWith(SECRET_KEY)
+            .setSubject(id.toString())
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .compact()
+    }
+
+    fun validateAccessTokenGetUserId(accessToken: String): Int? {
+        return try {
+            val claims =
+                Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .body
+            if (claims.expiration.before(Date())) null else claims.subject.toIntOrNull()
+        } catch (e: Exception) {
+            println("Token validation failed. Please try again.")
+            null
+        }
+    }
+
+    fun getRefreshTokenExpirationSeconds(): Long {
+        return REFRESH_TOKEN_EXPIRATION_TIME / 1000L
+    }
+
+    fun getAccessTokenExpirationSeconds(): Long {
+        return ACCESS_TOKEN_EXPIRATION_TIME / 1000L
+    }
+
+    fun getUserIdFromToken(token: String): Int {
+        val claims =
+            Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+        return claims.body.subject.toInt()
+    }
+
+    fun validateToken(token: String): Boolean {
+        return try {
+            val claims =
+                Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+            !claims.body.expiration.before(Date())
+        } catch (e: Exception) {
+            false
+        }
+    }
+}

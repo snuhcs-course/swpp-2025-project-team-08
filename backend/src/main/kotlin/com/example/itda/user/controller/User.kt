@@ -5,14 +5,14 @@ import com.example.itda.user.persistence.UserEntity
 data class User(
     val id: Int,
     val email: String,
-    val name: String,
-    val age: Int,
-    val gender: String,
-    val address: String,
-    val maritalStatus: String,
-    val educationLevel: String,
-    val householdSize: Int,
-    val householdIncome: Int,
+    val name: String?,
+    val age: Int?,
+    val gender: String?,
+    val address: String?,
+    val maritalStatus: String?,
+    val educationLevel: String?,
+    val householdSize: Int?,
+    val householdIncome: Int?,
 ) {
     companion object {
         fun fromEntity(entity: UserEntity): User {
