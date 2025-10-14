@@ -19,7 +19,7 @@ import com.example.itda.ui.auth.*
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.main.MainViewModel
 import com.example.itda.ui.main.MainViewState
-import com.example.itda.ui.main.HomeView
+import com.example.itda.ui.main.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         is MainViewState.HomeContent -> {
-                            // 홈 화면 상태: HomeView를 표시
-                            HomeView(
+                            // 홈 화면 상태: HomeScreen를 표시
+                            HomeScreen(
                                 onRefresh = viewModel::refreshData // 새로고침 액션 전달
                             )
                         }
