@@ -1,4 +1,4 @@
-package com.example.itda
+package com.example.itda.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,11 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.itda.ui.auth.*
-import com.example.itda.ui.auth.AuthViewModel
-import com.example.itda.ui.main.MainViewModel
-import com.example.itda.ui.main.MainViewState
-import com.example.itda.ui.main.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,9 +49,7 @@ class MainActivity : ComponentActivity() {
                         }
                         is MainViewState.HomeContent -> {
                             // 홈 화면 상태: HomeScreen를 표시
-                            HomeScreen(
-                                onRefresh = viewModel::refreshData // 새로고침 액션 전달
-                            )
+                            MainScreen()
                         }
                         is MainViewState.Error -> {
                             // 에러 상태: 에러 메시지 표시
