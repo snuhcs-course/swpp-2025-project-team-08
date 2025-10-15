@@ -1,6 +1,5 @@
 package com.example.itda.ui.common.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -10,13 +9,13 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import com.example.itda.ui.common.theme.Neutral90
+import com.example.itda.ui.common.theme.Primary40
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,8 +37,7 @@ fun MainTopAppBar(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .border(1.dp, color = MaterialTheme.colorScheme.primary),
+                .wrapContentHeight(),
             navigationIcon = {
                 // isBack 파라미터가 true일 경우에만 뒤로가기 아이콘 표시
                 if (isBack) {
@@ -55,8 +53,10 @@ fun MainTopAppBar(
             actions = actions,
             // 배경색 등 추가적인 디자인 설정
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary
+//                containerColor = MaterialTheme.colorScheme.primary,
+//                titleContentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = Neutral90,
+                titleContentColor = Primary40
             )
         )
     }
