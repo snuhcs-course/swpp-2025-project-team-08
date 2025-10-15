@@ -31,7 +31,11 @@ fun MainScreen(
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeScreen() }
+            composable("home") { HomeScreen(
+                onFeedClick = { feedId ->
+                    navController.navigate("feed/$feedId")
+                }
+            ) }
             composable("search") { SearchScreen() }
             composable("notification") { NotificationScreen() }
             composable("profile") { ProfileScreen(
