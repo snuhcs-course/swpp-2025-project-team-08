@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.itda.ui.auth.AuthViewModel
+import com.example.itda.ui.home.HomeScreen
 import com.example.itda.ui.navigation.BottomNavBar
 import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.ProfileScreen
@@ -16,7 +18,7 @@ import com.example.itda.ui.search.SearchScreen
 
 @Composable
 fun MainScreen(
-//    navController: NavHostController = rememberNavController()
+    authViewModel: AuthViewModel
 ) {
 
     val navController = rememberNavController()
@@ -32,7 +34,9 @@ fun MainScreen(
             composable("home") { HomeScreen() }
             composable("search") { SearchScreen() }
             composable("notification") { NotificationScreen() }
-            composable("profile") { ProfileScreen() }
+            composable("profile") { ProfileScreen(
+                authViewModel = authViewModel
+            ) }
         }
     }
 }
