@@ -18,7 +18,9 @@ import com.example.itda.ui.auth.InputField
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    onLoginClick : () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -168,7 +170,9 @@ fun SignUpScreen() {
                             fontSize = 14.sp,
                             color = Neutral10,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.clickable { }
+                            modifier = Modifier.clickable {
+                                onLoginClick()
+                            }
                         )
                     }
                 }
