@@ -1,4 +1,4 @@
-package com.example.itda.ui.main
+package com.example.itda.ui.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
