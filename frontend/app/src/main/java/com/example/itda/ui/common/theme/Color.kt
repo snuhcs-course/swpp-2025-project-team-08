@@ -40,6 +40,8 @@ val Primary99 = Color(0xFFF9FEFF)
 
 val GreenPrimary = Color(0xFF2E7D32)
 val GreenSecondary = Color(0xFFE6F3EA)
+val RedPrimary = Color(0xFFFF1744)
+val RedSecondary = Color(0xFFFF8A80)
 val YellowPrimary = Color(0xFFFFC107)
 val YellowSecondary = Color(0xFFFFCD3B)
 
