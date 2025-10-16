@@ -12,7 +12,7 @@ object NotificationContract : ScreenContract {
 
 @Composable
 fun NotificationScreen() {
-    BaseScreen(NotificationContract) {
+    BaseScreen("notification") {
         Text("알림 화면")
     }
 }

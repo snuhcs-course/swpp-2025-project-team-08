@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.ScreenContract
@@ -33,7 +32,7 @@ object ProfileContract : ScreenContract {
 fun ProfileScreen(
     authViewModel: AuthViewModel
 ) {
-    BaseScreen(ProfileContract) { paddingValues ->
+    BaseScreen("Profile") { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)

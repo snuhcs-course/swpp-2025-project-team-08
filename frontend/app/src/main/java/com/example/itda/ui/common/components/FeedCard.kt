@@ -28,7 +28,7 @@ import com.example.itda.ui.common.theme.Neutral60
 
 
 @Composable
-fun FeedItem(
+fun FeedCard(
     id: Int,                // 프로그램 고유 ID
     title: String,          // 프로그램 제목
     category: String,       // 프로그램 카테고리
@@ -121,7 +121,7 @@ fun FeedItem(
 fun PreviewFeedItem() {
     MaterialTheme {
         Column {
-            FeedItem(
+            FeedCard(
                 id = 1,
                 title = "민생회복 소비쿠폰",
                 category = "소비지원",
@@ -136,7 +136,7 @@ fun PreviewFeedItem() {
             Spacer(modifier = Modifier.height(10.dp))
 
             // 2. 신청 대상자가 아닌 경우
-            FeedItem(
+            FeedCard(
                 id = 2,
                 title = "청년 도약 계좌",
                 category = "자산형성",
