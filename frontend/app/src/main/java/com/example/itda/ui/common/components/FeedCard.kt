@@ -1,8 +1,6 @@
 package com.example.itda.ui.common.components
 
 //import androidx.compose.material.icons.filled.StarOutline
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,35 +8,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.R
-import com.example.itda.ui.common.theme.GreenPrimary
-import com.example.itda.ui.common.theme.GreenSecondary
 import com.example.itda.ui.common.theme.Neutral20
 import com.example.itda.ui.common.theme.Neutral60
-import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.YellowPrimary
-
 
 
 @Composable
@@ -79,20 +65,10 @@ fun FeedItem(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // 기관 로고
-                    Surface(
-                        shape = androidx.compose.foundation.shape.CircleShape,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        //TODO - logo image ID? 어떤 타입으로 넣어둘건지?
-                        // Image(painter = painterResource(id = logo), contentDescription = department)
-                        Image(
-                            painter = painterResource(
-                                id = logo
-                            ),
-                            contentDescription = department + "_logo",
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
+                    CircleImage(
+                        imgId = logo,
+                        contentDescription = department + "_logo"
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
@@ -107,12 +83,7 @@ fun FeedItem(
                         )
                     }
                 }
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "즐겨찾기",
-                    tint = if (isStarred) YellowPrimary else Neutral80,
-                    modifier = Modifier.size(24.dp)
-                )
+                StarButton(isStarred)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -129,34 +100,7 @@ fun FeedItem(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
-                if (isEligible) {
-                    // 신청 대상자 버튼
-                    Row(
-                        modifier = Modifier
-                            .height(30.dp)
-                            .background(
-                                color = GreenSecondary,
-                                shape = RoundedCornerShape(20.dp)
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "check",
-                            tint = GreenPrimary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "신청 대상자",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = GreenPrimary
-                        )
-                    }
-                }
+                if (isEligible) StatusTag("신청 대상자", StatusType.POSITIVE) // 신청 대상자 버튼
             }
 
             Spacer(modifier = Modifier.height(8.dp))
