@@ -87,10 +87,5 @@ jobs:
             sudo docker stop $(sudo docker ps -q)
             sudo docker rm $(sudo docker ps -aq)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
-            sudo docker run -d -p 80:8080 \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-              ${{ secrets.DOCKER_USERNAME }}/itda
-            sudo docker system prune -a -f --volumes"
+            sudo docker run -d -p 80:8080 -e DB_URL=${{ secrets.DB_URL }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} ${{ secrets.DOCKER_USERNAME }}/itda
+            sudo docker system prune -a -f --volumes
