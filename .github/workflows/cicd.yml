@@ -83,7 +83,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
-            sudo docker stop $(sudo docker ps -q)
+            bash -c "sudo docker stop $(sudo docker ps -q)
             sudo docker rm $(sudo docker ps -aq)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
             sudo docker run -d -p 8080:8080 \
@@ -92,4 +92,4 @@ jobs:
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               ${{ secrets.DOCKER_USERNAME }}/itda
-            sudo docker system prune -a -f --volumes
+            sudo docker system prune -a -f --volumes"
