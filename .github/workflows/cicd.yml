@@ -6,11 +6,11 @@ on:
   push:
     branches:
       - "main"
-      - "backend/**"
+      - "be/**"
   pull_request:
     branches:
       - "main"
-      - "backend/**"
+      - "be/**"
 
 permissions:
   contents: read
