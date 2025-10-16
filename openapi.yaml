@@ -217,8 +217,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 12
+          type: string
+          example: abcdef123456
         email:
           type: string
           example: john@email.com
@@ -332,8 +332,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 12
+          type: string
+          example: abcdef123456
         title:
           type: string
           example: "민생지원금 2차"
@@ -344,8 +344,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 12
+          type: string
+          example: abcdef123456
         title:
           type: string
           example: "민생지원금 2차"

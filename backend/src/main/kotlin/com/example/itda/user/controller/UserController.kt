@@ -1,19 +1,22 @@
 package com.example.itda.user.controller
 
+import com.example.itda.user.AuthUser
 import com.example.itda.user.service.UserService
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1")
 class UserController(
     private val userService: UserService,
 ) {
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     fun signUp(
         @RequestBody request: AuthRequest,
     ): ResponseEntity<AuthResponse> {
@@ -21,12 +24,39 @@ class UserController(
         return ResponseEntity.ok(response)
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     fun logIn(
         @RequestBody request: AuthRequest,
     ): ResponseEntity<AuthResponse> {
         val response = userService.logIn(request.email, request.password)
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/my-profile")
+    fun getProfile(
+        @AuthUser user: User,
+    ): ResponseEntity<User> {
+        val response = userService.getProfile(user.id)
+        return ResponseEntity.ok(response)
+    }
+
+    @PutMapping("/my-profile")
+    fun updateProfile(
+        @RequestBody request: ProfileRequest,
+        @AuthUser user: User,
+    ): ResponseEntity<Void> {
+        userService.updateProfile(
+            userId = user.id,
+            name = request.name,
+            age = request.age,
+            gender = request.gender,
+            address = request.address,
+            maritalStatus = request.maritalStatus,
+            educationLevel = request.educationLevel,
+            householdSize = request.householdSize,
+            householdIncome = request.householdIncome,
+        )
+        return ResponseEntity.ok().build()
     }
 }
 
@@ -44,4 +74,19 @@ data class AuthResponse(
     val tokenType: String,
     @JsonProperty("expires_in")
     val expiresIn: Long,
+)
+
+data class ProfileRequest(
+    val name: String,
+    val age: Int,
+    val gender: String,
+    val address: String,
+    @JsonProperty("marital_status")
+    val maritalStatus: String,
+    @JsonProperty("education_level")
+    val educationLevel: String,
+    @JsonProperty("household_size")
+    val householdSize: Int,
+    @JsonProperty("household_income")
+    val householdIncome: Int,
 )

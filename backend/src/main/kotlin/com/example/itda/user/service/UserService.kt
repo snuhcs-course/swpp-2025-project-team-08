@@ -82,4 +82,34 @@ class UserService(
             expiresIn = expiresIn,
         )
     }
+
+    @Transactional
+    fun getProfile(userId: String): User {
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        return User.fromEntity(userEntity)
+    }
+
+    @Transactional
+    fun updateProfile(
+        userId: String,
+        name: String,
+        age: Int,
+        gender: String,
+        address: String,
+        maritalStatus: String,
+        educationLevel: String,
+        householdSize: Int,
+        householdIncome: Int,
+    ) {
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        userEntity.name = name
+        userEntity.age = age
+        userEntity.gender = gender
+        userEntity.address = address
+        userEntity.maritalStatus = maritalStatus
+        userEntity.educationLevel = educationLevel
+        userEntity.householdSize = householdSize
+        userEntity.householdIncome = householdIncome
+        userRepository.save(userEntity)
+    }
 }

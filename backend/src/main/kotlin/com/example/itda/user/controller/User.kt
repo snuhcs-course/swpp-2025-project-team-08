@@ -3,7 +3,7 @@ package com.example.itda.user.controller
 import com.example.itda.user.persistence.UserEntity
 
 data class User(
-    val id: Int,
+    val id: String,
     val email: String,
     val name: String?,
     val age: Int?,
