@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.itda.data.model.DummyData
-import com.example.itda.data.model.FeedItem
 import com.example.itda.data.model.User
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
@@ -32,8 +31,9 @@ fun HomeScreen(
     //  이런식으로 homeviewmodel 에서 program 을 가져오고
     //  이걸 가공해서 feedList 에 FeedItem Type 으로 넣어줘야할듯.
     //  Feedlist 인자 타입도 FeedItem으로 바꾸고.
+    //  근데 Program에 logoURl, user와의 star, eligible 관계 모두 들어있거나 불러올 수 있으면 노상관
     val feedPrograms = DummyData.dummyPrograms
-    val dummyFeedItems = listOf<FeedItem>()
+    val dummyFeedItems = DummyData.dummyFeedItems
 
     val user : User = DummyData.dummyUser[0]
 
@@ -41,13 +41,13 @@ fun HomeScreen(
     var selectedCategory by remember { mutableStateOf(categories[0].name) }
 
     val filteredFeedPrograms = if (selectedCategory == "전체" || selectedCategory.isEmpty()) {
-        feedPrograms
+        dummyFeedItems
     } else {
-        feedPrograms.filter { it.category == selectedCategory }
+        dummyFeedItems.filter { it.category == selectedCategory }
     }
 
     BaseScreen(
-        contract = HomeContract,
+        title = "home",
         topBarVisible = false, // TODO - toppappbar 사라지지 않는 문제 해결하기
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
@@ -62,9 +62,9 @@ fun HomeScreen(
                     selectedCategory = newCategory }
             )
             FeedList(
-                items = filteredFeedPrograms,
+                items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요
                 filterCategory = selectedCategory,
-                onItemClick = { feedId -> onFeedClick }
+                onItemClick = { feed -> onFeedClick(feed.id) }
             )
         }
     }

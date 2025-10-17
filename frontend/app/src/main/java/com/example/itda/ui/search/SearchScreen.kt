@@ -5,14 +5,11 @@ import androidx.compose.runtime.Composable
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.ScreenContract
 
-object SearchContract : ScreenContract {
-    override val route = "search"
-    override val title = "search"
-}
-
 @Composable
 fun SearchScreen() {
-    BaseScreen(SearchContract) {
+    BaseScreen(
+        "title"
+    ) {
         Text("검색 화면")
     }
 }

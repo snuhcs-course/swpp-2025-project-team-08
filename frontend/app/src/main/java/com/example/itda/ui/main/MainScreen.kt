@@ -1,5 +1,6 @@
 package com.example.itda.ui.main
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.itda.ui.auth.AuthViewModel
+import com.example.itda.ui.feed.FeedScreen
 import com.example.itda.ui.home.HomeScreen
 import com.example.itda.ui.navigation.BottomNavBar
 import com.example.itda.ui.notification.NotificationScreen
@@ -34,6 +36,7 @@ fun MainScreen(
             composable("home") { HomeScreen(
                 onFeedClick = { feedId ->
                     navController.navigate("feed/$feedId")
+                    Log.d("MainScreen", "Feed ID: $feedId")
                 }
             ) }
             composable("search") { SearchScreen() }
@@ -41,6 +44,19 @@ fun MainScreen(
             composable("profile") { ProfileScreen(
                 authViewModel = authViewModel
             ) }
+
+
+            composable(
+                route = "feed/{feedId}"
+            ) { backStackEntry ->
+                val feedId = backStackEntry.arguments?.getString("feedId")?.toIntOrNull()
+                if (feedId != null) {
+                    FeedScreen(
+                        feedId = feedId,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
         }
     }
 }
