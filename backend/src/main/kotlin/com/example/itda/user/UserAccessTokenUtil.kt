@@ -13,29 +13,29 @@ object UserAccessTokenUtil {
     private const val ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 // 1 day
     private const val REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7 // 7 days
 
-    fun generateAccessToken(id: Int): String {
+    fun generateAccessToken(id: String): String {
         val now = Date()
         val expiryDate = Date(now.time + ACCESS_TOKEN_EXPIRATION_TIME)
         return Jwts.builder()
             .signWith(SECRET_KEY)
-            .setSubject(id.toString())
+            .setSubject(id)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .compact()
     }
 
-    fun generateRefreshToken(id: Int): String {
+    fun generateRefreshToken(id: String): String {
         val now = Date()
         val expiryDate = Date(now.time + REFRESH_TOKEN_EXPIRATION_TIME)
         return Jwts.builder()
             .signWith(SECRET_KEY)
-            .setSubject(id.toString())
+            .setSubject(id)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .compact()
     }
 
-    fun validateAccessTokenGetUserId(accessToken: String): Int? {
+    fun validateAccessTokenGetUserId(accessToken: String): String? {
         return try {
             val claims =
                 Jwts.parserBuilder()
@@ -43,7 +43,7 @@ object UserAccessTokenUtil {
                     .build()
                     .parseClaimsJws(accessToken)
                     .body
-            if (claims.expiration.before(Date())) null else claims.subject.toIntOrNull()
+            if (claims.expiration.before(Date())) null else claims.subject
         } catch (e: Exception) {
             println("Token validation failed. Please try again.")
             null
@@ -58,13 +58,13 @@ object UserAccessTokenUtil {
         return ACCESS_TOKEN_EXPIRATION_TIME / 1000L
     }
 
-    fun getUserIdFromToken(token: String): Int {
+    fun getUserIdFromToken(token: String): String {
         val claims =
             Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
-        return claims.body.subject.toInt()
+        return claims.body.subject
     }
 
     fun validateToken(token: String): Boolean {

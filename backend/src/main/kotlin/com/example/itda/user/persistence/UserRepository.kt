@@ -2,7 +2,7 @@ package com.example.itda.user.persistence
 
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface UserRepository : JpaRepository<UserEntity, Int> {
+interface UserRepository : JpaRepository<UserEntity, String> {
     fun existsByEmail(email: String): Boolean
 
     fun findByEmail(email: String): UserEntity?
