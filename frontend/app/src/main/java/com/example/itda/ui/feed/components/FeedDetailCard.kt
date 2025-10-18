@@ -30,7 +30,9 @@ fun FeedDetailCard(expanded: Boolean, onToggle: () -> Unit) {
         Column(Modifier.padding(12.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().clickable { onToggle() }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onToggle() }
             ) {
                 Text("📖 상세내용", fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))

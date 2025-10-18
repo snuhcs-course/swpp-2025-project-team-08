@@ -54,10 +54,10 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Neutral90,
-                    )
-                ) {
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Neutral90,
+                )
+            ) {
                 Text(
                     "로그아웃",
                     fontSize = 16.sp,

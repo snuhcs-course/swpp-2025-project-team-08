@@ -35,7 +35,7 @@ fun NavGraphBuilder.authGraph(
                     navController.navigate("login") {
                         popUpTo("login") { inclusive = true }
                     }
-               },
+                },
                 onSignUpSuccess = {
                     navController.navigate("personal_info") {
                         popUpTo("signup") { inclusive = true }

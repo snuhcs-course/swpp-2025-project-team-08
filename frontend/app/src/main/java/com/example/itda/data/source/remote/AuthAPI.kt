@@ -2,8 +2,8 @@ package com.example.itda.data.source.remote
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
-import retrofit2.http.POST
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 
 data class AuthRequest(
@@ -62,7 +62,6 @@ data class ProfileResponse(
     @SerializedName("household_income")
     val householdIncome: Int? = null
 )
-
 
 
 interface AuthAPI {

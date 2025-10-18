@@ -16,8 +16,7 @@ class FeedViewModel @Inject constructor(
 //    val feedItem: StateFlow<FeedItem> = _feedItem.asStateFlow() // 외부 접근 가능한 Read-Only StateFlow
 
 
-
-    fun getFeedItem (feedId : Int): FeedItem {
+    fun getFeedItem(feedId: Int): FeedItem {
         // TODO - Repository 연결해서 Feed 가져오기
         // feedItem = {FeedRepository.getFeedItem or programRepository.getProgram}
         return programRepository.getFeed(feedId)
@@ -25,12 +24,12 @@ class FeedViewModel @Inject constructor(
     }
 
 
-    fun toggleStar(feedId : Int) {
+    fun toggleStar(feedId: Int) {
         // TODO - Repository 연결해서 toggle Star
 
     }
 
-    fun applicationProgram(feedID : Int) {
+    fun applicationProgram(feedID: Int) {
         // TOOD - Repository 연결해서 program 바로 신청
     }
 }

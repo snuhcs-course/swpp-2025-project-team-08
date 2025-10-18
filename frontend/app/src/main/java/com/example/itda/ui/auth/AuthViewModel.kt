@@ -1,11 +1,14 @@
 package com.example.itda.ui.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,6 +19,7 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
     init {
         viewModelScope.launch {
             val hasToken = authRepository.isLoggedInFlow.first()
@@ -62,6 +66,7 @@ class AuthViewModel @Inject constructor(
 
         return ok
     }
+
     // 로그아웃
     fun logout() {
         viewModelScope.launch {
@@ -86,12 +91,15 @@ class AuthViewModel @Inject constructor(
     fun onSignUpEmailChange(v: String) {
         _signUpUi.value = _signUpUi.value.copy(email = v, error = null)
     }
+
     fun onSignUpPasswordChange(v: String) {
         _signUpUi.value = _signUpUi.value.copy(password = v, error = null)
     }
+
     fun onSignUpConfirmChange(v: String) {
         _signUpUi.value = _signUpUi.value.copy(confirmPassword = v, error = null)
     }
+
     fun onAgreeTermsChange(v: Boolean) {
         _signUpUi.value = _signUpUi.value.copy(agreeTerms = v, error = null)
     }
@@ -162,7 +170,8 @@ class AuthViewModel @Inject constructor(
         val ui = _personalInfoUi.value
 
         if (ui.name.isBlank() || ui.birthDate.isBlank() ||
-            ui.gender.isBlank() || ui.address.isBlank()) {
+            ui.gender.isBlank() || ui.address.isBlank()
+        ) {
             _personalInfoUi.update { it.copy(error = "모든 항목을 입력해주세요.") }
             return false
         }
@@ -183,7 +192,8 @@ class AuthViewModel @Inject constructor(
         )
 
             .onFailure { e ->
-                _personalInfoUi.update { it.copy(error = e.message ?: "프로필 업데이트 실패")
+                _personalInfoUi.update {
+                    it.copy(error = e.message ?: "프로필 업데이트 실패")
                 }
             }
             .isSuccess

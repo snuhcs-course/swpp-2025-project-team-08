@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun FeedInfoCard(
-    category : String,
-    startDate : String,
-    endDate : String,
-    department : String
+    category: String,
+    startDate: String,
+    endDate: String,
+    department: String
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
-        Row (
+        Row(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 

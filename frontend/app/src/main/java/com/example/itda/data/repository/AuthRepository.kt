@@ -1,6 +1,5 @@
 package com.example.itda.data.repository
 
-import android.util.Log
 import com.example.itda.data.source.local.PrefDataSource
 import com.example.itda.data.source.remote.AuthRequest
 import com.example.itda.data.source.remote.ProfileRequest

@@ -68,7 +68,7 @@ object DummyData {
 
 
     val dummyFeedItems = listOf<FeedItem>(
-        FeedItem (
+        FeedItem(
             id = 1,
             title = "AI 해커톤 2025",
             category = "대회",
@@ -81,7 +81,7 @@ object DummyData {
             logo = R.drawable.gov_logo,
             isEligible = true
         ),
-        FeedItem (
+        FeedItem(
             id = 2,
             title = "IT 취업 역량 캠프",
             category = "교육",
@@ -94,7 +94,7 @@ object DummyData {
             logo = R.drawable.hissf_logo,
             isEligible = true
         ),
-        FeedItem (
+        FeedItem(
             id = 3,
             title = "청년 도약 계좌",
             category = "자산형성",
@@ -107,7 +107,7 @@ object DummyData {
             logo = R.drawable.ic_launcher_foreground,
             isEligible = false
         ),
-        FeedItem (
+        FeedItem(
             id = 4,
             title = "민생회복 소비쿠폰",
             category = "소비지원",
@@ -120,7 +120,7 @@ object DummyData {
             logo = R.drawable.gov_logo,
             isEligible = false
         ),
-        FeedItem (
+        FeedItem(
             id = 5,
             title = "2차 민생회복 소비쿠폰",
             category = "소비지원",
@@ -133,7 +133,7 @@ object DummyData {
             logo = R.drawable.ic_launcher_background,
             isEligible = false
         ),
-        FeedItem (
+        FeedItem(
             id = 6,
             title = "1000회차 민생회복 소비로또",
             category = "소비지원",

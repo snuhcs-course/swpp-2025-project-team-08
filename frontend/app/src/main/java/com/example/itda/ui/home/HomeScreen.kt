@@ -21,9 +21,10 @@ object HomeContract : ScreenContract {
     override val route = "home"
     override val title = "home"
 }
+
 @Composable
 fun HomeScreen(
-    onFeedClick : (Int) -> Unit
+    onFeedClick: (Int) -> Unit
 ) {
 //    val homeViewModel : HomeViewModel = hiltViewModel()
 
@@ -35,7 +36,7 @@ fun HomeScreen(
     val feedPrograms = DummyData.dummyPrograms
     val dummyFeedItems = DummyData.dummyFeedItems
 
-    val user : User = DummyData.dummyUser[0]
+    val user: User = DummyData.dummyUser[0]
 
     val categories = remember { DummyData.dummyCategories }
     var selectedCategory by remember { mutableStateOf(categories[0].name) }
@@ -56,10 +57,11 @@ fun HomeScreen(
                 programCount = filteredFeedPrograms.size
             )
             ProgramFilterRow(
-                categories = categories.map { category -> category.name},
+                categories = categories.map { category -> category.name },
                 selectedCategory = selectedCategory,
                 onCategorySelected = { newCategory ->
-                    selectedCategory = newCategory }
+                    selectedCategory = newCategory
+                }
             )
             FeedList(
                 items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요

@@ -33,17 +33,17 @@ fun FeedCard(
     title: String,          // 프로그램 제목
     category: String,       // 프로그램 카테고리
     department: String,     // 주관 부서
-    link: String ? = null,           // 관련 링크 (URL)
+    link: String? = null,           // 관련 링크 (URL)
     content: String,        // 프로그램 설명 (text)
     // start_date: String ? = null,     // 시작 날짜 (ISO 포맷 문자열로 전달)
     // end_date: String ? = null,       // 종료 날짜
 
-    isStarred : Boolean,     // 즐겨찾기 여부
-    logo : Int = R.drawable.gov_logo,    // 로고 ID?
+    isStarred: Boolean,     // 즐겨찾기 여부
+    logo: Int = R.drawable.gov_logo,    // 로고 ID?
     // TODO - coil library 를 활용해 url 을 받아와 붙여넣는 방법도 고민중
     // logoUrl : String ? = null
     isEligible: Boolean,    // 신청 대상자 여부
-    onClick : () -> Unit,
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -130,7 +130,7 @@ fun PreviewFeedItem() {
                 isStarred = true, // 즐겨찾기 설정됨
                 isEligible = true, // 신청 대상자 O
                 logo = R.drawable.gov_logo,
-                onClick = {  }
+                onClick = { }
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -145,7 +145,7 @@ fun PreviewFeedItem() {
                 isStarred = false, // 즐겨찾기 설정 안 됨
                 isEligible = false, // 신청 대상자 X
                 logo = R.drawable.hissf_logo,
-                onClick = {  }
+                onClick = { }
             )
         }
     }

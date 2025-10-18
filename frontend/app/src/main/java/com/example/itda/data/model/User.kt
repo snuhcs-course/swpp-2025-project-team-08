@@ -8,7 +8,6 @@ data class User(
     val age: Int,                // 나이
     val gender: String,          // 성별
     val address: String,         // 주소
-    val birthday: String,        // 생년월일
     val marital_status: String,  // 결혼 여부
     val education_level: String, // 교육 수준
     val household_size: Int,     // 가구 인원수

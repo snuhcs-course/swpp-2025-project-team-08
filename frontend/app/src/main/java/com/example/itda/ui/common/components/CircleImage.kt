@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CircleImage(
-    imgId : Int, // TODO - logo imgURL : String 으로 변경해야함
-    contentDescription : String,
+    imgId: Int, // TODO - logo imgURL : String 으로 변경해야함
+    contentDescription: String,
 ) {
     Surface(
         shape = androidx.compose.foundation.shape.CircleShape,

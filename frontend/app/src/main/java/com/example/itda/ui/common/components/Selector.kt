@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,9 +31,6 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 
 // on/off를 보여주는 토글 셀렉터
 // 자세한 모양은 추후에 변경
@@ -49,11 +48,11 @@ fun ToggleSelector(
     val borderWidth: Dp = 2.dp
     val shape = RoundedCornerShape(percent = 50)
 
-    val borderColor       = Color(0xFF9CA3AF)
-    val trackColorOn      = Color(0xFFBFC5CC)
-    val trackColorOff     = Color(0xFFE6E9EE)
+    val borderColor = Color(0xFF9CA3AF)
+    val trackColorOn = Color(0xFFBFC5CC)
+    val trackColorOff = Color(0xFFE6E9EE)
     val thumbColorEnabled = Color(0xFF6B7280)
-    val thumbColorDisabled= Color(0xFF9AA1AA)
+    val thumbColorDisabled = Color(0xFF9AA1AA)
 
     // 내부 패딩(썸이 트랙에 맞닿지 않도록)
     val innerPadding = ((trackHeight - thumbSize) / 2f)

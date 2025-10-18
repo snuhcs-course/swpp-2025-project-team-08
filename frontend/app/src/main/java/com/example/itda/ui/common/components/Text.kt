@@ -3,7 +3,6 @@
 
 package com.example.itda.ui.common.components
 
-import android.icu.text.CaseMap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -141,5 +140,5 @@ fun AppText(
 @Composable
 private fun PreviewHomeScreen() {
     // 미리보기를 위한 더미 함수
-    AppText(variant= AppTextVariants.OutlinedTitle, text = "Test", fontSize = 5.sp)
+    AppText(variant = AppTextVariants.OutlinedTitle, text = "Test", fontSize = 5.sp)
 }
