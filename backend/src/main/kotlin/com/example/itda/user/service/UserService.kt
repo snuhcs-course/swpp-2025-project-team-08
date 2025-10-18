@@ -8,6 +8,7 @@ import com.example.itda.user.SignUpInvalidEmailException
 import com.example.itda.user.UserAccessTokenUtil
 import com.example.itda.user.UserNotFoundException
 import com.example.itda.user.controller.AuthResponse
+import com.example.itda.user.controller.ProfileRequest
 import com.example.itda.user.controller.User
 import com.example.itda.user.persistence.UserEntity
 import com.example.itda.user.persistence.UserRepository
@@ -92,24 +93,17 @@ class UserService(
     @Transactional
     fun updateProfile(
         userId: String,
-        name: String,
-        age: Int,
-        gender: String,
-        address: String,
-        maritalStatus: String,
-        educationLevel: String,
-        householdSize: Int,
-        householdIncome: Int,
+        request: ProfileRequest,
     ) {
         val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        userEntity.name = name
-        userEntity.age = age
-        userEntity.gender = gender
-        userEntity.address = address
-        userEntity.maritalStatus = maritalStatus
-        userEntity.educationLevel = educationLevel
-        userEntity.householdSize = householdSize
-        userEntity.householdIncome = householdIncome
+        request.name?.let { userEntity.name = it }
+        request.age?.let { userEntity.age = it }
+        request.gender?.let { userEntity.gender = it }
+        request.address?.let { userEntity.address = it }
+        request.maritalStatus?.let { userEntity.maritalStatus = it }
+        request.educationLevel?.let { userEntity.educationLevel = it }
+        request.householdSize?.let { userEntity.householdSize = it }
+        request.householdIncome?.let { userEntity.householdIncome = it }
         userRepository.save(userEntity)
     }
 }

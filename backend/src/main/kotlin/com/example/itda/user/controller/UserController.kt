@@ -47,14 +47,7 @@ class UserController(
     ): ResponseEntity<Void> {
         userService.updateProfile(
             userId = user.id,
-            name = request.name,
-            age = request.age,
-            gender = request.gender,
-            address = request.address,
-            maritalStatus = request.maritalStatus,
-            educationLevel = request.educationLevel,
-            householdSize = request.householdSize,
-            householdIncome = request.householdIncome,
+            request = request,
         )
         return ResponseEntity.ok().build()
     }
@@ -77,16 +70,16 @@ data class AuthResponse(
 )
 
 data class ProfileRequest(
-    val name: String,
-    val age: Int,
-    val gender: String,
-    val address: String,
+    val name: String?,
+    val age: Int?,
+    val gender: String?,
+    val address: String?,
     @JsonProperty("marital_status")
-    val maritalStatus: String,
+    val maritalStatus: String?,
     @JsonProperty("education_level")
-    val educationLevel: String,
+    val educationLevel: String?,
     @JsonProperty("household_size")
-    val householdSize: Int,
+    val householdSize: Int?,
     @JsonProperty("household_income")
-    val householdIncome: Int,
+    val householdIncome: Int?,
 )
