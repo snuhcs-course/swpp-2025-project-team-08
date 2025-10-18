@@ -1,9 +1,7 @@
 package com.example.itda.ui.common.util
 
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 fun getTodayString(): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
