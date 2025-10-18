@@ -5,9 +5,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.itda.ui.auth.AuthViewModel
-import com.example.itda.ui.auth.LoginScreen
-import com.example.itda.ui.auth.PersonalInfoScreen
-import com.example.itda.ui.auth.SignUpScreen
+import com.example.itda.ui.auth.LoginRoute
+import com.example.itda.ui.auth.PersonalInfoRoute
+import com.example.itda.ui.auth.SignUpRoute
 
 fun NavGraphBuilder.authGraph(
     navController: NavController,
@@ -18,25 +18,38 @@ fun NavGraphBuilder.authGraph(
         route = "auth_graph"
     ) {
         composable("login") {
-            LoginScreen(
-                authViewModel,
-                onSignUpClick = { navController.navigate("signup") }
+            LoginRoute(
+                onSignUpClick = {
+                    navController.navigate("signup")
+                },
+                onLoginSuccess = {
+                    navController.navigate("main_graph") {
+                        popUpTo("auth_graph") { inclusive = true }
+                    }
+                }
             )
         }
         composable("signup") {
-            SignUpScreen(
-                onLoginClick = { navController.navigate("login") }
-//                onNext = { navController.navigate("personal_info") },
-//                onBack = { navController.popBackStack() }
+            SignUpRoute(
+                onLoginClick = {
+                    navController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onSignUpSuccess = {
+                    navController.navigate("personal_info") {
+                        popUpTo("signup") { inclusive = true }
+                    }
+                }
             )
         }
         composable("personal_info") {
-            PersonalInfoScreen(
-//                onFinish = {
-//                    navController.navigate("main_graph") {
-//                        popUpTo("auth_graph") { inclusive = true }
-//                    }
-//                }
+            PersonalInfoRoute(
+                onComplete = {
+                    navController.navigate("main_graph") {
+                        popUpTo("auth_graph") { inclusive = true }
+                    }
+                }
             )
         }
     }

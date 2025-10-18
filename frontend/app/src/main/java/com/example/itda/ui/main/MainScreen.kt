@@ -33,17 +33,21 @@ fun MainScreen(
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeScreen(
-                onFeedClick = { feedId ->
-                    navController.navigate("feed/$feedId")
-                    Log.d("MainScreen", "Feed ID: $feedId")
-                }
-            ) }
+            composable("home") {
+                HomeScreen(
+                    onFeedClick = { feedId ->
+                        navController.navigate("feed/$feedId")
+                        Log.d("MainScreen", "Feed ID: $feedId")
+                    }
+                )
+            }
             composable("search") { SearchScreen() }
             composable("notification") { NotificationScreen() }
-            composable("profile") { ProfileScreen(
-                authViewModel = authViewModel
-            ) }
+            composable("profile") {
+                ProfileScreen(
+                    authViewModel = authViewModel
+                )
+            }
 
 
             composable(

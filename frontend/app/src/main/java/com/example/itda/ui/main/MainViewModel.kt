@@ -14,8 +14,10 @@ import kotlinx.coroutines.launch
 sealed interface MainViewState {
     // 초기 로딩 중
     data object Loading : MainViewState
+
     // 홈 화면 컨텐츠가 준비됨
     data object HomeContent : MainViewState
+
     // 에러 발생 시
     data class Error(val message: String) : MainViewState
 }

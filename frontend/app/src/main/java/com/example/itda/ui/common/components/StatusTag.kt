@@ -34,8 +34,8 @@ enum class StatusType {
 
 @Composable
 fun StatusTag(
-    text : String,
-    status : StatusType
+    text: String,
+    status: StatusType
 ) {
     val primaryColor = when (status) {
         StatusType.POSITIVE -> GreenPrimary
@@ -58,11 +58,11 @@ fun StatusTag(
             .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if(status == StatusType.POSITIVE) {
+        if (status == StatusType.POSITIVE) {
             Icon(
-                imageVector =  Icons.Default.Check,
+                imageVector = Icons.Default.Check,
                 contentDescription = "check",
-                tint =  primaryColor,
+                tint = primaryColor,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))

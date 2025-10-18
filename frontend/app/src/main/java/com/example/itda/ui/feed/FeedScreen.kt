@@ -35,8 +35,8 @@ import com.example.itda.ui.feed.components.FeedInfoCard
 
 @Composable
 fun FeedScreen(
-    feedId : Int, // TODO - feedID != programID 가 되는 경우가 있을까?
-    onBack : () -> Unit
+    feedId: Int, // TODO - feedID != programID 가 되는 경우가 있을까?
+    onBack: () -> Unit
 ) {
 //    val feedViewModel : FeedViewModel = hiltViewModel()
 
@@ -58,7 +58,7 @@ fun FeedScreen(
         return
     }
 
-    BaseScreen (
+    BaseScreen(
         title = " ",
         onBack = onBack,
         topBarVisible = true,

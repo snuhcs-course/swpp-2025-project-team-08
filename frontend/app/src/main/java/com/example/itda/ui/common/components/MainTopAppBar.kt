@@ -23,8 +23,8 @@ import com.example.itda.ui.common.theme.Primary40
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopAppBar(
-    title : String,
-    isBack : Boolean = false,
+    title: String,
+    isBack: Boolean = false,
     onBackClicked: () -> Unit = {}, // 뒤로가기 버튼 클릭 콜백
     visible: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {} // 우측 아이콘 영역

@@ -5,6 +5,7 @@ package com.example.itda.ui.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,24 +13,21 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.composed
-import androidx.compose.ui.tooling.preview.Preview
 
 sealed class InputVariant {
     // 상단에 라벨, 기본 인풋
@@ -264,10 +262,10 @@ private fun PreviewHomeScreen() {
         onValueChange = { text = it }
     )
     AppInput(
-            variant = InputVariant.Search(
-                placeholder = "입력하세요"
-            ),
-    value = text,
-    onValueChange = { text = it }
+        variant = InputVariant.Search(
+            placeholder = "입력하세요"
+        ),
+        value = text,
+        onValueChange = { text = it }
     )
 }

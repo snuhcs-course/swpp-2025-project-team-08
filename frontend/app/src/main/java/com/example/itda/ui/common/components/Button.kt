@@ -3,7 +3,6 @@
 package com.example.itda.ui.common.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -106,6 +105,6 @@ fun AppButton(
 @Composable
 private fun PreviewHomeScreen() {
     // 미리보기를 위한 더미 함수
-    AppButton(ButtonKind.Filled, onClick={}, Primary10, text = "Test")
+    AppButton(ButtonKind.Filled, onClick = {}, Primary10, text = "Test")
 }
 

@@ -39,7 +39,7 @@ fun BottomNavBar(navController: NavHostController) {
         BottomNavItem.Notification,
         BottomNavItem.Profile
     )
-    NavigationBar (
+    NavigationBar(
         containerColor = Neutral100,
         tonalElevation = 5.dp,
     ) {

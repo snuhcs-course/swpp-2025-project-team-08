@@ -23,7 +23,7 @@ fun FeedList(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(8.dp)
     ) {
-        items(items, key = {it.id}) { item ->
+        items(items, key = { it.id }) { item ->
             // TODO - item id 를 보고 user 와의 관계에 대한 정보 가공 in program repository?
             //  ex : isStared, isEligible..
             //  homeViewmodel.getFeedInfo() -> programRepository.starred

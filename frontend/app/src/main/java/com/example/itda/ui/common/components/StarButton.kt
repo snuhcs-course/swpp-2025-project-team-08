@@ -12,7 +12,7 @@ import com.example.itda.ui.common.theme.YellowPrimary
 
 @Composable
 fun StarButton(
-    isStarred : Boolean
+    isStarred: Boolean
 ) {
     Icon(
         imageVector = Icons.Default.Star,
