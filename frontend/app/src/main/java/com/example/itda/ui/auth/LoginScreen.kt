@@ -5,49 +5,25 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.ui.common.theme.Neutral0
-import com.example.itda.ui.common.theme.Neutral10
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Neutral40
-import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.Neutral90
-import com.example.itda.ui.common.theme.Primary60
+import com.example.itda.ui.common.theme.*
 
-//@Preview(showBackground = true)
 @Composable
 fun LoginScreen(
-    authViewModel: AuthViewModel,
+    ui: AuthViewModel.LoginUiState,
+    onLoginEmailChange: (String) -> Unit,
+    onLoginPasswordChange: (String) -> Unit,
+    onSubmit: () -> Unit,
     onSignUpClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -101,8 +77,8 @@ fun LoginScreen(
                 ) {
                     InputField(
                         label = "이메일",
-                        value = email,
-                        onValueChange = { email = it },
+                        value = ui.email,
+                        onValueChange = onLoginEmailChange,
                         placeholder = "이메일을 입력해주세요."
                     )
 
@@ -110,8 +86,8 @@ fun LoginScreen(
 
                     InputField(
                         label = "비밀번호",
-                        value = password,
-                        onValueChange = { password = it },
+                        value = ui.password,
+                        onValueChange = onLoginPasswordChange,
                         placeholder = "비밀번호를 입력해주세요.",
                         isPassword = true
                     )
@@ -119,16 +95,13 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // 로그인 버튼
-                    val isFormValid = email.isNotEmpty() && password.isNotEmpty()
+                    val isFormValid = ui.email.isNotEmpty() && ui.password.isNotEmpty()
 
                     Button(
                         onClick = {
                             /* TODO: 로그인 API 연결 */
                             Log.d("login", "LoginButtonClicked on LoginScreen: $data")
-                            authViewModel.login(
-                                email = email,
-                                password = password
-                            )
+                            onSubmit()
                         },
                         modifier = Modifier
                             .fillMaxWidth()

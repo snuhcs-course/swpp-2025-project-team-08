@@ -18,18 +18,6 @@ fun AppNavHost() {
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState() // 로그인 여부
     val startDestination: String = if (isLoggedIn) "main_graph" else "auth_graph" // 로그인 되어있으면 MainScreen, 안되어있으면 AuthScreen
 
-
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            navController.navigate("main_graph") {
-                popUpTo(0) { inclusive = true }
-            }
-        } else {
-            navController.navigate("auth_graph") {
-                popUpTo(0) { inclusive = true }
-            }
-        }
-    }
     NavHost(
         navController = navController,
         startDestination = startDestination
