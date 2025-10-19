@@ -14,6 +14,7 @@ import com.example.itda.ui.home.HomeScreen
 import com.example.itda.ui.navigation.BottomNavBar
 import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.ProfileScreen
+import com.example.itda.ui.profile.ProfileViewModel
 import com.example.itda.ui.search.SearchScreen
 
 // mainscreen 에서 login 여부 보고 분기 -> homescreen / loginscreen
@@ -45,7 +46,8 @@ fun MainScreen(
             composable("notification") { NotificationScreen() }
             composable("profile") {
                 ProfileScreen(
-                    authViewModel = authViewModel
+                    viewModel = ProfileViewModel(),
+                    navController = navController
                 )
             }
 
