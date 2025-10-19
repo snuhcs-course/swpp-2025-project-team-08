@@ -11,14 +11,15 @@ import org.springframework.web.bind.annotation.RestController
 class ProgramController(
     private val programService: ProgramService,
 ) {
-
     @GetMapping("/programs")
     fun getPrograms(): List<ProgramSummaryResponse> {
         return programService.getPrograms()
     }
 
     @GetMapping("/programs/{id}")
-    fun getProgram(@PathVariable id: Long): ProgramResponse {
+    fun getProgram(
+        @PathVariable id: Long,
+    ): ProgramResponse {
         return programService.getProgram(id)
     }
 }

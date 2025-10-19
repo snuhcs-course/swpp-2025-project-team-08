@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException
 class ProgramService(
     val programRepository: ProgramRepository,
 ) {
-
     fun getPrograms(): List<ProgramSummaryResponse> {
         val programs = programRepository.findAll()
 
@@ -20,8 +19,9 @@ class ProgramService(
     }
 
     fun getProgram(id: Long): ProgramResponse {
-        val program = programRepository.findByIdOrNull(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found: $id")
+        val program =
+            programRepository.findByIdOrNull(id)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found: $id")
 
         return ProgramResponse.fromEntity(program)
     }

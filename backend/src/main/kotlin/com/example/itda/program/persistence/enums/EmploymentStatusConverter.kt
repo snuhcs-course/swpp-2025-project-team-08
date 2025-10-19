@@ -5,9 +5,7 @@ import jakarta.persistence.Converter
 
 @Converter(autoApply = true)
 class EmploymentStatusConverter : AttributeConverter<EmploymentStatus, String> {
-    override fun convertToDatabaseColumn(attribute: EmploymentStatus?): String? =
-        attribute?.dbValue
+    override fun convertToDatabaseColumn(attribute: EmploymentStatus?): String? = attribute?.dbValue
 
-    override fun convertToEntityAttribute(dbData: String?): EmploymentStatus? =
-        dbData?.let { EmploymentStatus.fromDb(it) }
+    override fun convertToEntityAttribute(dbData: String?): EmploymentStatus? = dbData?.let { EmploymentStatus.fromDb(it) }
 }

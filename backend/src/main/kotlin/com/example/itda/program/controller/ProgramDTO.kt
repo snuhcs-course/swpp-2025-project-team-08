@@ -3,16 +3,15 @@ package com.example.itda.program.controller
 import com.example.itda.program.persistence.ProgramEntity
 import java.time.OffsetDateTime
 
-
 data class ProgramSummaryResponse(
     val id: Int,
-    val title: String
+    val title: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
             ProgramSummaryResponse(
                 id = entity.id ?: error("ProgramEntity.id is null"),
-                title = entity.title
+                title = entity.title,
             )
     }
 }
@@ -38,7 +37,7 @@ data class ProgramResponse(
     val applyStartAt: OffsetDateTime?,
     val applyEndAt: OffsetDateTime?,
     val createdAt: OffsetDateTime?,
-    val updatedAt: OffsetDateTime?
+    val updatedAt: OffsetDateTime?,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramResponse =
@@ -63,7 +62,7 @@ data class ProgramResponse(
                 applyStartAt = entity.applyStartAt,
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,
-                updatedAt = entity.updatedAt
+                updatedAt = entity.updatedAt,
             )
     }
 }

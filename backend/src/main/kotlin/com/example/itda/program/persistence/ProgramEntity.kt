@@ -3,13 +3,17 @@ package com.example.itda.program.persistence
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.OffsetDateTime
 
 @Entity
 @Table(name = "program")
 class ProgramEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -17,7 +21,6 @@ class ProgramEntity {
 
     @Column(name = "uuid", nullable = false, unique = true, length = 255)
     lateinit var uuid: String
-
 
     @Column(name = "title", nullable = false, length = 255)
     lateinit var title: String
