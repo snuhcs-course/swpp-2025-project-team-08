@@ -1,16 +1,8 @@
 package com.example.itda.ui.home
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.itda.data.model.DummyData
-import com.example.itda.data.model.User
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.components.ScreenContract
@@ -24,7 +16,10 @@ object HomeContract : ScreenContract {
 
 @Composable
 fun HomeScreen(
-    onFeedClick: (Int) -> Unit
+    ui: HomeViewModel.HomeUiState, // UiState를 인자로 받음
+    onFeedClick: (Int) -> Unit,
+    onCategorySelected: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 //    val homeViewModel : HomeViewModel = hiltViewModel()
 
@@ -33,48 +28,43 @@ fun HomeScreen(
     //  이걸 가공해서 feedList 에 FeedItem Type 으로 넣어줘야할듯.
     //  Feedlist 인자 타입도 FeedItem으로 바꾸고.
     //  근데 Program에 logoURl, user와의 star, eligible 관계 모두 들어있거나 불러올 수 있으면 노상관
-    val feedPrograms = DummyData.dummyPrograms
-    val dummyFeedItems = DummyData.dummyFeedItems
 
-    val user: User = DummyData.dummyUser[0]
-
-    val categories = remember { DummyData.dummyCategories }
-    var selectedCategory by remember { mutableStateOf(categories[0].name) }
-
-    val filteredFeedPrograms = if (selectedCategory == "전체" || selectedCategory.isEmpty()) {
-        dummyFeedItems
+    val filteredFeedPrograms = if (ui.selectedCategoryName == "전체" || ui.selectedCategoryName.isEmpty()) {
+        ui.feedItems
     } else {
-        dummyFeedItems.filter { it.category == selectedCategory }
+        ui.feedItems.filter { item ->
+            item.categories.any { category ->
+                category.name == ui.selectedCategoryName
+            } }
     }
+
 
     BaseScreen(
         title = "home",
-        topBarVisible = false, // TODO - toppappbar 사라지지 않는 문제 해결하기
+        topBarVisible = false,
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = modifier) {
             HomeHeader(
-                username = user.name,
+                username = ui.user.name,
                 programCount = filteredFeedPrograms.size
             )
             ProgramFilterRow(
-                categories = categories.map { category -> category.name },
-                selectedCategory = selectedCategory,
-                onCategorySelected = { newCategory ->
-                    selectedCategory = newCategory
-                }
+                categories = ui.categories.map { category -> category.name },
+                selectedCategory = ui.selectedCategoryName,
+                onCategorySelected = onCategorySelected
             )
             FeedList(
                 items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요
-                filterCategory = selectedCategory,
+                filterCategory = ui.selectedCategoryName,
                 onItemClick = { feed -> onFeedClick(feed.id) }
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun PreviewHomeScreen() {
-    // 미리보기를 위한 더미 함수
-    HomeScreen({})
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun PreviewHomeScreen() {
+//    // 미리보기를 위한 더미 함수
+//    HomeScreen({})
+//}
