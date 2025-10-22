@@ -21,4 +21,9 @@ class ProgramRepository @Inject constructor(
     fun getFeed(feedId: Int): FeedItem {
         return DummyData.dummyFeedItems.find { it.id == feedId } ?: DummyData.dummyFeedItems[0]
     }
+
+    // TODO - User에 맞는 program list를 전부 불러오는 함수. 현재는 dummtFeedList 불러오기
+    fun getFeedList(): List<FeedItem> {
+        return DummyData.dummyFeedItems
+    }
 }
