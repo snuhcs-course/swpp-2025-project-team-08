@@ -1,12 +1,13 @@
 package com.example.itda.user
 
+import com.example.itda.DomainException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 
 sealed class UserException(
     code: HttpStatusCode,
     message: String,
-) : RuntimeException(message)
+) : DomainException(code, message)
 
 class AuthenticateException : UserException(
     code = HttpStatus.UNAUTHORIZED,
