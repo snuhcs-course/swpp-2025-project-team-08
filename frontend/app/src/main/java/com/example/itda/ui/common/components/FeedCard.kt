@@ -23,6 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.R
+import com.example.itda.data.model.Category
+import com.example.itda.data.model.DummyData
 import com.example.itda.ui.common.theme.Neutral20
 import com.example.itda.ui.common.theme.Neutral60
 
@@ -31,7 +33,7 @@ import com.example.itda.ui.common.theme.Neutral60
 fun FeedCard(
     id: Int,                // 프로그램 고유 ID
     title: String,          // 프로그램 제목
-    category: String,       // 프로그램 카테고리
+    categories: List<Category>,       // 프로그램 카테고리
     department: String,     // 주관 부서
     link: String? = null,           // 관련 링크 (URL)
     content: String,        // 프로그램 설명 (text)
@@ -76,11 +78,16 @@ fun FeedCard(
                             fontSize = 14.sp,
                             color = Neutral20
                         )
-                        Text(
-                            text = category, // 카테고리
-                            fontSize = 12.sp,
-                            color = Neutral60
-                        )
+                        Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
+                            for (category in categories) {
+                                Text(
+                                    text = category.name, // 카테고리
+                                    fontSize = 12.sp,
+                                    color = Neutral60
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                        }
                     }
                 }
                 StarButton(isStarred)
@@ -124,27 +131,12 @@ fun PreviewFeedItem() {
             FeedCard(
                 id = 1,
                 title = "민생회복 소비쿠폰",
-                category = "소비지원",
+                categories = DummyData.dummyCategories,
                 department = "행정안전부",
                 content = "25만원 받을 수 있음",
                 isStarred = true, // 즐겨찾기 설정됨
                 isEligible = true, // 신청 대상자 O
                 logo = R.drawable.gov_logo,
-                onClick = { }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // 2. 신청 대상자가 아닌 경우
-            FeedCard(
-                id = 2,
-                title = "청년 도약 계좌",
-                category = "자산형성",
-                department = "금융위원회",
-                content = "최대 5천만원 목돈 마련 기회",
-                isStarred = false, // 즐겨찾기 설정 안 됨
-                isEligible = false, // 신청 대상자 X
-                logo = R.drawable.hissf_logo,
                 onClick = { }
             )
         }

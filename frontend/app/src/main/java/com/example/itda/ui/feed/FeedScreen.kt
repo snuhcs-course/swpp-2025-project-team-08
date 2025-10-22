@@ -18,10 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.data.model.DummyData
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.common.theme.Neutral80
@@ -35,7 +33,7 @@ import com.example.itda.ui.feed.components.FeedInfoCard
 
 @Composable
 fun FeedScreen(
-    feedId: Int, // TODO - feedID != programID 가 되는 경우가 있을까?
+    ui: FeedViewModel.FeedUiState, // UiState를 인자로 받음
     onBack: () -> Unit
 ) {
 //    val feedViewModel : FeedViewModel = hiltViewModel()
@@ -44,8 +42,7 @@ fun FeedScreen(
     var detailExpanded by remember { mutableStateOf(false) }
 
     val feed = try {
-        DummyData.dummyFeedItems[feedId]
-//        feedViewModel.getFeedItem(feedId)
+        ui.feed
     } catch (e: Exception) {
         Log.e("FeedScreen", "Feed load failed: $e")
         null
@@ -98,7 +95,7 @@ fun FeedScreen(
             FeedHeaderSection(
                 title = feed.title,
                 endDate = feed.end_date,
-                tags = listOf(feed.category),
+                tags = feed.categories,
                 isEligible = feed.isEligible,
                 isStarred = feed.isStarred
             )
@@ -107,7 +104,7 @@ fun FeedScreen(
 
             // 지원혜택 카드
             FeedInfoCard(
-                category = feed.category,
+                categories = feed.categories,
                 startDate = feed.start_date,
                 endDate = feed.end_date,
                 department = feed.department
@@ -131,9 +128,9 @@ fun FeedScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun PreviewFeedScreen() {
-    // 미리보기를 위한 더미 함수
-    FeedScreen(1, {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun PreviewFeedScreen() {
+//    // 미리보기를 위한 더미 함수
+//    FeedScreen(1, {})
+//}

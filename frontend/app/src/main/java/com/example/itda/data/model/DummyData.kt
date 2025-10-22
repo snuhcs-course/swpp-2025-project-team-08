@@ -66,12 +66,28 @@ object DummyData {
         ),
     )
 
+    val dummyCategories = listOf<Category>(
+        Category(0,  "전체"),
+        Category(1,  "대회"),
+        Category(2,  "소비지원"),
+        Category(3,  "교육"),
+        Category(4,  "자산형성"),
+        Category(5,  "민간사업"),
+        Category(6,  "정부사업"),
+        Category(7,  "AI"),
+        Category(8,  "IT"),
+    )
 
     val dummyFeedItems = listOf<FeedItem>(
         FeedItem(
             id = 1,
             title = "AI 해커톤 2025",
-            category = "대회",
+            categories = listOf<Category>(
+                dummyCategories[1],
+                dummyCategories[5],
+                dummyCategories[7],
+                dummyCategories[8]
+            ),
             department = "소프트웨어학과",
             link = "https://example.com/ai-hackathon",
             content = "인공지능을 활용한 창의적 문제 해결을 주제로 한 해커톤입니다.",
@@ -84,7 +100,11 @@ object DummyData {
         FeedItem(
             id = 2,
             title = "IT 취업 역량 캠프",
-            category = "교육",
+            categories = listOf<Category>(
+                dummyCategories[3],
+                dummyCategories[5],
+                dummyCategories[8]
+            ),
             department = "진로취업센터",
             link = "https://example.com/jobcamp",
             content = "IT 직무 취업을 위한 실전 포트폴리오 작성 및 모의 면접 프로그램.",
@@ -97,7 +117,10 @@ object DummyData {
         FeedItem(
             id = 3,
             title = "청년 도약 계좌",
-            category = "자산형성",
+            categories = listOf<Category>(
+                dummyCategories[4],
+                dummyCategories[6],
+            ),
             department = "금융위원회",
             content = "최대 5천만원 목돈 마련 기회",
             link = "https://example.com/ai-hackathon",
@@ -110,7 +133,10 @@ object DummyData {
         FeedItem(
             id = 4,
             title = "민생회복 소비쿠폰",
-            category = "소비지원",
+            categories = listOf<Category>(
+                dummyCategories[2],
+                dummyCategories[6],
+            ),
             department = "행정안전부",
             content = "25만원 받을 수 있음",
             link = "https://example.com/jobcamp",
@@ -123,7 +149,10 @@ object DummyData {
         FeedItem(
             id = 5,
             title = "2차 민생회복 소비쿠폰",
-            category = "소비지원",
+            categories = listOf<Category>(
+                dummyCategories[2],
+                dummyCategories[6],
+            ),
             department = "행정안전부",
             content = "25만원 받을 수 있음",
             link = "https://example.com/jobcamp",
@@ -136,7 +165,10 @@ object DummyData {
         FeedItem(
             id = 6,
             title = "1000회차 민생회복 소비로또",
-            category = "소비지원",
+            categories = listOf<Category>(
+                dummyCategories[2],
+                dummyCategories[6],
+            ),
             department = "행정안전부",
             content = "25만원 받을 수 있음",
             link = "https://example.com/jobcamp",
@@ -191,11 +223,4 @@ object DummyData {
         )
     )
 
-    val dummyCategories = listOf<Category>(
-        Category(0, "all", "전체"),
-        Category(1, "competition", "대회"),
-        Category(2, "spending", "소비지원"),
-        Category(3, "education", "교육"),
-        Category(4, "wealth", "자산형성"),
-    )
 }

@@ -4,7 +4,7 @@ data class FeedItem(
 
     val id: Int,             // 프로그램 고유 ID
     val title: String,       // 프로그램 제목
-    val category: String,    // 프로그램 카테고리
+    val categories: List<Category>,    // 프로그램 카테고리
     val department: String,  // 주관 부서
     val link: String,        // 관련 링크 (URL)
     val content: String,     // 프로그램 설명 (text)
