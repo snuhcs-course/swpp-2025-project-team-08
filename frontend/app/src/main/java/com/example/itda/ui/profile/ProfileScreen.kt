@@ -47,10 +47,12 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-//    viewModel: ProfileViewModel,
-//    navController: NavController
+    ui : ProfileViewModel.ProfileUiState,
+    onSettingClick : () -> Unit,
+    onPersonalInfoClick : () -> Unit,
+    modifier : Modifier = Modifier,
 ) {
-//    val userInfo by viewModel.userInfo.collectAsState()
+
 
     Scaffold(
         topBar = {
@@ -58,9 +60,7 @@ fun ProfileScreen(
                 title = { Text("Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
                 actions = {
                     IconButton(
-                        onClick = {
-//                            navController.navigate("settings")
-                        },
+                        onClick = onSettingClick,
                         modifier = Modifier
                             .padding(end = 8.dp)
                     ) {
@@ -180,9 +180,7 @@ fun ProfileScreen(
                         )
                     }
                     Button(
-                        onClick = {
-//                            navController.navigate("personal_info")
-                        },
+                        onClick = onPersonalInfoClick,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF9C7BA8)
                         ),

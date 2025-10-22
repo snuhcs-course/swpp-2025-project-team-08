@@ -1,8 +1,17 @@
 package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.DummyData
+import com.example.itda.data.model.User
+import com.example.itda.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class UserInfo(
     val userName: String = "User_name",
@@ -18,11 +27,40 @@ data class UserInfo(
     val householdIncome: String = "n",
     val excludedKeywords: String = ""
 )
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
+    data class ProfileUiState(
+        val user: User = DummyData.dummyUser[0], // 사용자 정보
+        val isLoading: Boolean = false
+    )
 
-class ProfileViewModel : ViewModel() {
+    private val _profileUi = MutableStateFlow(ProfileUiState())
+    val profileUi: StateFlow<ProfileViewModel.ProfileUiState> = _profileUi.asStateFlow()
 
-    private val _userInfo = MutableStateFlow(UserInfo())
-    val userInfo: StateFlow<UserInfo> = _userInfo
+    init {
+        loadProfileData()
+    }
+
+
+    // TODO: Repository에 사용자 정보 저장
+    private fun loadProfileData() {
+        viewModelScope.launch {
+            _profileUi.update { it.copy(isLoading = true) }
+
+            val user =
+                userRepository.getMe()
+
+
+            _profileUi.update {
+                it.copy(
+                    user = user,
+                    isLoading = false
+                )
+            }
+        }
+    }
 
     // 나중에 API 연동 시 사용할 함수들
     fun loadUserInfo() {
@@ -30,7 +68,5 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun updateUserInfo(newInfo: UserInfo) {
-        // TODO: Repository에 사용자 정보 저장
-        _userInfo.value = newInfo
     }
 }
