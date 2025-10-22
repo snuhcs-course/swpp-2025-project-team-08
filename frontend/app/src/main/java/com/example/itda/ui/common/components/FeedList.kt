@@ -30,7 +30,7 @@ fun FeedList(
             FeedCard(
                 id = item.id,
                 title = item.title,
-                category = item.category,
+                categories = item.categories,
                 department = item.department,
                 content = item.content,
 

@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.itda.data.model.Category
 
 @Composable
 fun FeedInfoCard(
-    category: String,
+    categories: List<Category>,
     startDate: String,
     endDate: String,
     department: String
@@ -31,7 +32,11 @@ fun FeedInfoCard(
             }
 
             Column(Modifier.padding(12.dp)) {
-                Text(category)
+                Row{
+                    for(category in categories){
+                        Text(category.name)
+                    }
+                }
                 Text("$startDate ~ $endDate")//"25.09.15(월) ~ 25.11.30(일)")
                 Text(department)
             }

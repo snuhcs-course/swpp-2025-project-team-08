@@ -1,11 +1,17 @@
 package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
+import com.example.itda.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class PersonalInfoViewModel : ViewModel() {
+@HiltViewModel
+class PersonalInfoViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+) : ViewModel() {
 
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name

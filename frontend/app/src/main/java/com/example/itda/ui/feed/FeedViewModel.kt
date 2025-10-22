@@ -1,31 +1,55 @@
 package com.example.itda.ui.feed
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.DummyData
 import com.example.itda.data.model.FeedItem
 import com.example.itda.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val programRepository: ProgramRepository
+    private val programRepository: ProgramRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 
-//    private val _feedItem = MutableStateFlow(DummyData.dummyFeedItems[0]) // viewmodel 내에서 관리하는 Writable StateFlow
-//    val feedItem: StateFlow<FeedItem> = _feedItem.asStateFlow() // 외부 접근 가능한 Read-Only StateFlow
+    data class FeedUiState(
+        val feed: FeedItem = DummyData.dummyFeedItems[0], // 피드 데이터[0], // 사용자 정보
+        val isLoading: Boolean = false
+    )
 
 
-    fun getFeedItem(feedId: Int): FeedItem {
-        // TODO - Repository 연결해서 Feed 가져오기
-        // feedItem = {FeedRepository.getFeedItem or programRepository.getProgram}
-        return programRepository.getFeed(feedId)
+    private val _feedUi = MutableStateFlow(FeedUiState())
+    val feedUi: StateFlow<FeedViewModel.FeedUiState> = _feedUi.asStateFlow()
+
+
+    fun getFeedItem(feedId: Int) {
+        viewModelScope.launch {
+            _feedUi.update {it.copy(isLoading = true)}
+            val feedItem = programRepository.getFeed(feedId) // TODO - getFeed 말고 getProgram?
+            _feedUi.update {
+                it.copy(
+                    feed = feedItem,
+                    isLoading = false
+                )
+            }
+        }
+
+
 
     }
 
 
-    fun toggleStar(feedId: Int) {
-        // TODO - Repository 연결해서 toggle Star
+    fun toggleBookmark(feedId: Int) {
+        // TODO - Repository 연결해서 toggle bookmark
 
     }
 

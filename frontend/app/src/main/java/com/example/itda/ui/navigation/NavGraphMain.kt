@@ -1,55 +1,109 @@
 package com.example.itda.ui.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.itda.ui.auth.AuthViewModel
-import com.example.itda.ui.main.MainScreen
+import com.example.itda.ui.common.theme.Neutral100
+import com.example.itda.ui.feed.FeedRoute
+import com.example.itda.ui.home.HomeRoute
+import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.PersonalInfoScreen
-import com.example.itda.ui.profile.PersonalInfoViewModel
-import com.example.itda.ui.profile.ProfileScreen
-import com.example.itda.ui.profile.ProfileViewModel
-import com.example.itda.ui.profile.SettingScreen
-import com.example.itda.ui.profile.SettingViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.itda.ui.profile.ProfileRoute
+import com.example.itda.ui.profile.SettingsRoute
+import com.example.itda.ui.search.SearchScreen
 
+// Bottom Navigation 탭의 경로 목록을 정의합니다.
+private val MainTabRoutes = listOf(
+    "home", "search", "notification", "profile"
+)
 
 fun NavGraphBuilder.mainGraph(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
     navigation(
-        startDestination = "main_screen",
+        startDestination = MainTabRoutes.first(), // "home"
         route = "main_graph"
     ) {
-        composable("main_screen") {
-            MainScreen(authViewModel = authViewModel)
+        // 1. 메인 탭 화면들 정의
+        MainTabRoutes.forEach { route ->
+            composable(route) {
+                // MainScaffoldWrapper로 감싸서 BottomBar와 Padding을 제공
+                MainScaffoldWrapper(navController = navController) { innerPadding ->
+                    when (route) {
+                        "home" -> HomeRoute(
+                            onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                        "search" -> SearchScreen(
+                            //modifier = Modifier.padding(innerPadding)
+                         )
+                        "notification" -> NotificationScreen(
+                            //modifier = Modifier.padding(innerPadding)
+                         )
+                        "profile" -> ProfileRoute(
+                            onSettingClick = { navController.navigate("settings") },
+                            onPersonalInfoClick = { navController.navigate("personal_info") },
+                            modifier=  Modifier.padding(innerPadding),
+                        )
+                    }
+                }
+            }
         }
 
-        composable("profile") {
-            val viewModel: ProfileViewModel = viewModel()
-            ProfileScreen(
-                viewModel = viewModel,
-                navController = navController
-            )
+        // 2. Bottom Bar가 없는 상세 화면 정의
+        composable(
+            route = "feed/{feedId}",
+            arguments = listOf(navArgument("feedId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val feedId = backStackEntry.arguments?.getInt("feedId")
+            if (feedId != null) {
+                // 이 화면은 Wrapper로 감싸지 않아 BottomBar가 보이지 않습니다.
+                FeedRoute(
+                    feedId = feedId,
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
 
         composable("settings") {
-            val viewModel: SettingViewModel = viewModel()
-            SettingScreen(
-                viewModel = viewModel,
-                navController = navController,
-                authViewModel = authViewModel
+            SettingsRoute(
+                onBack = { navController.popBackStack() },
             )
         }
 
         composable("personal_info") {
-            val viewModel: PersonalInfoViewModel = viewModel()
             PersonalInfoScreen(
-                viewModel = viewModel,
-                navController = navController
+                onBack = { navController.popBackStack() },
             )
         }
+
+    }
+}
+
+@Composable
+fun MainScaffoldWrapper(
+    navController: NavController,
+    content: @Composable (paddingValues: PaddingValues) -> Unit
+) {
+    // 현재 경로를 확인하여 Bottom Bar를 숨길지 결정하는 로직을 추가할 수 있습니다.
+    // 하지만, NavGraphMain에서 Scaffold Wrapper를 사용할 때,
+    // BottomBar가 필요 없는 경로는 Wrapper를 사용하지 않도록 설계하는 것이 더 깔끔합니다.
+    // 여기서는 BottomNavBar가 필요한 탭 화면을 감싸는 역할만 수행합니다.
+    Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }, // 👈 BottomNavBar가 여기에 위치
+        containerColor = Neutral100, // 배경색
+    ) { innerPadding -> // 👈 BottomBar의 높이만큼 계산된 PaddingValues가 innerPadding으로 제공됨
+        content(innerPadding) // 👈 이 innerPadding이 content 람다를 통해 Route로 전달됩니다.
     }
 }
