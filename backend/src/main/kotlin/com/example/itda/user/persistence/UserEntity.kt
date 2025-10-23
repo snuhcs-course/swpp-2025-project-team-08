@@ -1,5 +1,9 @@
 package com.example.itda.user.persistence
 
+import com.example.itda.program.persistence.enums.EducationLevel
+import com.example.itda.program.persistence.enums.EmploymentStatus
+import com.example.itda.program.persistence.enums.Gender
+import com.example.itda.program.persistence.enums.MaritalStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -22,15 +26,17 @@ class UserEntity(
     @Column(nullable = true)
     var age: Int? = null,
     @Column(nullable = true)
-    var gender: String? = null,
+    var gender: Gender? = null,
     @Column(nullable = true)
     var address: String? = null,
     @Column(name = "marital_status", nullable = true)
-    var maritalStatus: String? = null,
+    var maritalStatus: MaritalStatus? = null,
     @Column(name = "education_level", nullable = true)
-    var educationLevel: String? = null,
+    var educationLevel: EducationLevel? = null,
     @Column(name = "household_size", nullable = true)
     var householdSize: Int? = null,
     @Column(name = "household_income", nullable = true)
     var householdIncome: Int? = null,
+    @Column(name = "employment_status", nullable = true)
+    var employmentStatus: EmploymentStatus? = null,
 )

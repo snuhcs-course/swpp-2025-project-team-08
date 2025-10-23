@@ -13,6 +13,7 @@ data class User(
     val educationLevel: String?,
     val householdSize: Int?,
     val householdIncome: Int?,
+    val employmentStatus: String?,
 ) {
     companion object {
         fun fromEntity(entity: UserEntity): User {
@@ -21,12 +22,13 @@ data class User(
                 email = entity.email,
                 name = entity.name,
                 age = entity.age,
-                gender = entity.gender,
+                gender = entity.gender?.dbValue,
                 address = entity.address,
-                maritalStatus = entity.maritalStatus,
-                educationLevel = entity.educationLevel,
+                maritalStatus = entity.maritalStatus?.dbValue,
+                educationLevel = entity.educationLevel?.dbValue,
                 householdSize = entity.householdSize,
                 householdIncome = entity.householdIncome,
+                employmentStatus = entity.employmentStatus?.dbValue,
             )
         }
     }

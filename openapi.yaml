@@ -234,10 +234,10 @@ components:
           type: string
           description: 성별 (남성/여성/비공개 등)
           enum:
-            - Male
-            - Female
-            - Other
-          example: Female
+            - 무관
+            - 남성
+            - 여성
+          example: 남성
         address:
           type: string
           description: 사용자의 주소지
@@ -246,20 +246,25 @@ components:
           type: string
           description: 결혼 여부
           enum:
-            - Single
-            - Married
-            - Divorced
-          example: Married
+            - 무관
+            - 미혼
+            - 기혼
+            - 이혼/사별
+          example: 기혼
         education_level:
           type: string
           description: 최종 학력
           enum:
-            - HighSchool
-            - Associate
-            - Bachelor
-            - Master
-            - PhD
-          example: Bachelor
+            - 무관
+            - 고졸
+            - 전문대졸
+            - 재학생
+            - 휴학생
+            - 졸업예정
+            - 대졸
+            - 석사
+            - 박사
+          example: 대졸
         household_size:
           type: integer
           format: int32
@@ -271,10 +276,15 @@ components:
           format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
-      required:
-        - email
-        - password
-        - name
+        employment_status:
+          type: string
+          description: 고용 상태
+          enum:
+            - 무관
+            - 재직자
+            - 미취업자
+            - 자영업자
+          example: 재직자
     ProfileRequest:
       type: object
       properties:
@@ -290,10 +300,10 @@ components:
           type: string
           description: 성별 (남성/여성/비공개 등)
           enum:
-            - Male
-            - Female
-            - Other
-          example: Female
+            - ANY
+            - MALE
+            - FEMALE
+          example: FEMALE
         address:
           type: string
           description: 사용자의 주소지
@@ -302,20 +312,25 @@ components:
           type: string
           description: 결혼 여부
           enum:
-            - Single
-            - Married
-            - Divorced
-          example: Married
+            - ANY
+            - SINGLE
+            - MARRIED
+            - DIVORCED_OR_BEREAVED
+          example: MARRIED
         education_level:
           type: string
           description: 최종 학력
           enum:
-            - HighSchool
-            - Associate
-            - Bachelor
-            - Master
-            - PhD
-          example: Bachelor
+            - ANY
+            - HIGHSCHOOL
+            - ASSOCIATE
+            - STUDENT
+            - LEAVE_OF_ABSENCE
+            - EXPECTED_GRADUATION
+            - BACHELOR
+            - MASTER
+            - PHD
+          example: EXPECTED_GRADUATION
         household_size:
           type: integer
           format: int32
@@ -327,32 +342,149 @@ components:
           format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
-
+        employment_status:
+          type: string
+          description: 고용 상태
+          enum:
+            - ANY
+            - EMPLOYED
+            - UNEMPLOYED
+            - SELF_EMPLOYED
+          example: EMPLOYED
     Program:
       type: object
       properties:
         id:
+          type: integer
+          format: int32
+          description: '프로그램의 내부 식별자 (ID)'
+          example: 1234
+        uuid:
           type: string
+          format: uuid
+          description: '프로그램의 고유 식별자 (UUID)'
           example: abcdef123456
         title:
           type: string
+          description: '프로그램 제목'
           example: "민생지원금 2차"
-        content:
+        details:
           type: string
-          example: "민생지원금 2차"
+          description: '프로그램 상세 내용'
+          example: '코로나 19로 인한 경제적 피해를 극복하기 위한 지원금'
+        applicationMethod:
+          type: string
+          description: '신청 방법'
+          example: '온라인 신청'
+        referenceUrl:
+          type: string
+          format: url
+          description: '참고 자료 URL'
+          example: 'https://example.com/ref'
+        eligibilityGender:
+          type: string
+          description: '지원 대상 성별 (예: 남성, 여성, 무관)'
+          enum:
+            - 무관
+            - 남성
+            - 여성
+          example: 여성
+        eligibilityMinAge:
+          type: integer
+          format: int32
+          description: '최소 연령'
+          example: 19
+        eligibilityMaxAge:
+          type: integer
+          format: int32
+          description: '최대 연령'
+          example: 65
+        eligibilityRegion:
+          type: string
+          description: '지원 대상 지역'
+          example: '서울시'
+        eligibilityMaritalStatus:
+          type: string
+          description: '지원 대상 결혼 상태 (예: 미혼, 기혼, 무관)'
+          enum:
+            - 무관
+            - 미혼
+            - 기혼
+            - 이혼/사별
+          example: 기혼
+        eligibilityEducation:
+          type: string
+          description: '지원 대상 학력 수준 (예: 고졸, 학사, 무관)'
+          enum:
+            - 무관
+            - 고졸
+            - 전문대졸
+            - 재학생
+            - 휴학생
+            - 졸업예정
+            - 대졸
+            - 석사
+            - 박사
+          example: 대졸
+        eligibilityMinHousehold:
+          type: integer
+          format: int32
+          description: '최소 가구원 수'
+          example: 1
+        eligibilityMaxHousehold:
+          type: integer
+          format: int32
+          description: '최대 가구원 수'
+          example: 4
+        eligibilityMinIncome:
+          type: integer
+          format: int64 
+          description: '최소 가구 소득 (원)'
+          example: 0
+        eligibilityMaxIncome:
+          type: integer
+          format: int64
+          description: '최대 가구 소득 (원)'
+          example: 70000000
+        eligibilityEmployment:
+          type: string
+          description: '지원 대상 고용 상태 (예: 재직자, 미취업자, 무관)'
+          enum:
+            - 무관
+            - 재직자
+            - 미취업자
+            - 자영업자
+          example: 재직자
+        applyStartAt:
+          type: string
+          format: OffsetDateTime
+          description: '신청 시작 일시'
+          example: '2024-01-01T09:00:00+09:00'
+        applyEndAt:
+          type: string
+          format: OffsetDateTime
+          description: '신청 종료 일시'
+          example: '2024-03-31T18:00:00+09:00'
+        createdAt:
+          type: string
+          format: OffsetDateTime
+          description: '생성 일시'
+          example: '2023-12-01T10:00:00+09:00'
+        updatedAt:
+          type: string
+          format: OffsetDateTime
+          description: '최종 수정 일시'
+          example: '2024-01-05T11:30:00+09:00'
     ProgramSummary:
       type: object
       properties:
         id:
-          type: string
-          example: abcdef123456
+          type: integer
+          format: int32
+          example: 1234
         title:
           type: string
           example: "민생지원금 2차"
-        content:
-          type: string
-          example: "민생지원금 2차"
-
     Error:
       type: object
       properties:

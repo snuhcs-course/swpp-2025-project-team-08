@@ -1,5 +1,6 @@
 package com.example.itda.program.persistence
 
+import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
@@ -50,7 +51,7 @@ class ProgramEntity {
     var eligibilityMaritalStatus: MaritalStatus? = null
 
     @Column(name = "eligibility_education", length = 50)
-    var eligibilityEducation: String? = null
+    var eligibilityEducation: EducationLevel? = null
 
     @Column(name = "eligibility_min_household")
     var eligibilityMinHousehold: Int? = null
