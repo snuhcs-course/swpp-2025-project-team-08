@@ -104,6 +104,7 @@ class UserService(
         request.educationLevel?.let { userEntity.educationLevel = it }
         request.householdSize?.let { userEntity.householdSize = it }
         request.householdIncome?.let { userEntity.householdIncome = it }
+        request.employmentStatus?.let { userEntity.employmentStatus = it }
         userRepository.save(userEntity)
     }
 }

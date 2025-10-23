@@ -1,5 +1,9 @@
 package com.example.itda.user.controller
 
+import com.example.itda.program.persistence.enums.EducationLevel
+import com.example.itda.program.persistence.enums.EmploymentStatus
+import com.example.itda.program.persistence.enums.Gender
+import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.user.AuthUser
 import com.example.itda.user.service.UserService
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -72,14 +76,16 @@ data class AuthResponse(
 data class ProfileRequest(
     val name: String?,
     val age: Int?,
-    val gender: String?,
+    val gender: Gender?,
     val address: String?,
     @JsonProperty("marital_status")
-    val maritalStatus: String?,
+    val maritalStatus: MaritalStatus?,
     @JsonProperty("education_level")
-    val educationLevel: String?,
+    val educationLevel: EducationLevel?,
     @JsonProperty("household_size")
     val householdSize: Int?,
     @JsonProperty("household_income")
     val householdIncome: Int?,
+    @JsonProperty("employment_status")
+    val employmentStatus: EmploymentStatus?,
 )

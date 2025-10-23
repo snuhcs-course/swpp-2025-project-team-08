@@ -53,7 +53,7 @@ data class ProgramResponse(
                 eligibilityMaxAge = entity.eligibilityMaxAge,
                 eligibilityRegion = entity.eligibilityRegion,
                 eligibilityMaritalStatus = entity.eligibilityMaritalStatus?.dbValue,
-                eligibilityEducation = entity.eligibilityEducation,
+                eligibilityEducation = entity.eligibilityEducation?.dbValue,
                 eligibilityMinHousehold = entity.eligibilityMinHousehold,
                 eligibilityMaxHousehold = entity.eligibilityMaxHousehold,
                 eligibilityMinIncome = entity.eligibilityMinIncome,

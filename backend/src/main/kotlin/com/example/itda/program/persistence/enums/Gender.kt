@@ -1,6 +1,7 @@
 package com.example.itda.program.persistence.enums
 
 enum class Gender(val dbValue: String) {
+    ANY("무관"),
     MALE("남성"),
     FEMALE("여성"),
     ;
