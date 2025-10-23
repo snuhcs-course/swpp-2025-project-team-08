@@ -258,10 +258,13 @@ components:
             - 무관
             - 고졸
             - 전문대졸
-            - 학사
+            - 재학생
+            - 휴학생
+            - 졸업예정
+            - 대졸
             - 석사
             - 박사
-          example: 학사
+          example: 대졸
         household_size:
           type: integer
           format: int32
@@ -321,10 +324,13 @@ components:
             - ANY
             - HIGHSCHOOL
             - ASSOCIATE
+            - STUDENT
+            - LEAVE_OF_ABSENCE
+            - EXPECTED_GRADUATION
             - BACHELOR
             - MASTER
             - PHD
-          example: ASSOCIATE
+          example: EXPECTED_GRADUATION
         household_size:
           type: integer
           format: int32
@@ -413,10 +419,13 @@ components:
             - 무관
             - 고졸
             - 전문대졸
-            - 학사
+            - 재학생
+            - 휴학생
+            - 졸업예정
+            - 대졸
             - 석사
             - 박사
-          example: '학사'
+          example: 대졸
         eligibilityMinHousehold:
           type: integer
           format: int32
