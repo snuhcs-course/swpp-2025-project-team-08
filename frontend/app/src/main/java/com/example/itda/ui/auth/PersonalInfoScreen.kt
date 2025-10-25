@@ -77,7 +77,8 @@ fun PersonalInfoScreen(
                         label = "성함",
                         value = ui.name,
                         onValueChange = onNameChange,
-                        placeholder = "성함을 입력해주세요"
+                        placeholder = "성함을 입력해주세요",
+                        errorMessage = ui.nameError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -86,7 +87,8 @@ fun PersonalInfoScreen(
                     BirthDateInput(
                         label = "생년월일",
                         value = ui.birthDate,
-                        onValueChange = onBirthDateChange
+                        onValueChange = onBirthDateChange,
+                        errorMessage = ui.birthDateError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -118,17 +120,42 @@ fun PersonalInfoScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (ui.genderError != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = ui.genderError,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // 주소
                     InputField(
                         label = "주소",
                         value = ui.address,
                         onValueChange = onAddressChange,
-                        placeholder = "주소를 입력해주세요"
+                        placeholder = "주소를 입력해주세요",
+                        errorMessage = ui.addressError
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (ui.generalError != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = ui.generalError,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // 제출하기 버튼
                     val isFormValid = ui.name.isNotEmpty() &&
@@ -146,14 +173,23 @@ fun PersonalInfoScreen(
                             disabledContainerColor = Neutral80
                         ),
                         shape = RoundedCornerShape(8.dp),
-                        enabled = isFormValid
+                        enabled = isFormValid && !ui.isLoading
                     ) {
-                        Text(
-                            "제출하기",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isFormValid) Neutral100 else Neutral40
-                        )
+                        if (ui.isLoading) {
+                            // ✨ 로딩 중 스피너 표시
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Neutral100,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                "제출하기",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (isFormValid) Neutral100 else Neutral40
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))

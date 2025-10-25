@@ -77,7 +77,8 @@ fun SignUpScreen(
                         label = "이메일",
                         value = ui.email,
                         onValueChange = onSignUpEmailChange,
-                        placeholder = "이메일을 입력해주세요."
+                        placeholder = "이메일을 입력해주세요.",
+                        errorMessage = ui.emailError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -87,7 +88,8 @@ fun SignUpScreen(
                         value = ui.password,
                         onValueChange = onSignUpPasswordChange,
                         placeholder = "비밀번호를 입력해주세요.",
-                        isPassword = true
+                        isPassword = true,
+                        errorMessage = ui.passwordError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -97,7 +99,8 @@ fun SignUpScreen(
                         value = ui.confirmPassword,
                         onValueChange = onSignUpConfirmChange,
                         placeholder = "비밀번호를 다시 입력해주세요.",
-                        isPassword = true
+                        isPassword = true,
+                        errorMessage = ui.confirmPasswordError
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -125,7 +128,19 @@ fun SignUpScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (ui.generalError != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = ui.generalError,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     val isFormValid =
                         ui.email.isNotEmpty() && ui.password.isNotEmpty() && ui.confirmPassword.isNotEmpty() && ui.agreeTerms

@@ -3,6 +3,8 @@ package com.example.itda.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
+import com.example.itda.data.source.remote.ApiError
+import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -32,39 +33,64 @@ class AuthViewModel @Inject constructor(
         val email: String = "",
         val password: String = "",
         val isLoading: Boolean = false,
-        val error: String? = null
+        val emailError: String? = null,
+        val passwordError: String? = null,
+        val generalError: String? = null
     )
 
     private val _loginUi = MutableStateFlow(LoginUiState())
     val loginUi: StateFlow<LoginUiState> = _loginUi.asStateFlow()
 
     fun onLoginEmailChange(v: String) {
-        _loginUi.value = _loginUi.value.copy(email = v, error = null)
+        _loginUi.update { it.copy(email = v, emailError = null, generalError = null) }
     }
 
     fun onLoginPasswordChange(v: String) {
-        _loginUi.value = _loginUi.value.copy(password = v, error = null)
+        _loginUi.update { it.copy(password = v, passwordError = null, generalError = null) }
     }
 
-    // 로그인
     suspend fun submitLogin(): Boolean {
         val ui = _loginUi.value
 
-        if (ui.email.isBlank() || ui.password.isBlank()) {
-            _loginUi.update { it.copy(error = "이메일/비밀번호를 입력하세요.") }
+        if (ui.email.isBlank()) {
+            _loginUi.update { it.copy(emailError = "이메일을 입력해주세요") }
             return false
         }
-        _loginUi.update { it.copy(isLoading = true, error = null) }
+        if (ui.password.isBlank()) {
+            _loginUi.update { it.copy(passwordError = "비밀번호를 입력해주세요") }
+            return false
+        }
 
-        val ok = authRepository.login(ui.email, ui.password)
-            .onFailure { e -> _loginUi.update { it.copy(error = e.message ?: "로그인 실패") } }
-            .isSuccess
+        _loginUi.update { it.copy(isLoading = true, emailError = null, passwordError = null, generalError = null) }
+
+        val result = authRepository.login(ui.email, ui.password)
+
+        result.onFailure { exception ->
+            val apiError = ApiErrorParser.parseError(exception)
+
+            when (apiError) {
+                is ApiError.UserNotFound -> {
+                    _loginUi.update { it.copy(emailError = apiError.message) }
+                }
+                is ApiError.WrongPassword -> {
+                    _loginUi.update { it.copy(passwordError = apiError.message) }
+                }
+                is ApiError.NetworkError -> {
+                    _loginUi.update { it.copy(generalError = apiError.message) }
+                }
+                else -> {
+                    _loginUi.update { it.copy(generalError = apiError.message) }
+                }
+            }
+        }
+
         _loginUi.update { it.copy(isLoading = false) }
-        if (ok) {
+
+        if (result.isSuccess) {
             _isLoggedIn.value = true
         }
 
-        return ok
+        return result.isSuccess
     }
 
     // 로그아웃
@@ -82,26 +108,36 @@ class AuthViewModel @Inject constructor(
         val confirmPassword: String = "",
         val agreeTerms: Boolean = false,
         val isLoading: Boolean = false,
-        val error: String? = null
+        val emailError: String? = null,
+        val passwordError: String? = null,
+        val confirmPasswordError: String? = null,
+        val generalError: String? = null
     )
 
     private val _signUpUi = MutableStateFlow(SignUpUiState())
     val signUpUi: StateFlow<SignUpUiState> = _signUpUi.asStateFlow()
 
     fun onSignUpEmailChange(v: String) {
-        _signUpUi.value = _signUpUi.value.copy(email = v, error = null)
+        _signUpUi.update { it.copy(email = v, emailError = null, generalError = null) }
     }
 
     fun onSignUpPasswordChange(v: String) {
-        _signUpUi.value = _signUpUi.value.copy(password = v, error = null)
+        _signUpUi.update {
+            it.copy(
+                password = v,
+                passwordError = null,
+                confirmPasswordError = null,
+                generalError = null
+            )
+        }
     }
 
     fun onSignUpConfirmChange(v: String) {
-        _signUpUi.value = _signUpUi.value.copy(confirmPassword = v, error = null)
+        _signUpUi.update { it.copy(confirmPassword = v, confirmPasswordError = null, generalError = null) }
     }
 
     fun onAgreeTermsChange(v: Boolean) {
-        _signUpUi.value = _signUpUi.value.copy(agreeTerms = v, error = null)
+        _signUpUi.update { it.copy(agreeTerms = v, generalError = null) }
     }
 
     fun isSignUpFormValid(ui: SignUpUiState = _signUpUi.value): Boolean {
@@ -114,26 +150,78 @@ class AuthViewModel @Inject constructor(
     }
 
     suspend fun submitSignUp(): Boolean {
-
         val ui = _signUpUi.value
 
-        if (!isSignUpFormValid(ui)) {
-            _signUpUi.update { it.copy(error = "입력값을 확인해주세요.") }
-            return false
+        var hasError = false
+
+        if (ui.email.isBlank()) {
+            _signUpUi.update { it.copy(emailError = "이메일을 입력해주세요") }
+            hasError = true
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(ui.email).matches()) {
+            _signUpUi.update { it.copy(emailError = "올바른 이메일 형식이 아닙니다") }
+            hasError = true
         }
 
-        _signUpUi.update { it.copy(isLoading = true, error = null) }
+        if (ui.password.isBlank()) {
+            _signUpUi.update { it.copy(passwordError = "비밀번호를 입력해주세요") }
+            hasError = true
+        } else if (ui.password.length !in 8..16) {
+            _signUpUi.update { it.copy(passwordError = "비밀번호는 8~16자여야 합니다") }
+            hasError = true
+        }
 
-        val ok = authRepository.signup(ui.email, ui.password)
-            .onFailure { e ->
-                _signUpUi.update { it.copy(error = e.message ?: "회원가입 실패") }
+        if (ui.confirmPassword.isBlank()) {
+            _signUpUi.update { it.copy(confirmPasswordError = "비밀번호를 다시 입력해주세요") }
+            hasError = true
+        } else if (ui.password != ui.confirmPassword) {
+            _signUpUi.update { it.copy(confirmPasswordError = "비밀번호가 일치하지 않습니다") }
+            hasError = true
+        }
+
+        if (!ui.agreeTerms) {
+            _signUpUi.update { it.copy(generalError = "약관에 동의해주세요") }
+            hasError = true
+        }
+
+        if (hasError) return false
+
+        _signUpUi.update {
+            it.copy(
+                isLoading = true,
+                emailError = null,
+                passwordError = null,
+                confirmPasswordError = null,
+                generalError = null
+            )
+        }
+
+        val result = authRepository.signup(ui.email, ui.password)
+
+        result.onFailure { exception ->
+            val apiError = ApiErrorParser.parseError(exception)
+
+            when (apiError) {
+                is ApiError.InvalidEmail -> {
+                    _signUpUi.update { it.copy(emailError = apiError.message) }
+                }
+                is ApiError.BadPassword -> {
+                    _signUpUi.update { it.copy(passwordError = apiError.message) }
+                }
+                is ApiError.EmailConflict -> {
+                    _signUpUi.update { it.copy(emailError = apiError.message) }
+                }
+                is ApiError.NetworkError -> {
+                    _signUpUi.update { it.copy(generalError = apiError.message) }
+                }
+                else -> {
+                    _signUpUi.update { it.copy(generalError = apiError.message) }
+                }
             }
-            .isSuccess
+        }
 
         _signUpUi.update { it.copy(isLoading = false) }
 
-
-        return ok
+        return result.isSuccess
     }
 
     // 기본 개인 정보 입력 상태
@@ -143,61 +231,97 @@ class AuthViewModel @Inject constructor(
         val gender: String = "",
         val address: String = "",
         val isLoading: Boolean = false,
-        val error: String? = null
+        val nameError: String? = null,
+        val birthDateError: String? = null,
+        val genderError: String? = null,
+        val addressError: String? = null,
+        val generalError: String? = null
     )
 
     private val _personalInfoUi = MutableStateFlow(PersonalInfoUiState())
     val personalInfoUi: StateFlow<PersonalInfoUiState> = _personalInfoUi.asStateFlow()
 
     fun onNameChange(v: String) {
-        _personalInfoUi.value = _personalInfoUi.value.copy(name = v, error = null)
+        _personalInfoUi.update { it.copy(name = v, nameError = null, generalError = null) }
     }
 
     fun onBirthDateChange(v: String) {
         val filtered = v.filter { it.isDigit() }.take(8)
-        _personalInfoUi.value = _personalInfoUi.value.copy(birthDate = filtered, error = null)
+        _personalInfoUi.update { it.copy(birthDate = filtered, birthDateError = null, generalError = null) }
     }
 
     fun onGenderChange(v: String) {
-        _personalInfoUi.value = _personalInfoUi.value.copy(gender = v, error = null)
+        _personalInfoUi.update { it.copy(gender = v, genderError = null, generalError = null) }
     }
 
     fun onAddressChange(v: String) {
-        _personalInfoUi.value = _personalInfoUi.value.copy(address = v, error = null)
+        _personalInfoUi.update { it.copy(address = v, addressError = null, generalError = null) }
     }
 
     suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
-        if (ui.name.isBlank() || ui.birthDate.isBlank() ||
-            ui.gender.isBlank() || ui.address.isBlank()
-        ) {
-            _personalInfoUi.update { it.copy(error = "모든 항목을 입력해주세요.") }
-            return false
+        var hasError = false
+
+        if (ui.name.isBlank()) {
+            _personalInfoUi.update { it.copy(nameError = "이름을 입력해주세요") }
+            hasError = true
         }
 
-        _personalInfoUi.update { it.copy(isLoading = true, error = null) }
+        if (ui.birthDate.isBlank()) {
+            _personalInfoUi.update { it.copy(birthDateError = "생년월일을 입력해주세요") }
+            hasError = true
+        } else if (ui.birthDate.length != 8) {
+            _personalInfoUi.update { it.copy(birthDateError = "8자리를 입력해주세요") }
+            hasError = true
+        } else if (!isValidBirthDate(ui.birthDate)) {
+            _personalInfoUi.update { it.copy(birthDateError = "올바른 생년월일을 입력해주세요") }
+            hasError = true
+        }
+
+        if (ui.gender.isBlank()) {
+            _personalInfoUi.update { it.copy(genderError = "성별을 선택해주세요") }
+            hasError = true
+        }
+
+        if (ui.address.isBlank()) {
+            _personalInfoUi.update { it.copy(addressError = "주소를 입력해주세요") }
+            hasError = true
+        }
+
+        if (hasError) return false
+
+        _personalInfoUi.update {
+            it.copy(
+                isLoading = true,
+                nameError = null,
+                birthDateError = null,
+                genderError = null,
+                addressError = null,
+                generalError = null
+            )
+        }
 
         val age = calculateAge(ui.birthDate)
 
-        val ok = authRepository.updateProfile(
+        val result = authRepository.updateProfile(
             name = ui.name,
             age = age,
             gender = ui.gender,
             address = ui.address
         )
 
-            .onFailure { e ->
-                _personalInfoUi.update {
-                    it.copy(error = e.message ?: "프로필 업데이트 실패")
-                }
-            }
-            .isSuccess
+        result.onFailure { exception ->
+            val apiError = ApiErrorParser.parseError(exception)
+            _personalInfoUi.update { it.copy(generalError = apiError.message) }
+        }
 
         _personalInfoUi.update { it.copy(isLoading = false) }
-        if (ok) {
+
+        if (result.isSuccess) {
             _isLoggedIn.value = true
         }
-        return ok
+
+        return result.isSuccess
     }
 }
