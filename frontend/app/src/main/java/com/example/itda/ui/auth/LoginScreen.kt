@@ -5,21 +5,10 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,13 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.ui.common.theme.Neutral0
-import com.example.itda.ui.common.theme.Neutral10
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Neutral40
-import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.Neutral90
-import com.example.itda.ui.common.theme.Primary60
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun LoginScreen(
@@ -98,7 +81,8 @@ fun LoginScreen(
                         label = "이메일",
                         value = ui.email,
                         onValueChange = onLoginEmailChange,
-                        placeholder = "이메일을 입력해주세요."
+                        placeholder = "이메일을 입력해주세요.",
+                        errorMessage = ui.emailError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -108,39 +92,65 @@ fun LoginScreen(
                         value = ui.password,
                         onValueChange = onLoginPasswordChange,
                         placeholder = "비밀번호를 입력해주세요.",
-                        isPassword = true
+                        isPassword = true,
+                        errorMessage = ui.passwordError
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (ui.generalError != null) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = ui.generalError,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // 로그인 버튼
                     val isFormValid = ui.email.isNotEmpty() && ui.password.isNotEmpty()
 
                     Button(
-                        onClick = {
-                            /* TODO: 로그인 API 연결 */
-                            Log.d("login", "LoginButtonClicked on LoginScreen: $data")
-                            onSubmit()
-                        },
+                        onClick = onSubmit,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isFormValid)
-                                Primary60  // 활성화 시 메인 컬러
+                                Primary60
                             else
                                 Neutral90,
                             disabledContainerColor = Neutral80
                         ),
                         shape = RoundedCornerShape(8.dp),
-                        enabled = isFormValid
+                        enabled = isFormValid && !ui.isLoading
                     ) {
-                        Text(
-                            "로그인",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isFormValid) Neutral100 else Neutral40
-                        )
+                        if (ui.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Neutral100,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                "로그인",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (isFormValid) Neutral100 else Neutral40
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -169,19 +179,19 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // 비밀번호 찾기
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "비밀번호 찾기",
-                            fontSize = 14.sp,
-                            color = Neutral40,
-                            modifier = Modifier
-                                .clickable { }
-                                .padding(8.dp)
-                        )
-                    }
+//                    Box(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        Text(
+//                            text = "비밀번호 찾기",
+//                            fontSize = 14.sp,
+//                            color = Neutral40,
+//                            modifier = Modifier
+//                                .clickable { }
+//                                .padding(8.dp)
+//                        )
+//                    }
                 }
             }
         }

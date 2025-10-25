@@ -24,8 +24,11 @@ fun InputField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
+    errorMessage: String? = null,
     isPassword: Boolean = false
 ) {
+    val isError = errorMessage != null
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -46,6 +49,7 @@ fun InputField(
                 PasswordVisualTransformation()
             else
                 VisualTransformation.None,
+            isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Primary60,
                 unfocusedBorderColor = Neutral90,
@@ -53,7 +57,16 @@ fun InputField(
                 unfocusedTextColor = Neutral10
             ),
             shape = RoundedCornerShape(8.dp),
-            singleLine = true
+            singleLine = true,
+            supportingText = if (isError) {
+                {
+                    Text(
+                        text = errorMessage,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            } else null
         )
     }
 }
@@ -99,8 +112,11 @@ fun BirthDateInput(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    errorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val isError = errorMessage != null
+
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -125,6 +141,7 @@ fun BirthDateInput(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number  // 숫자 키패드
             ),
+            isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Primary60,
                 unfocusedBorderColor = Neutral90,
@@ -132,7 +149,16 @@ fun BirthDateInput(
                 unfocusedTextColor = Neutral10
             ),
             shape = RoundedCornerShape(8.dp),
-            singleLine = true
+            singleLine = true,
+            supportingText = {
+                if (isError) {
+                    Text(
+                        text = errorMessage,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         )
     }
 }
@@ -148,4 +174,22 @@ fun calculateAge(birthDate: String): Int? {
     val currentYear = 2025
 
     return currentYear - birthYear
+}
+
+/**
+ * 생년월일 유효성 검사
+ */
+fun isValidBirthDate(birthDate: String): Boolean {
+    if (birthDate.length != 8) return false
+
+    val year = birthDate.substring(0, 4).toIntOrNull() ?: return false
+    val month = birthDate.substring(4, 6).toIntOrNull() ?: return false
+    val day = birthDate.substring(6, 8).toIntOrNull() ?: return false
+
+    // 기본 범위 체크
+    if (year < 1900 || year > 2025) return false
+    if (month < 1 || month > 12) return false
+    if (day < 1 || day > 31) return false
+
+    return true
 }
