@@ -176,7 +176,6 @@ fun PersonalInfoScreen(
                         enabled = isFormValid && !ui.isLoading
                     ) {
                         if (ui.isLoading) {
-                            // ✨ 로딩 중 스피너 표시
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
                                 color = Neutral100,

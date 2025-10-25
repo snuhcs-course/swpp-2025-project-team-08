@@ -7,10 +7,10 @@ import com.google.gson.annotations.SerializedName
  */
 data class ErrorResponse(
     @SerializedName("code")
-    val code: String,  // ✨ "NOT_FOUND", "BAD_REQUEST" 등 문자열!
+    val code: String,
 
     @SerializedName("message")
-    val message: String  // "User not found" 등
+    val message: String
 )
 
 /**
