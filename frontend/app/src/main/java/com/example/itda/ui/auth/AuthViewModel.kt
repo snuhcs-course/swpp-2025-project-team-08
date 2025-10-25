@@ -184,11 +184,7 @@ class AuthViewModel @Inject constructor(
             name = ui.name,
             age = age,
             gender = ui.gender,
-            address = ui.address,
-            maritalStatus = "Single",
-            educationLevel = "HighSchool",
-            householdSize = 1,
-            householdIncome = 7500
+            address = ui.address
         )
 
             .onFailure { e ->
@@ -204,14 +200,4 @@ class AuthViewModel @Inject constructor(
         }
         return ok
     }
-
-    private fun calculateAge(birthDate: String): Int {
-        if (birthDate.length != 8) return 0
-
-        val birthYear = birthDate.substring(0, 4).toIntOrNull() ?: return 0
-        val currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
-
-        return currentYear - birthYear
-    }
-
 }
