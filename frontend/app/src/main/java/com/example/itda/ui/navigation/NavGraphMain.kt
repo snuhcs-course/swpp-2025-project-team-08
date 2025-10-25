@@ -46,7 +46,7 @@ fun NavGraphBuilder.mainGraph(
                             modifier = Modifier.padding(innerPadding)
                         )
                         "search" -> SearchScreen(
-                            //modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding)
                          )
                         "notification" -> NotificationScreen(
                             //modifier = Modifier.padding(innerPadding)
