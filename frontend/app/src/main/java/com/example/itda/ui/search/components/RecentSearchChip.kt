@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.*
 
 /**
- * 최근 검색어 칩 (가로 스크롤용)
+ * 최근 검색어 칩
  */
 @Composable
 fun RecentSearchChip(
@@ -26,8 +26,8 @@ fun RecentSearchChip(
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onItemClick),
-        shape = RoundedCornerShape(16.dp),  // 둥근 모서리
-        color = Neutral90,  // 배경색 (연한 회색)
+        shape = RoundedCornerShape(16.dp),
+        color = Neutral90,
         tonalElevation = 0.dp
     ) {
         Row(

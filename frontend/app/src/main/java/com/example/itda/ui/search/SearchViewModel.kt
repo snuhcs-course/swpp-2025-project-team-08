@@ -38,8 +38,8 @@ class SearchViewModel @Inject constructor(
                 _uiState.value.recentSearches.filter { it != query }
 
         _uiState.value = _uiState.value.copy(
-            recentSearches = updatedSearches.take(10), // 최대 10개만 저장
-            searchQuery = ""                            // 검색 후 입력창 초기화
+            recentSearches = updatedSearches.take(10),
+            searchQuery = "" // 검색 후 입력창 초기화
         )
 
         // TODO: searchRepository.search(query)
