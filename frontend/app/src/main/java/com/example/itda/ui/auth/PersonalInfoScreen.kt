@@ -106,14 +106,14 @@ fun PersonalInfoScreen(
                     ) {
                         GenderOption(
                             text = "남성",
-                            selected = ui.gender == "Male",
-                            onClick = { onGenderChange("Male") },
+                            selected = ui.gender == "MALE",
+                            onClick = { onGenderChange("MALE") },
                             modifier = Modifier.weight(1f)
                         )
                         GenderOption(
                             text = "여성",
-                            selected = ui.gender == "Female",
-                            onClick = { onGenderChange("Female") },
+                            selected = ui.gender == "FEMALE",
+                            onClick = { onGenderChange("FEMALE") },
                             modifier = Modifier.weight(1f)
                         )
                     }

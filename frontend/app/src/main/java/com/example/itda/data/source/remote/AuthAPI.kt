@@ -29,18 +29,7 @@ data class ProfileRequest(
     val name: String,
     val age: Int?,
     val gender: String?,
-    val address: String?,
-    @SerializedName("marital_status")
-    val maritalStatus: String? = null,
-
-    @SerializedName("education_level")
-    val educationLevel: String? = null,
-
-    @SerializedName("household_size")
-    val householdSize: Int? = null,
-
-    @SerializedName("household_income")
-    val householdIncome: Int? = null
+    val address: String?
 )
 
 data class ProfileResponse(
@@ -49,18 +38,7 @@ data class ProfileResponse(
     val name: String,
     val age: Int?,
     val gender: String?,
-    val address: String?,
-    @SerializedName("marital_status")
-    val maritalStatus: String? = null,
-
-    @SerializedName("education_level")
-    val educationLevel: String? = null,
-
-    @SerializedName("household_size")
-    val householdSize: Int? = null,
-
-    @SerializedName("household_income")
-    val householdIncome: Int? = null
+    val address: String?
 )
 
 

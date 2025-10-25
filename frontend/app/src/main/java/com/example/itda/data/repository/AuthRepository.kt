@@ -62,21 +62,13 @@ class AuthRepository @Inject constructor(
         name: String,
         age: Int? = null,
         gender: String? = null,
-        address: String? = null,
-        maritalStatus: String? = null,
-        educationLevel: String? = null,
-        householdSize: Int? = null,
-        householdIncome: Int? = null
+        address: String? = null
     ): Result<Unit> = runCatching {
         val request = ProfileRequest(
             name = name,
             age = age,
             gender = gender,
-            address = address,
-            maritalStatus = maritalStatus,
-            educationLevel = educationLevel,
-            householdSize = householdSize,
-            householdIncome = householdIncome
+            address = address
         )
         api.updateProfile(request)
     }
