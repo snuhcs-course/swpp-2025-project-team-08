@@ -6,7 +6,6 @@ import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.user.AuthUser
 import com.example.itda.user.service.UserService
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -63,29 +62,20 @@ data class AuthRequest(
 )
 
 data class AuthResponse(
-    @JsonProperty("access_token")
     val accessToken: String,
-    @JsonProperty("refresh_token")
     val refreshToken: String,
-    @JsonProperty("token_type")
     val tokenType: String,
-    @JsonProperty("expires_in")
     val expiresIn: Long,
 )
 
 data class ProfileRequest(
     val name: String?,
-    val age: Int?,
+    val birthDate: String?,
     val gender: Gender?,
     val address: String?,
-    @JsonProperty("marital_status")
     val maritalStatus: MaritalStatus?,
-    @JsonProperty("education_level")
     val educationLevel: EducationLevel?,
-    @JsonProperty("household_size")
     val householdSize: Int?,
-    @JsonProperty("household_income")
     val householdIncome: Int?,
-    @JsonProperty("employment_status")
     val employmentStatus: EmploymentStatus?,
 )

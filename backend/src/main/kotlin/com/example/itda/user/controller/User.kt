@@ -1,12 +1,13 @@
 package com.example.itda.user.controller
 
 import com.example.itda.user.persistence.UserEntity
+import java.time.format.DateTimeFormatter
 
 data class User(
     val id: String,
     val email: String,
     val name: String?,
-    val age: Int?,
+    val birthDate: String?,
     val gender: String?,
     val address: String?,
     val maritalStatus: String?,
@@ -21,7 +22,7 @@ data class User(
                 id = entity.id!!,
                 email = entity.email,
                 name = entity.name,
-                age = entity.age,
+                birthDate = entity.birthDate?.format(DateTimeFormatter.ISO_LOCAL_DATE),
                 gender = entity.gender?.dbValue,
                 address = entity.address,
                 maritalStatus = entity.maritalStatus?.dbValue,

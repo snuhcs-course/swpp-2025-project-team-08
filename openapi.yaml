@@ -197,16 +197,16 @@ components:
     AuthResponse:
       type: object
       properties:
-        access_token:
+        accessToken:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-        refresh_token:
+        refreshToken:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-        token_type:
+        tokenType:
           type: string
           example: Bearer
-        expires_in:
+        expiresIn:
           type: integer
           example: 3600
       required:
@@ -225,11 +225,11 @@ components:
         name:
           type: string
           example: John Doe
-        age:
-          type: integer
-          format: int32
-          description: 사용자 나이
-          example: 35
+        birthDate:
+          type: string
+          format: date
+          description: 사용자 생년월일
+          example: 1988-01-01
         gender:
           type: string
           description: 성별 (남성/여성/비공개 등)
@@ -242,7 +242,7 @@ components:
           type: string
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
-        marital_status:
+        maritalStatus:
           type: string
           description: 결혼 여부
           enum:
@@ -251,7 +251,7 @@ components:
             - 기혼
             - 이혼/사별
           example: 기혼
-        education_level:
+        educationLevel:
           type: string
           description: 최종 학력
           enum:
@@ -265,18 +265,18 @@ components:
             - 석사
             - 박사
           example: 대졸
-        household_size:
+        householdSize:
           type: integer
           format: int32
           description: 가구원 수
           minimum: 1
           example: 4
-        household_income:
+        householdIncome:
           type: integer
           format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
-        employment_status:
+        employmentStatus:
           type: string
           description: 고용 상태
           enum:
@@ -291,11 +291,11 @@ components:
         name:
           type: string
           example: John Doe
-        age:
-          type: integer
-          format: int32
-          description: 사용자 나이
-          example: 35
+        birthDate:
+          type: string
+          format: date
+          description: 사용자 생년월일
+          example: 1988-01-01
         gender:
           type: string
           description: 성별 (남성/여성/비공개 등)
@@ -308,7 +308,7 @@ components:
           type: string
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
-        marital_status:
+        maritalStatus:
           type: string
           description: 결혼 여부
           enum:
@@ -317,7 +317,7 @@ components:
             - MARRIED
             - DIVORCED_OR_BEREAVED
           example: MARRIED
-        education_level:
+        educationLevel:
           type: string
           description: 최종 학력
           enum:
@@ -331,18 +331,18 @@ components:
             - MASTER
             - PHD
           example: EXPECTED_GRADUATION
-        household_size:
+        householdSize:
           type: integer
           format: int32
           description: 가구원 수
           minimum: 1
           example: 4
-        household_income:
+        householdIncome:
           type: integer
           format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
-        employment_status:
+        employmentStatus:
           type: string
           description: 고용 상태
           enum:

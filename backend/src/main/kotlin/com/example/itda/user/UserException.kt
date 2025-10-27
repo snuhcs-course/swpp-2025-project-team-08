@@ -38,3 +38,8 @@ class LogInInvalidPasswordException : UserException(
     code = HttpStatus.BAD_REQUEST,
     message = "Wrong password",
 )
+
+class InvalidBirthDateFormatException : UserException(
+    code = HttpStatus.BAD_REQUEST,
+    message = "Invalid birth date format. Must be in YYYY-MM-DD format.",
+)
