@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDate
 
 @Entity
 @Table(name = "\"user\"")
@@ -23,8 +24,8 @@ class UserEntity(
     var password: String,
     @Column(nullable = true)
     var name: String? = null,
-    @Column(nullable = true)
-    var age: Int? = null,
+    @Column(name = "birth_date", nullable = true)
+    var birthDate: LocalDate? = null,
     @Column(nullable = true)
     var gender: Gender? = null,
     @Column(nullable = true)

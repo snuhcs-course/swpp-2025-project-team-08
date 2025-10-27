@@ -1,6 +1,7 @@
 package com.example.itda.user.service
 
 import com.example.itda.user.AuthenticateException
+import com.example.itda.user.InvalidBirthDateFormatException
 import com.example.itda.user.LogInInvalidPasswordException
 import com.example.itda.user.SignUpBadPasswordException
 import com.example.itda.user.SignUpEmailConflictException
@@ -16,6 +17,9 @@ import org.mindrot.jbcrypt.BCrypt
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @Service
 class UserService(
@@ -97,7 +101,14 @@ class UserService(
     ) {
         val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
         request.name?.let { userEntity.name = it }
-        request.age?.let { userEntity.age = it }
+        request.birthDate?.let {
+            userEntity.birthDate =
+                try {
+                    LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE)
+                } catch (e: DateTimeParseException) {
+                    throw InvalidBirthDateFormatException()
+                }
+        }
         request.gender?.let { userEntity.gender = it }
         request.address?.let { userEntity.address = it }
         request.maritalStatus?.let { userEntity.maritalStatus = it }
