@@ -79,6 +79,12 @@ fun NavGraphBuilder.mainGraph(
         composable("settings") {
             SettingsRoute(
                 onBack = { navController.popBackStack() },
+                onLogoutSuccess = {  // ✅ 추가!
+                    // 로그아웃 성공 시 로그인 화면으로 이동
+                    navController.navigate("auth_graph") {
+                        popUpTo("main_graph") { inclusive = true }
+                    }
+                }
             )
         }
 
