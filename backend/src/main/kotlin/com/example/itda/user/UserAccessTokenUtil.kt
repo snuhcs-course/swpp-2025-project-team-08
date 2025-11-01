@@ -7,9 +7,13 @@ import java.util.Date
 
 object UserAccessTokenUtil {
     private val SECRET_KEY =
-        System.getenv("JWT_SECRET_KEY")
-            ?.let { Keys.hmacShaKeyFor(it.toByteArray(StandardCharsets.UTF_8)) }
-            ?: throw IllegalStateException("JWT_SECRET_KEY is not set!")
+        run {
+            val secretString =
+                System.getProperty("JWT_SECRET_KEY")
+                    ?: System.getenv("JWT_SECRET_KEY")
+                    ?: throw IllegalStateException("JWT_SECRET_KEY is not set!")
+            Keys.hmacShaKeyFor(secretString.toByteArray(StandardCharsets.UTF_8))
+        }
     private const val ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 // 1 day
     private const val REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7 // 7 days
 
