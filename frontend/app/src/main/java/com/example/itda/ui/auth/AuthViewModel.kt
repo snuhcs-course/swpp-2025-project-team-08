@@ -8,6 +8,7 @@ import com.example.itda.data.source.remote.ApiErrorParser
 import com.example.itda.ui.auth.components.formatBirthDate
 import com.example.itda.ui.auth.components.isValidBirthDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,11 +23,18 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+    private val _isLoadingInitial = MutableStateFlow(true)
+    val isLoadingInitial: StateFlow<Boolean> = _isLoadingInitial.asStateFlow()
 
     init {
         viewModelScope.launch {
+            _isLoadingInitial.value = true
+
             val hasToken = authRepository.isLoggedInFlow.first()
             _isLoggedIn.value = hasToken
+
+             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
+            _isLoadingInitial.value = false
         }
     }
 
