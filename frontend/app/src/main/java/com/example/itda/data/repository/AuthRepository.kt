@@ -60,13 +60,13 @@ class AuthRepository @Inject constructor(
 
     suspend fun updateProfile(
         name: String,
-        age: Int? = null,
+        birthDate: String? = null,
         gender: String? = null,
         address: String? = null
     ): Result<Unit> = runCatching {
         val request = ProfileRequest(
             name = name,
-            age = age,
+            birthDate = birthDate,
             gender = gender,
             address = address
         )
