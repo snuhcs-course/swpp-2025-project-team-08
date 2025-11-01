@@ -43,6 +43,7 @@ data class ProfileResponse(
     val employmentStatus: String?
 )
 
+
 interface AuthAPI {
     @POST("auth/signup")
     suspend fun signup(@Body body: AuthRequest): AuthResponse
