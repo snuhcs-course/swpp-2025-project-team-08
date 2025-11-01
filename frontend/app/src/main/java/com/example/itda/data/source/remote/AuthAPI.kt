@@ -12,18 +12,22 @@ data class AuthRequest(
 )
 
 data class AuthResponse(
+    @SerializedName("accessToken")
     val accessToken: String,
 
+    @SerializedName("refreshToken")
     val refreshToken: String?,
 
+    @SerializedName("tokenType")
     val tokenType: String?,
 
+    @SerializedName("expiresIn")
     val expiresIn: Int?
 )
 
 data class ProfileRequest(
     val name: String,
-    val birthDate: String?,
+    val age: Int?,
     val gender: String?,
     val address: String?
 )
@@ -32,7 +36,7 @@ data class ProfileResponse(
     val id: Int,
     val email: String,
     val name: String,
-    val birthDate: String?,
+    val age: Int?,
     val gender: String?,
     val address: String?
 )

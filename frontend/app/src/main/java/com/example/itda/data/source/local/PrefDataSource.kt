@@ -20,10 +20,10 @@ class PrefDataSource @Inject constructor(
     // 가벼운 자잘히 필요할 키 값들을 저장해둘 용도.
     // 토큰, 마지막 로그인 시간등
     private object Keys {
-        val ACCESS_TOKEN = stringPreferencesKey("access_token")
-        val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
-        val TOKEN_TYPE = stringPreferencesKey("token_type")
-        val EXPIRES_IN = intPreferencesKey("expires_in")
+        val ACCESS_TOKEN = stringPreferencesKey("accessToken")
+        val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
+        val TOKEN_TYPE = stringPreferencesKey("tokenType")
+        val EXPIRES_IN = intPreferencesKey("expiresIn")
     }
 
     // 토큰 Flow
