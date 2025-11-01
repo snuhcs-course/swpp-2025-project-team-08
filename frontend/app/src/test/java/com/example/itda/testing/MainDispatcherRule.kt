@@ -9,15 +9,6 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-/**
- * Main Dispatcher를 테스트용으로 교체하는 JUnit Rule
- *
- * 사용법:
- * ```
- * @get:Rule
- * val mainDispatcherRule = MainDispatcherRule()
- * ```
- */
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = StandardTestDispatcher()
 ) : TestRule {
