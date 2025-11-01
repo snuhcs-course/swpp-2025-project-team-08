@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.auth.components.*
 import com.example.itda.ui.common.theme.*
 
 @Composable
@@ -93,7 +94,7 @@ fun PersonalInfoScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 성별 (Radio Button)
+                    // 성별
                     Text(
                         text = "성별",
                         fontSize = 14.sp,

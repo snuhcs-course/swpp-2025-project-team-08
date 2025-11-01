@@ -1,75 +1,17 @@
-package com.example.itda.ui.auth
+package com.example.itda.ui.auth.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.*
-
-/**
- * 공통 입력 필드 컴포넌트
- */
-@Composable
-fun InputField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    errorMessage: String? = null,
-    isPassword: Boolean = false
-) {
-    val isError = errorMessage != null
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Neutral10,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(placeholder, color = Neutral60)
-            },
-            visualTransformation = if (isPassword)
-                PasswordVisualTransformation()
-            else
-                VisualTransformation.None,
-            isError = isError,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary60,
-                unfocusedBorderColor = Neutral90,
-                focusedTextColor = Neutral10,
-                unfocusedTextColor = Neutral10
-            ),
-            shape = RoundedCornerShape(8.dp),
-            singleLine = true,
-            supportingText = if (isError) {
-                {
-                    Text(
-                        text = errorMessage,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            } else null
-        )
-    }
-}
 
 /**
  * 성별 선택 컴포넌트
@@ -161,35 +103,4 @@ fun BirthDateInput(
             }
         )
     }
-}
-
-
-/**
- * 나이 계산하는 헬퍼 함수
- */
-fun calculateAge(birthDate: String): Int? {
-    if (birthDate.length != 8) return null
-
-    val birthYear = birthDate.substring(0, 4).toIntOrNull() ?: return null
-    val currentYear = 2025
-
-    return currentYear - birthYear
-}
-
-/**
- * 생년월일 유효성 검사
- */
-fun isValidBirthDate(birthDate: String): Boolean {
-    if (birthDate.length != 8) return false
-
-    val year = birthDate.substring(0, 4).toIntOrNull() ?: return false
-    val month = birthDate.substring(4, 6).toIntOrNull() ?: return false
-    val day = birthDate.substring(6, 8).toIntOrNull() ?: return false
-
-    // 기본 범위 체크
-    if (year < 1900 || year > 2025) return false
-    if (month < 1 || month > 12) return false
-    if (day < 1 || day > 31) return false
-
-    return true
 }
