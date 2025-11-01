@@ -1,27 +1,37 @@
 package com.example.itda.ui.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.components.ScreenContract
+import com.example.itda.ui.common.theme.Neutral100
+import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
+import com.example.itda.ui.navigation.LoadingScreen
 
 object HomeContract : ScreenContract {
     override val route = "home"
     override val title = "home"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     ui: HomeViewModel.HomeUiState, // UiState를 인자로 받음
     onFeedClick: (Int) -> Unit,
     onCategorySelected: (String) -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-//    val homeViewModel : HomeViewModel = hiltViewModel()
 
     // TODO
     //  이런식으로 homeviewmodel 에서 program 을 가져오고
@@ -38,6 +48,8 @@ fun HomeScreen(
             } }
     }
 
+    val pullToRefreshState = rememberPullToRefreshState()
+
 
     BaseScreen(
         title = "home",
@@ -53,18 +65,45 @@ fun HomeScreen(
                 selectedCategory = ui.selectedCategoryName,
                 onCategorySelected = onCategorySelected
             )
-            FeedList(
-                items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요
-                filterCategory = ui.selectedCategoryName,
-                onItemClick = { feed -> onFeedClick(feed.id) }
-            )
+            if(ui.isLoading) {
+                LoadingScreen(
+                    text = ""
+                )
+            }
+            else {
+                PullToRefreshBox(
+                    isRefreshing = ui.isRefreshing,
+                    onRefresh = { onRefresh() },
+                    state = pullToRefreshState,
+                    indicator = {
+                        Indicator(
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            isRefreshing = ui.isRefreshing,
+                            containerColor = Neutral100,
+                            color = Primary50,
+                            state = pullToRefreshState
+                        )
+                    }
+                ) {
+                    FeedList(
+                        items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요
+                        filterCategory = ui.selectedCategoryName,
+                        onItemClick = { feed -> onFeedClick(feed.id) }
+                    )
+                }
+            }
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun PreviewHomeScreen() {
-//    // 미리보기를 위한 더미 함수
-//    HomeScreen({})
-//}
+@Preview(showBackground = true)
+@Composable
+private fun PreviewHomeScreen() {
+    // 미리보기를 위한 더미 함수
+    HomeScreen(
+        ui = HomeViewModel.HomeUiState(),
+        onFeedClick = {},
+        onCategorySelected = {},
+        onRefresh = {}
+    )
+}
