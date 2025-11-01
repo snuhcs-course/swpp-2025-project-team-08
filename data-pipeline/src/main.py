@@ -1,6 +1,9 @@
+import json
 import os
 import argparse
 
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional, Dict, List
 from urllib.parse import quote_plus
 
@@ -41,6 +44,28 @@ def create_parser():
     return parser
 
 
+def save_raw_programs(programs: List[Dict[str, Any]]):
+    project_root = Path(__file__).resolve().parents[1]
+    data_dir = project_root / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    save_path_ts = data_dir / f"raw_programs_{ts}.json"
+    save_path = data_dir / "raw_programs.json"
+
+    with save_path_ts.open("w", encoding="utf-8") as f:
+        json.dump(programs, f, ensure_ascii=False, indent=2)
+
+    with save_path.open("w", encoding="utf-8") as f:
+        json.dump(programs, f, ensure_ascii=False, indent=2)
+
+    print(f"Saved raw programs to {save_path_ts} and {save_path}.")
+
+
+def save_trimmed_programs():
+    pass
+
+
 def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
     print("[*] Start loading...")
     loaders = [
@@ -52,10 +77,13 @@ def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
 
     programs = []
     for loader in loaders:
-        print(f"{loader} Running...")
+        print(f"Running {loader}...")
         loader_programs = loader.load()
         programs.extend(loader_programs)
-    print(f"Total {len(programs)} programs are loaded.\n")
+    print(f"Total {len(programs)} programs are loaded.")
+
+    save_raw_programs(programs)
+    print()
 
     return programs
 
