@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiError
 import com.example.itda.data.source.remote.ApiErrorParser
+import com.example.itda.ui.auth.components.formatBirthDate
+import com.example.itda.ui.auth.components.isValidBirthDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -93,14 +95,6 @@ class AuthViewModel @Inject constructor(
         return result.isSuccess
     }
 
-    // 로그아웃
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
-            _isLoggedIn.value = false
-        }
-    }
-
     // 회원가입 상태
     data class SignUpUiState(
         val email: String = "",
@@ -138,15 +132,6 @@ class AuthViewModel @Inject constructor(
 
     fun onAgreeTermsChange(v: Boolean) {
         _signUpUi.update { it.copy(agreeTerms = v, generalError = null) }
-    }
-
-    fun isSignUpFormValid(ui: SignUpUiState = _signUpUi.value): Boolean {
-        return ui.email.isNotBlank() &&
-                ui.password.isNotBlank() &&
-                ui.confirmPassword.isNotBlank() &&
-                ui.password == ui.confirmPassword &&
-                ui.agreeTerms &&
-                !ui.isLoading
     }
 
     suspend fun submitSignUp(): Boolean {
@@ -302,11 +287,11 @@ class AuthViewModel @Inject constructor(
             )
         }
 
-        val age = calculateAge(ui.birthDate)
+        val formattedBirthDate = formatBirthDate(ui.birthDate)
 
         val result = authRepository.updateProfile(
             name = ui.name,
-            age = age,
+            birthDate = formattedBirthDate,
             gender = ui.gender,
             address = ui.address
         )
