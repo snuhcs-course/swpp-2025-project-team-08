@@ -91,7 +91,7 @@ fun SettingScreen(
                     checked = ui.darkMode,
                     onCheckedChange = { toggleDarkMode() }
                 )
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingToggleItemSimple(
                     title = "알림 설정",
                     checked = ui.alarmEnabled,
@@ -107,9 +107,9 @@ fun SettingScreen(
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 SettingMenuItemSimple("공지사항") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("자주 묻는 질문") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("고객 문의") { }
             }
 
@@ -121,17 +121,17 @@ fun SettingScreen(
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 SettingMenuItemSimple("이용 약관") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("개인정보 처리방침") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("개인정보 수집/이용 동의 (맞춤정책)") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("민감정보 수집/이용 동의 (맞춤정책)") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("위치기반서비스 이용약관 동의") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("마케팅 이용동의") { }
-                HorizontalDivider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("로그아웃") { onLogout() }
             }
 
@@ -156,7 +156,7 @@ fun SettingSectionTitleSimple(title: String) {
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1C1B1F),
+            color = Neutral10,
             textAlign = TextAlign.Center
         )
     }
@@ -179,7 +179,7 @@ fun SettingToggleItemSimple(
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Color(0xFF1C1B1F),
+            color = Neutral10,
             fontWeight = FontWeight.Normal
         )
         Switch(
@@ -187,9 +187,9 @@ fun SettingToggleItemSimple(
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = Color(0xFF9E9E9E),
+                checkedTrackColor = Neutral60,
                 uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = Color(0xFFE0E0E0)
+                uncheckedTrackColor = Neutral90
             )
         )
     }
@@ -209,14 +209,14 @@ fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Color(0xFF1C1B1F),
+            color = Neutral90,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.weight(1f)
         )
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = Color(0xFF9E9E9E),
+            tint = Neutral60,
             modifier = Modifier.size(20.dp)
         )
     }

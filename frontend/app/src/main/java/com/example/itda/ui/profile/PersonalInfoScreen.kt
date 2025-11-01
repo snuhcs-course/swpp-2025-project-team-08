@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.itda.ui.common.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +85,7 @@ fun PersonalInfoScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .background(Color(0xFFF5F5F5))
+                .background(Neutral99)
                 .padding(20.dp)  // 화면 가장자리 여백
         ) {
             Spacer(modifier = Modifier.height(16.dp))  // 상단 여백
@@ -95,7 +96,7 @@ fun PersonalInfoScreen(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = Color(0xFFE0E0E0),
+                        color = Neutral90,
                         shape = RoundedCornerShape(12.dp)
                     ),
                 shape = RoundedCornerShape(12.dp),
@@ -183,7 +184,7 @@ fun PersonalInfoScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2D2D2D)
+                            containerColor = Neutral20
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -219,7 +220,7 @@ fun PersonalInfoFieldSimple(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
-            color = Color(0xFF1C1B1F),
+            color = Neutral10,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         OutlinedTextField(
@@ -229,17 +230,17 @@ fun PersonalInfoFieldSimple(
             placeholder = {
                 Text(
                     placeholder,
-                    color = Color(0xFFBDBDBD),
+                    color = Neutral70,
                     fontSize = 14.sp
                 )
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF2D2D2D),
-                unfocusedBorderColor = Color(0xFFE0E0E0),
+                focusedBorderColor = Neutral20,
+                unfocusedBorderColor = Neutral90,
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
-                focusedTextColor = Color(0xFF1C1B1F),
-                unfocusedTextColor = Color(0xFF1C1B1F)
+                focusedTextColor = Neutral10,
+                unfocusedTextColor = Neutral10
             ),
             shape = RoundedCornerShape(8.dp)
         )

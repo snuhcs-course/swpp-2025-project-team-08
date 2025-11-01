@@ -71,7 +71,7 @@ fun ProfileScreen(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "설정",
-                            tint = Color(0xFF8B7BA0)
+                            tint = Purple40
                         )
                     }
                 },
@@ -95,7 +95,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                color = Color(0xFFE0E0E0),
+                color = Neutral90,
                 shape = RoundedCornerShape(16.dp)
                 ),
                 shape = RoundedCornerShape(16.dp),
@@ -130,7 +130,7 @@ fun ProfileScreen(
                             text = "User_name",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1C1B1F)
+                            color = Neutral10
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
@@ -159,12 +159,12 @@ fun ProfileScreen(
                         text = "맞춤 정보",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1C1B1F)
+                        color = Neutral10
                     )
                     Text(
                         text = "아래 정보를 이용하여 개인에게 알맞은 정책을 추천해드립니다.",
                         fontSize = 11.sp,
-                        color = Color(0xFF79747E),
+                        color = Neutral50,
                         lineHeight = 14.sp
                     )
                 }
@@ -225,7 +225,7 @@ fun ProfileInfoItem(
         Text(
             text = label,
             fontSize = 15.sp,
-            color = Color(0xFF79747E),
+            color = Neutral50,
             fontWeight = FontWeight.Normal
         )
         Spacer(modifier = Modifier.height(6.dp))
@@ -234,7 +234,7 @@ fun ProfileInfoItem(
             Box(
                 modifier = Modifier
                     .background(
-                        color = Color(0xFFFFEB3B).copy(alpha = 0.4f),
+                        color = YellowSecondary.copy(alpha = 0.4f),
                         shape = RoundedCornerShape(4.dp)
                     )
                     .padding(horizontal = 4.dp, vertical = 2.dp)
@@ -243,7 +243,7 @@ fun ProfileInfoItem(
                     text = value,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF1C1B1F)
+                    color = Neutral10
                 )
             }
         } else {
@@ -251,7 +251,7 @@ fun ProfileInfoItem(
                 text = value,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF1C1B1F)
+                color = Neutral10
             )
         }
 
