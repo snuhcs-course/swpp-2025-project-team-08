@@ -22,3 +22,7 @@ def trim_program(state: GraphState):
     trimmed_program = chain.invoke({"raw_program": json.dumps(raw_program)})
 
     return {"trimmed_program": trimmed_program}
+
+
+def validate_program(state: GraphState):
+    return {"is_valid": True}
