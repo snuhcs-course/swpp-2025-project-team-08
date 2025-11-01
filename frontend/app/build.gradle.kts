@@ -104,7 +104,7 @@ dependencies {
     // Navigation Testing
     testImplementation("androidx.navigation:navigation-testing:2.8.5")
 
-    // ===== Instrumented Tests (app/src/androidTest/) =====
+    // ===== Instrumented Tests =====
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
