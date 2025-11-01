@@ -1,12 +1,15 @@
-import argparse
 import os
-import sys
+import argparse
+
+from typing import Any, Optional, Dict, List
 from urllib.parse import quote_plus
-from tqdm import tqdm
+
 from dotenv import load_dotenv
+from tqdm import tqdm
+
 from graph import graph
-from loader.api_loader import YouthCenterLoader
 from database.manager import PostgresManager
+from loader import BokjiroLoader
 
 load_dotenv()
 
@@ -23,6 +26,12 @@ YOUTH_CENTER_API_KEY = os.getenv("YOUTH_CENTER_API_KEY")
 def create_parser():
     parser = argparse.ArgumentParser(description="data pipeline for ITDA")
 
+    parser.add_argument(
+        "mode",
+        choices=["load", "trim", "save", "all"],
+        help="which stage to run: load => fetch from APIs, trim => transform, save => persist to DB, all => run everything",
+    )
+
     parser.add_argument("--db-commit-batch-size", type=int, default=10)
     parser.add_argument("--db-min-pool-size", type=int, default=1)
     parser.add_argument("--db-max-pool-size", type=int, default=5)
@@ -32,26 +41,28 @@ def create_parser():
     return parser
 
 
-def main():
-    parser = create_parser()
-    args = parser.parse_args()
-
+def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
+    print("[*] Start loading...")
     loaders = [
-        YouthCenterLoader(
-            api_key=YOUTH_CENTER_API_KEY,
+        BokjiroLoader(
             page_size=args.api_page_size,
             max_page_num=args.api_max_page_num,
-        )
+        ),
     ]
 
-    print("[*] Start loaders...")
-    raw_programs = []
-
-    for loader in tqdm(loaders, desc="Loading programs"):
+    programs = []
+    for loader in loaders:
+        print(f"{loader} Running...")
         loader_programs = loader.load()
-        raw_programs.extend(loader_programs)
-    print(f"Total {len(raw_programs)} programs are loaded.\n")
+        programs.extend(loader_programs)
+    print(f"Total {len(programs)} programs are loaded.\n")
 
+    return programs
+
+
+def do_trim(
+    args, raw_programs: Optional[List[Dict[str, Any]]] = None
+) -> List[Dict[str, Any]]:
     print("[*] Start trimming with graph...")
     programs = []
 
@@ -60,12 +71,13 @@ def main():
         programs.append(result["trimmed_program"])
     print(f"Total {len(programs)} programs are trimmed.\n")
 
+    return programs
+
+
+def do_save(
+    args, db_manager: PostgresManager, programs: Optional[List[Dict[str, Any]]] = None
+):
     print("[*] Start saving to DB...")
-    db_manager = PostgresManager(
-        conn_string=DATABASE_URL,
-        min_pool_size=args.db_min_pool_size,
-        max_pool_size=args.db_max_pool_size,
-    )
     try:
         total_inserted = 0
         batch_size = args.db_commit_batch_size
@@ -80,12 +92,29 @@ def main():
         db_manager.close()
 
 
+def main():
+    parser = create_parser()
+    args = parser.parse_args()
+
+    mode = args.mode
+
+    db_manager = PostgresManager(
+        conn_string=DATABASE_URL,
+        min_pool_size=args.db_min_pool_size,
+        max_pool_size=args.db_max_pool_size,
+    )
+
+    if mode == "load":
+        do_load(args, db_manager)
+    elif mode == "trim":
+        do_trim(args)
+    elif mode == "save":
+        do_save(args, db_manager)
+    elif mode == "all":
+        programs = do_load(args, db_manager)
+        programs = do_trim(args, programs)
+        do_save(args, db_manager, programs)
+
+
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n[!] Interrupted by user", file=sys.stderr)
-        sys.exit(130)
-    except Exception as e:
-        print(f"[!] Error: {e}", file=sys.stderr)
-        sys.exit(1)
+    main()

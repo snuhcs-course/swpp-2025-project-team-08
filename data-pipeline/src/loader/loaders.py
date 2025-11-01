@@ -1,21 +1,32 @@
+import json
+import re
+import time
+
 from abc import ABC, abstractmethod
 from typing import Any, List, Set, Dict, Optional
 
 import requests
+from tqdm import tqdm
 
-from config import YOUTH_CENTER_ENDPOINT
+
+from config import (
+    BOKJIRO_ENDPOINT,
+    BOKJIRO_UUID_ENDPOINT,
+    BOKJIRO_SESSION_ENDPOINT,
+    YOUTH_CENTER_ENDPOINT,
+)
 
 
-class APILoader(ABC):
+class Loader(ABC):
     def __init__(
         self,
-        api_key: str,
         page_size: int,
         max_page_num: int,
-        previously_loaded_ids: Optional[Set[str]] = None,
+        api_key: str = None,
+        prev_uuids: Optional[Set[str]] = None,
     ):
         self.api_key = api_key
-        self.previously_loaded_ids = previously_loaded_ids
+        self.prev_uuids = prev_uuids
 
         self.page_size = page_size
         self.max_page_num = max_page_num
@@ -25,13 +36,13 @@ class APILoader(ABC):
         raise NotImplementedError
 
 
-class YouthCenterLoader(APILoader):
+class YouthCenterLoader(Loader):
     def _find_duplicate(self, programs: List[Dict[str, Any]]) -> int:
-        if not self.previously_loaded_ids:
+        if not self.prev_uuids:
             return -1
 
         for i, program in enumerate(programs):
-            if program["plcyNo"] in self.previously_loaded_ids:
+            if program["plcyNo"] in self.prev_uuids:
                 return i
 
         return -1
@@ -148,3 +159,135 @@ class YouthCenterLoader(APILoader):
 
     def __str__(self):
         return "YouthCenterLoader"
+
+
+class BokjiroLoader(Loader):
+    def _start_session(self) -> requests.Session:
+        headers = {
+            "Accept": "*/*",
+            "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Content-Type": "application/json; charset=UTF-8",
+            "Host": "www.bokjiro.go.kr",
+            "Origin": "https://www.bokjiro.go.kr",
+            "Referer": BOKJIRO_SESSION_ENDPOINT,
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+            "X-Requested-With": "XMLHttpRequest",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+        }
+
+        session = requests.Session()
+        session.headers.update(headers)
+
+        response = session.get(BOKJIRO_SESSION_ENDPOINT)
+        response.raise_for_status()
+
+        return session
+
+    def _load_uuids(
+        self, session: requests.Session, page: int, targets: List[str]
+    ) -> Dict[str, List[str]]:
+        payload = {
+            "dmSearchParam": {
+                "page": str(page),
+                "onlineYn": "",
+                "searchTerm": "",
+                "tabId": "1",
+                "orderBy": "date",
+                "bkjrLftmCycCd": "",
+                "daesang": "",
+                "period": ",".join(targets),
+                "age": "",
+                "region": "",
+                "jjim": "",
+                "subject": "",
+                "favoriteKeyword": "",
+                "sidoCd": "",
+                "sggCd": "",
+                "endYn": "",
+            },
+            "dmScr": {
+                "curScrId": "tbu/app/twat/twata/twataa/TWAT52005M",
+                "befScrId": "",
+            },
+        }
+
+        response = session.post(
+            BOKJIRO_UUID_ENDPOINT, data=json.dumps(payload), timeout=10
+        )
+        response.raise_for_status()
+        response_json = response.json()
+
+        central_services = response_json["dsServiceList1"]
+        local_services = response_json["dsServiceList2"]
+
+        central_uuids = [data["WLFARE_INFO_ID"] for data in central_services]
+        local_uuids = [data["WLFARE_INFO_ID"] for data in local_services]
+
+        uuids = {
+            "local": local_uuids,
+            "central": central_uuids,
+        }
+
+        return uuids
+
+    def _load_programs(
+        self, session: requests.Session, uuids: List[str], page: int, operating: str
+    ) -> List[Dict[str, Any]]:
+        programs = []
+
+        for uuid in tqdm(uuids, desc=f"(BokjoroLoader)({operating}) page {page}"):
+            response = session.get(BOKJIRO_ENDPOINT.format(uuid))
+            response.raise_for_status()
+            time.sleep(1)
+
+            html_bytes = response.content
+            html_text = html_bytes.decode("utf-8")
+
+            match = re.search(
+                r"cpr\.core\.Platform\.INSTANCE\.initParameter\((.*?)\);cpr\.core\.Platform\.INSTANCE\.lookup",
+                html_text,
+                re.DOTALL,
+            )
+
+            if not match:
+                continue
+
+            data_json = json.loads(match.group(1))
+            program = json.loads(data_json["initValue"]["dmWlfareInfo"])
+
+            program["program_operating_entity"] = operating
+
+            programs.append(program)
+
+        return programs
+
+    def load(self) -> List[Dict[str, Any]]:
+        programs = []
+
+        session = self._start_session()
+
+        page = 1
+        targets = ["중장년", "노년"]
+
+        while page <= self.max_page_num:
+            uuids = self._load_uuids(session=session, page=page, targets=targets)
+            time.sleep(1)
+
+            central_program_batch = self._load_programs(
+                session=session, uuids=uuids["central"], page=page, operating="central"
+            )
+            local_program_batch = self._load_programs(
+                session=session, uuids=uuids["local"], page=page, operating="local"
+            )
+
+            programs.extend(central_program_batch)
+            programs.extend(local_program_batch)
+
+            page += 1
+
+        return programs
+
+    def __str__(self):
+        return "BokjiroLoader"
