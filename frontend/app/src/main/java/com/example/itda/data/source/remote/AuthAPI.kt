@@ -1,6 +1,5 @@
 package com.example.itda.data.source.remote
 
-import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -13,30 +12,36 @@ data class AuthRequest(
 
 data class AuthResponse(
     val accessToken: String,
-
     val refreshToken: String?,
-
     val tokenType: String?,
-
     val expiresIn: Int?
 )
 
 data class ProfileRequest(
-    val name: String,
+    val name: String?,
     val birthDate: String?,
     val gender: String?,
-    val address: String?
+    val address: String?,
+    val maritalStatus: String?,
+    val educationLevel: String?,
+    val householdSize: Int?,
+    val householdIncome: Int?,
+    val employmentStatus: String?
 )
 
 data class ProfileResponse(
-    val id: Int,
+    val id: String,
     val email: String,
-    val name: String,
+    val name: String?,
     val birthDate: String?,
     val gender: String?,
-    val address: String?
+    val address: String?,
+    val maritalStatus: String?,
+    val educationLevel: String?,
+    val householdSize: Int?,
+    val householdIncome: Int?,
+    val employmentStatus: String?
 )
-
 
 interface AuthAPI {
     @POST("auth/signup")
