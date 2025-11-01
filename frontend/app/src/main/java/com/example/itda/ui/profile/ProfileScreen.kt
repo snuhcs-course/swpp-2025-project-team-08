@@ -48,6 +48,7 @@ import androidx.compose.foundation.border
 import com.example.itda.ui.common.theme.*
 
 
+// ProfileScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -56,8 +57,6 @@ fun ProfileScreen(
     onPersonalInfoClick : () -> Unit,
     modifier : Modifier = Modifier,
 ) {
-
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,8 +64,7 @@ fun ProfileScreen(
                 actions = {
                     IconButton(
                         onClick = onSettingClick,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Icon(
                             Icons.Default.Settings,
@@ -95,9 +93,9 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                color = Neutral90,
-                shape = RoundedCornerShape(16.dp)
-                ),
+                        color = Neutral90,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Primary95),
                 elevation = CardDefaults.cardElevation(0.dp)
@@ -127,22 +125,20 @@ fun ProfileScreen(
 
                     Column {
                         Text(
-                            text = "User_name",
+                            text = ui.user.name ?: "사용자",  // 실제 데이터 사용
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Neutral10
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "user_id",
+                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",  // 실제 데이터 사용
                             fontSize = 13.sp,
                             color = Color(0xFF79747E)
                         )
                     }
                 }
             }
-
-
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -193,20 +189,63 @@ fun ProfileScreen(
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    ProfileInfoItem("이름", "")
-                    ProfileInfoItem("나이", "")
-                    ProfileInfoItem("성별", "")
-                    ProfileInfoItem("주소지", "")
-                    ProfileInfoItem("결혼 여부", "")
-                    ProfileInfoItem("학력", "")
-                    ProfileInfoItem("가구원 수", "")
-                    ProfileInfoItem("가구원 소득", "")
-                    ProfileInfoItem("제외 알고리즘", "", isLast = true)
+                    val user = ui.user
+
+                    ProfileInfoItem("이름", user.name ?: "")
+                    ProfileInfoItem("생년월일", user.birthDate ?: "")
+                    ProfileInfoItem("성별", convertEnumToKorean(user.gender, "gender"))
+                    ProfileInfoItem("주소지", user.address ?: "")
+                    ProfileInfoItem("결혼 여부", convertEnumToKorean(user.maritalStatus, "marital"))
+                    ProfileInfoItem("학력", convertEnumToKorean(user.educationLevel, "education"))
+                    ProfileInfoItem("가구원 수", user.householdSize?.toString() ?: "")
+                    ProfileInfoItem("가구원 소득", user.householdIncome?.let { "${it}만원" } ?: "")
+                    ProfileInfoItem("취업 상태", convertEnumToKorean(user.employmentStatus, "employment"), isLast = true)
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+// Enum → 한글 변환 함수 추가
+private fun convertEnumToKorean(enumName: String?, type: String): String {
+    if (enumName.isNullOrBlank()) return ""
+
+    return when (type) {
+        "gender" -> when (enumName) {
+            "MALE" -> "남성"
+            "FEMALE" -> "여성"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "marital" -> when (enumName) {
+            "SINGLE" -> "미혼"
+            "MARRIED" -> "기혼"
+            "DIVORCED_OR_BEREAVED" -> "이혼/사별"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "education" -> when (enumName) {
+            "HIGHSCHOOL" -> "고졸"
+            "STUDENT" -> "재학생"
+            "LEAVE_OF_ABSENCE" -> "휴학생"
+            "EXPECTED_GRADUATE" -> "졸업예정"
+            "ASSOCIATE" -> "전문대졸"
+            "BACHELOR" -> "대졸"
+            "MASTER" -> "석사"
+            "PHD" -> "박사"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "employment" -> when (enumName) {
+            "EMPLOYED" -> "재직자"
+            "UNEMPLOYED" -> "미취업자"
+            "SELF_EMPLOYED" -> "자영업자"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        else -> ""
     }
 }
 
@@ -240,7 +279,7 @@ fun ProfileInfoItem(
                     .padding(horizontal = 4.dp, vertical = 2.dp)
             ) {
                 Text(
-                    text = value,
+                    text = value.ifEmpty { "-" },  // 빈 값이면 "-" 표시
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = Neutral10
@@ -248,7 +287,7 @@ fun ProfileInfoItem(
             }
         } else {
             Text(
-                text = value,
+                text = value.ifEmpty { "-" },  // 빈 값이면 "-" 표시
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = Neutral10
@@ -259,14 +298,4 @@ fun ProfileInfoItem(
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ProfileScreenPreview() {
-    ProfileScreen(
-        ui = ProfileViewModel.ProfileUiState(),
-        onSettingClick = {},
-        onPersonalInfoClick = {}
-    )
 }

@@ -183,43 +183,30 @@ object DummyData {
 
     val dummyUser = listOf<User>(
         User(
-            id = 1,
-            email = "hong.gildong@example.com",
-            password = "hashed_password_1",
+            id = "1",  // String으로 변경
+            email = "test@example.com",
             name = "홍길동",
-            age = 32,
+            birthDate = "1990-01-01",
             gender = "남성",
             address = "서울특별시 강남구",
-            marital_status = "기혼",
-            education_level = "대학교 졸업",
-            household_size = 4,
-            household_income = 7500 // 단위: 만 원
+            maritalStatus = "미혼",
+            educationLevel = "대졸",
+            householdSize = 3,
+            householdIncome = 5000,
+            employmentStatus = "재직자"
         ),
         User(
-            id = 2,
-            email = "kim.younghee@example.com",
-            password = "hashed_password_2",
-            name = "김영희",
-            age = 25,
-            gender = "여성",
-            address = "부산광역시 해운대구",
-            marital_status = "미혼",
-            education_level = "대학 재학 중",
-            household_size = 1,
-            household_income = 3000
-        ),
-        User(
-            id = 3,
-            email = "park.chulsoo@example.com",
-            password = "hashed_password_3",
-            name = "박철수",
-            age = 48,
+            id = "2",
+            email = "test2@example.com",
+            name = "김철수",
+            birthDate = "1985-05-15",
             gender = "남성",
-            address = "경기도 성남시 분당구",
-            marital_status = "기혼",
-            education_level = "대학원 졸업",
-            household_size = 3,
-            household_income = 12000
+            address = "서울특별시 서초구",
+            maritalStatus = "기혼",
+            educationLevel = "석사",
+            householdSize = 4,
+            householdIncome = 8000,
+            employmentStatus = "재직자"
         )
     )
 
