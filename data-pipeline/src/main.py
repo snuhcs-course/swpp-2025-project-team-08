@@ -26,6 +26,11 @@ DATABASE_URL = f"postgresql://{quote_plus(DB_USER)}:{quote_plus(DB_PASSWORD)}@{D
 YOUTH_CENTER_API_KEY = os.getenv("YOUTH_CENTER_API_KEY")
 
 
+project_root = Path(__file__).resolve().parents[1]
+data_dir = project_root / "data"
+data_dir.mkdir(parents=True, exist_ok=True)
+
+
 def create_parser():
     parser = argparse.ArgumentParser(description="data pipeline for ITDA")
 
@@ -45,10 +50,6 @@ def create_parser():
 
 
 def save_raw_programs(programs: List[Dict[str, Any]]):
-    project_root = Path(__file__).resolve().parents[1]
-    data_dir = project_root / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     save_path_ts = data_dir / f"raw_programs_{ts}.json"
     save_path = data_dir / "raw_programs.json"
@@ -59,11 +60,30 @@ def save_raw_programs(programs: List[Dict[str, Any]]):
     with save_path.open("w", encoding="utf-8") as f:
         json.dump(programs, f, ensure_ascii=False, indent=2)
 
-    print(f"Saved raw programs to {save_path_ts} and {save_path}.")
+    print(f"Saved {len(programs)} raw programs. \n")
 
 
-def save_trimmed_programs():
-    pass
+def save_trimmed_programs(programs: List[Dict[str, Any]]):
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    save_path_ts = data_dir / f"trimmed_programs{ts}.json"
+    save_path = data_dir / "trimmed_programs.json"
+
+    with save_path_ts.open("w", encoding="utf-8") as f:
+        json.dump(programs, f, ensure_ascii=False, indent=2)
+
+    with save_path.open("w", encoding="utf-8") as f:
+        json.dump(programs, f, ensure_ascii=False, indent=2)
+
+    print(f"Saved {len(programs)} trimmed programs. \n")
+
+
+def load_raw_programs() -> List[Dict[str, Any]]:
+    save_path = project_root / "data" / "raw_programs.json"
+
+    with save_path.open("r", encoding="utf-8") as f:
+        programs = json.load(f)
+
+    return programs
 
 
 def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
@@ -83,7 +103,6 @@ def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
     print(f"Total {len(programs)} programs are loaded.")
 
     save_raw_programs(programs)
-    print()
 
     return programs
 
@@ -91,13 +110,25 @@ def do_load(args, db_manager: PostgresManager) -> List[Dict[str, Any]]:
 def do_trim(
     args, raw_programs: Optional[List[Dict[str, Any]]] = None
 ) -> List[Dict[str, Any]]:
+    if not raw_programs:
+        raw_programs = load_raw_programs()
+
+    raw_programs = raw_programs[-2:]
+
     print("[*] Start trimming with graph...")
     programs = []
 
     for raw_program in tqdm(raw_programs, desc="Trimming Programs"):
         result = graph.invoke({"raw_program": raw_program})
-        programs.append(result["trimmed_program"])
-    print(f"Total {len(programs)} programs are trimmed.\n")
+
+        is_valid = result["is_valid"]
+        program = result["trimmed_program"]
+
+        if is_valid:
+            programs.append(program)
+
+    print(f"Total {len(programs)} programs are trimmed.")
+    save_trimmed_programs(programs)
 
     return programs
 
