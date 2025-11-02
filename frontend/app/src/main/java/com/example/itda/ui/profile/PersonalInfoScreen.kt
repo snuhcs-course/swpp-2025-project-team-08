@@ -107,10 +107,10 @@ fun PersonalInfoScreen(
                     )
 
                     PersonalInfoFieldSimple(
-                        label = "주소지",
+                        label = "우편번호",
                         value = ui.address,
                         onValueChange = { viewModel.onAddressChange(it) },
-                        placeholder = "주소를 입력해주세요",
+                        placeholder = "우편번호를 입력해주세요",
                         errorMessage = ui.addressError
                     )
 

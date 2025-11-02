@@ -54,7 +54,7 @@ fun NavGraphBuilder.mainGraph(
                         "profile" -> ProfileRoute(
                             onSettingClick = { navController.navigate("settings") },
                             onPersonalInfoClick = { navController.navigate("personal_info") },
-                            modifier=  Modifier.padding(innerPadding),
+                            modifier = Modifier.padding(innerPadding),
                         )
                     }
                 }

@@ -3,7 +3,6 @@ package com.example.itda.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.UserRepository
-import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import android.util.Log
 
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
@@ -43,7 +41,7 @@ class PersonalInfoViewModel @Inject constructor(
         loadUserData()
     }
 
-    // Enum 이름 → 한글 변환 (불러올 때)
+    // Enum 이름 → 한글 (서버값 -> UI표시)
     private fun convertEnumToKorean(enumName: String?, type: String): String {
         return when (type) {
             "gender" -> when (enumName) {
@@ -52,6 +50,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "ANY" -> "무관"
                 else -> ""
             }
+
             "marital" -> when (enumName) {
                 "SINGLE" -> "미혼"
                 "MARRIED" -> "기혼"
@@ -59,6 +58,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "ANY" -> "무관"
                 else -> ""
             }
+
             "education" -> when (enumName) {
                 "HIGHSCHOOL" -> "고졸"
                 "STUDENT" -> "재학생"
@@ -71,6 +71,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "ANY" -> "무관"
                 else -> ""
             }
+
             "employment" -> when (enumName) {
                 "EMPLOYED" -> "재직자"
                 "UNEMPLOYED" -> "미취업자"
@@ -78,11 +79,12 @@ class PersonalInfoViewModel @Inject constructor(
                 "ANY" -> "무관"
                 else -> ""
             }
+
             else -> ""
         }
     }
 
-    // 한글 → Enum 이름 변환 (저장할 때)
+    // 한글 → Enum 이름 (UI입력 -> 서버전송)
     private fun convertKoreanToEnum(korean: String?, type: String): String? {
         if (korean.isNullOrBlank()) return null
 
@@ -93,6 +95,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "무관" -> "ANY"
                 else -> null
             }
+
             "marital" -> when (korean) {
                 "미혼" -> "SINGLE"
                 "기혼" -> "MARRIED"
@@ -100,6 +103,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "무관" -> "ANY"
                 else -> null
             }
+
             "education" -> when (korean) {
                 "고졸" -> "HIGHSCHOOL"
                 "재학생" -> "STUDENT"
@@ -112,6 +116,7 @@ class PersonalInfoViewModel @Inject constructor(
                 "무관" -> "ANY"
                 else -> null
             }
+
             "employment" -> when (korean) {
                 "재직자" -> "EMPLOYED"
                 "미취업자" -> "UNEMPLOYED"
@@ -119,10 +124,11 @@ class PersonalInfoViewModel @Inject constructor(
                 "무관" -> "ANY"
                 else -> null
             }
+
             else -> null
         }
     }
-    // PersonalInfoViewModel.kt의 loadUserData()에 로그 추가
+
     private fun loadUserData() {
         viewModelScope.launch {
             _personalInfoUi.update { it.copy(isLoading = true) }
@@ -130,14 +136,10 @@ class PersonalInfoViewModel @Inject constructor(
             try {
                 val user = userRepository.getMe()
 
-                android.util.Log.d("PersonalInfoVM", "Loaded user: $user")  // 로그 추가
-
                 val convertedGender = convertEnumToKorean(user.gender, "gender")
                 val convertedMarital = convertEnumToKorean(user.maritalStatus, "marital")
                 val convertedEducation = convertEnumToKorean(user.educationLevel, "education")
                 val convertedEmployment = convertEnumToKorean(user.employmentStatus, "employment")
-
-                android.util.Log.d("PersonalInfoVM", "Converted - Gender: $convertedGender, Marital: $convertedMarital")  // 로그 추가
 
                 _personalInfoUi.update {
                     it.copy(
@@ -150,37 +152,46 @@ class PersonalInfoViewModel @Inject constructor(
                         householdSize = user.householdSize?.toString() ?: "",
                         householdIncome = user.householdIncome?.toString() ?: "",
                         employmentStatus = convertedEmployment,
-                        isLoading = false
+                        isLoading = false,
+                        nameError = null,
+                        birthDateError = null,
+                        genderError = null,
+                        addressError = null,
+                        generalError = null
                     )
                 }
-
-                android.util.Log.d("PersonalInfoVM", "UI State updated: ${_personalInfoUi.value}")  // 로그 추가
-
             } catch (e: Exception) {
-                android.util.Log.e("PersonalInfoVM", "Error loading user data", e)  // 로그 추가
                 _personalInfoUi.update {
                     it.copy(
                         isLoading = false,
-                        generalError = "정보 불러오기 실패: ${e.message}"
+                        generalError = "사용자 정보를 불러오지 못했습니다"
                     )
                 }
             }
         }
     }
+
     fun onNameChange(v: String) {
-        _personalInfoUi.update { it.copy(name = v, nameError = null, generalError = null) }
+        _personalInfoUi.update {
+            it.copy(name = v, nameError = null, generalError = null)
+        }
     }
 
     fun onBirthDateChange(v: String) {
-        _personalInfoUi.update { it.copy(birthDate = v, birthDateError = null, generalError = null) }
+        _personalInfoUi.update {
+            it.copy(birthDate = v, birthDateError = null, generalError = null)
+        }
     }
 
     fun onGenderChange(v: String) {
-        _personalInfoUi.update { it.copy(gender = v, genderError = null, generalError = null) }
+        _personalInfoUi.update {
+            it.copy(gender = v, genderError = null, generalError = null)
+        }
     }
 
     fun onAddressChange(v: String) {
-        _personalInfoUi.update { it.copy(address = v, addressError = null, generalError = null) }
+        val filtered = v.filter { it.isDigit() }.take(5)
+        _personalInfoUi.update { it.copy(address = filtered, addressError = null, generalError = null) }
     }
 
     fun onMaritalStatusChange(v: String) {
@@ -205,7 +216,8 @@ class PersonalInfoViewModel @Inject constructor(
         _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
     }
 
-    suspend fun submitPersonalInfo(): Boolean {
+    // 변경점: suspend 제거. 즉시 Boolean 리턴.
+    fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
         var hasError = false
@@ -225,64 +237,49 @@ class PersonalInfoViewModel @Inject constructor(
             hasError = true
         }
 
-        if (ui.address.isBlank()) {
-            _personalInfoUi.update { it.copy(addressError = "주소를 입력해주세요") }
+        if (ui.address.length != 5) {
+            _personalInfoUi.update { it.copy(addressError = "우편번호 5자리를 입력해주세요") }
             hasError = true
         }
 
         if (hasError) {
-            Log.d("PersonalInfoVM", "Validation failed")
             return false
         }
 
-        _personalInfoUi.update {
-            it.copy(
-                isLoading = true,
-                nameError = null,
-                birthDateError = null,
-                genderError = null,
-                addressError = null,
-                generalError = null
-            )
-        }
+        // 검증 통과. 저장 시작.
+        _personalInfoUi.update { it.copy(isLoading = true, generalError = null) }
 
-        // 한글 → Enum 이름으로 변환
         val genderEnum = convertKoreanToEnum(ui.gender, "gender")
         val maritalEnum = convertKoreanToEnum(ui.maritalStatus, "marital")
         val educationEnum = convertKoreanToEnum(ui.education, "education")
         val employmentEnum = convertKoreanToEnum(ui.employmentStatus, "employment")
 
-        Log.d("PersonalInfoVM", "Converted enums:")
-        Log.d("PersonalInfoVM", "  gender: ${ui.gender} -> $genderEnum")
-        Log.d("PersonalInfoVM", "  marital: ${ui.maritalStatus} -> $maritalEnum")
-        Log.d("PersonalInfoVM", "  education: ${ui.education} -> $educationEnum")
-        Log.d("PersonalInfoVM", "  employment: ${ui.employmentStatus} -> $employmentEnum")
+        // 실제 저장 호출은 비동기. 테스트는 advanceUntilIdle()로 기다린다.
+        viewModelScope.launch {
+            val result = userRepository.updateProfile(
+                name = ui.name,
+                birthDate = ui.birthDate,
+                gender = genderEnum,
+                address = ui.address,
+                maritalStatus = maritalEnum,
+                educationLevel = educationEnum,
+                householdSize = ui.householdSize.toIntOrNull(),
+                householdIncome = ui.householdIncome.toIntOrNull(),
+                employmentStatus = employmentEnum
+            )
 
-        val result = userRepository.updateProfile(
-            name = ui.name,
-            birthDate = ui.birthDate,
-            gender = genderEnum,
-            address = ui.address,
-            maritalStatus = maritalEnum,
-            educationLevel = educationEnum,
-            householdSize = ui.householdSize.toIntOrNull(),
-            householdIncome = ui.householdIncome.toIntOrNull(),
-            employmentStatus = employmentEnum
-        )
-
-        result.onSuccess {
-            Log.d("PersonalInfoVM", "Save successful!")
-        }
-
-        result.onFailure { exception ->
-            Log.e("PersonalInfoVM", "Save failed", exception)
-            _personalInfoUi.update {
-                it.copy(generalError = "저장 실패: ${exception.message}")
+            result.onSuccess {
             }
+
+            result.onFailure { exception ->
+                _personalInfoUi.update {
+                    it.copy(generalError = "저장 실패: ${exception.message}")
+                }
+            }
+
+            _personalInfoUi.update { it.copy(isLoading = false) }
         }
 
-        _personalInfoUi.update { it.copy(isLoading = false) }
-
-        return result.isSuccess
+        return true
     }
 }

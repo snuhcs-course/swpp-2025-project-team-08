@@ -40,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         loadProfileData()
     }
 
-    private fun loadProfileData() {
+    fun loadProfileData() {
         viewModelScope.launch {
             _profileUi.update { it.copy(isLoading = true) }
 

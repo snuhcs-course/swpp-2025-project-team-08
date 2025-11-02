@@ -30,7 +30,8 @@ fun ProfileRoute(
         ui = ui,
         onPersonalInfoClick = onPersonalInfoClick,
         onSettingClick = onSettingClick,
-        modifier = modifier
+        modifier = modifier,
+        onRefresh = { vm.loadProfileData() }  // 👈 추가
     )
 }
 

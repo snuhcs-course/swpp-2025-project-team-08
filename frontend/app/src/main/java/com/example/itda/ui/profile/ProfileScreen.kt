@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
 import com.example.itda.ui.common.theme.*
+import androidx.compose.runtime.LaunchedEffect
 
 
 // ProfileScreen.kt
@@ -55,8 +56,13 @@ fun ProfileScreen(
     ui : ProfileViewModel.ProfileUiState,
     onSettingClick : () -> Unit,
     onPersonalInfoClick : () -> Unit,
+    onRefresh: () -> Unit,
     modifier : Modifier = Modifier,
 ) {
+    LaunchedEffect(Unit) {
+        onRefresh()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,6 +93,7 @@ fun ProfileScreen(
                 .background(Color.White)
                 .padding(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             // 사용자 프로필 카드
             Card(
                 modifier = Modifier
@@ -131,11 +138,11 @@ fun ProfileScreen(
                             color = Neutral10
                         )
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",  // 실제 데이터 사용
-                            fontSize = 13.sp,
-                            color = Color(0xFF79747E)
-                        )
+//                        Text(
+//                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",  // 실제 데이터 사용
+//                            fontSize = 13.sp,
+//                            color = Color(0xFF79747E)
+//                        )
                     }
                 }
             }
@@ -194,7 +201,7 @@ fun ProfileScreen(
                     ProfileInfoItem("이름", user.name ?: "")
                     ProfileInfoItem("생년월일", user.birthDate ?: "")
                     ProfileInfoItem("성별", convertEnumToKorean(user.gender, "gender"))
-                    ProfileInfoItem("주소지", user.address ?: "")
+                    ProfileInfoItem("우편번호", user.address ?: "")
                     ProfileInfoItem("결혼 여부", convertEnumToKorean(user.maritalStatus, "marital"))
                     ProfileInfoItem("학력", convertEnumToKorean(user.educationLevel, "education"))
                     ProfileInfoItem("가구원 수", user.householdSize?.toString() ?: "")
@@ -203,7 +210,7 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
