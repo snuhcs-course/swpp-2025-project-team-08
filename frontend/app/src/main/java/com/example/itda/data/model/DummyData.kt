@@ -4,6 +4,7 @@ import com.example.itda.R
 
 object DummyData {
     val dummyPrograms = listOf<Program>(
+        /*
         Program(
             id = 1,
             title = "AI 해커톤 2025",
@@ -64,6 +65,7 @@ object DummyData {
             start_date = "2025-10-20",
             end_date = "2025-10-25"
         ),
+        */
     )
 
     val dummyCategories = listOf<Category>(
@@ -78,8 +80,8 @@ object DummyData {
         Category(8,  "IT"),
     )
 
-    val dummyFeedItems = listOf<FeedItem>(
-        FeedItem(
+    val dummyFeedItems = listOf<Program>(
+        Program(
             id = 1,
             title = "AI 해커톤 2025",
             categories = listOf<Category>(
@@ -97,7 +99,7 @@ object DummyData {
             logo = R.drawable.gov_logo,
             isEligible = true
         ),
-        FeedItem(
+        Program(
             id = 2,
             title = "IT 취업 역량 캠프",
             categories = listOf<Category>(
@@ -114,7 +116,7 @@ object DummyData {
             logo = R.drawable.hissf_logo,
             isEligible = true
         ),
-        FeedItem(
+        Program(
             id = 3,
             title = "청년 도약 계좌",
             categories = listOf<Category>(
@@ -130,7 +132,7 @@ object DummyData {
             logo = R.drawable.ic_launcher_foreground,
             isEligible = false
         ),
-        FeedItem(
+        Program(
             id = 4,
             title = "민생회복 소비쿠폰",
             categories = listOf<Category>(
@@ -146,7 +148,7 @@ object DummyData {
             logo = R.drawable.gov_logo,
             isEligible = false
         ),
-        FeedItem(
+        Program(
             id = 5,
             title = "2차 민생회복 소비쿠폰",
             categories = listOf<Category>(
@@ -162,7 +164,7 @@ object DummyData {
             logo = R.drawable.ic_launcher_background,
             isEligible = false
         ),
-        FeedItem(
+        Program(
             id = 6,
             title = "1000회차 민생회복 소비로또",
             categories = listOf<Category>(

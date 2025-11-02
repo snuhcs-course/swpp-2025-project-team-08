@@ -8,14 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.itda.R
-import com.example.itda.data.model.FeedItem
+import com.example.itda.data.model.Program
 
 @Composable
 fun FeedList(
     // 표시할 FeedItem 데이터의 리스트를 인자로 받습니다.
-    items: List<FeedItem>,
+    items: List<Program>,
     filterCategory: String,
-    onItemClick: (FeedItem) -> Unit
+    onItemClick: (Program) -> Unit
 ) {
 
 
