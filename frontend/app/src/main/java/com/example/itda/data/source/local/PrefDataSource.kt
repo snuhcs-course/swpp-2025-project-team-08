@@ -74,6 +74,17 @@ class PrefDataSource @Inject constructor(
         }
     }
 
+    // 👇 User 캐시 저장
+    suspend fun saveUserCache(userJson: String) {
+        try {
+            context.dataStore.edit { prefs ->
+                prefs[Keys.USER_CACHE] = userJson
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     // 로그인 여부 확인
     fun isLoggedIn(): Flow<Boolean> = accessTokenFlow.map {
         !it.isNullOrBlank()
