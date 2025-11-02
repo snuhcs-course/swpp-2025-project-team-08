@@ -5,33 +5,35 @@ A significant portion of government support policy budgets often fails to reach 
 To solve this problem, '잇다' is developing a service that helps individuals easily and conveniently find and utilize support policies tailored specifically to them. We use a ReAct-based LLM approach to unify and automate policy data crawling across all levels of government, creating a single, comprehensive source. Based on user-provided data (age, income, residency, etc.), the system provides personalized policy recommendations, supports keyword search, and simplifies complex government announcements. This includes clear guidance on application procedures and a direct link to the official application page, ultimately maximizing citizen convenience and utilization.
 
 
-## What demo demonstrates - Iteration 1
+## What demo demonstrates - Iteration 3
 
 ### Showcasing demo video
 
-https://youtu.be/Z_AnJLYR0aw
+[https://youtu.be/Z_AnJLYR0aw](https://youtube.com/shorts/3aYDKGdWCdQ?feature=share)
 
 ### Features implemented
 
-In iteration 1, We focuses on establishing a robust architectural foundation using the modern Android development stack (Kotlin and Jetpack Compose) to prepare the further development.
+In iteration 3, we focused on implementing most of the application and on testing.
 
-1. State-Driven UI with Jetpack Compose (Modern UI Structure)
-   - MVVM & State Management: Implemented the officially recommended MVVM architecture utilizing Kotlin StateFlow to manage and react to the app's state (MainViewState).
-   - Declarative UI: The screen is built using Jetpack Compose, ensuring a responsive and modern UI structure.
+**1. Frontend Implement**
+- **Profile pages**: On the profile pages, you can update or view your personal information.
+- **Auth**: We added a logout feature and improved the login and sign-up functionality.
+- **HomeView**: We enhanced the Home view screen.
 
-2. Core Application State Flow Demonstration
-    - Loading: Shows a CircularProgressIndicator during data fetching.
-    - Content: Renders the main HomeView after loading.
-    - Error: Includes a logic path to display an error message.
+**2. Testing**
+- **Frontend Unit Test**: We implement in frontend unit tests. (not achieved coverage goal yet)
+- **Backend Test**: We achieved meaningful results in backend tests. (>=80%)
 
-3. Basic User Interaction (Refresh Action)
-   - The "Policy Refresh" button triggers the state transition, proving the basic data re-fetching mechanism is functional and properly integrated with the ViewModel.
+**3. Backend Implement**
+- **Data loader completion**: Program details vectorize and save in vectorDB
+- **Confirmation of recommendation algorithms**: Generate a user preference profile vector by incorporating satisfaction scores (1–5) for the five user policies. Recommend by computing the similarity between the user’s preferenceVector and the program’s detailsVector.
+
 
 ### Goals achieved
-- Completion of the initial setup for a modern Android app based on Jetpack Compose.
-- Verification of the basic implementation of Android's officially recommended architecture (MVVM + Coroutines/Flow).
-- Successful demonstration of screen transition logic between the data loading state (Loading) and the content display state (HomeContent).
-- Implementation of a basic interaction flow where user input (button click) triggers an app state change and UI refresh.
+- **Testing**: Implement Testing code and achieve meaningful result in backend
+- **Ready-to-Present UI/UX**: Implement most of UI/UX
+- **Data loader completion**: Program details vectorize and save in vectorDB
+- **Confirmation of recommendation algorithms**: Generate a user preference profile vector by incorporating satisfaction scores (1–5) for the five user policies. Recommend by computing the similarity between the user’s preferenceVector and the program’s detailsVector.
 
 
 ## Getting Started
