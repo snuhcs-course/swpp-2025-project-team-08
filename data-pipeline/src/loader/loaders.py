@@ -9,7 +9,7 @@ import requests
 from tqdm import tqdm
 
 
-from config import (
+from utils.config import (
     BOKJIRO_ENDPOINT,
     BOKJIRO_UUID_ENDPOINT,
     BOKJIRO_SESSION_ENDPOINT,
@@ -237,7 +237,7 @@ class BokjiroLoader(Loader):
     ) -> List[Dict[str, Any]]:
         programs = []
 
-        for uuid in tqdm(uuids, desc=f"(BokjoroLoader)({operating}) page {page}"):
+        for uuid in tqdm(uuids, desc=f"(BokjoroLoader) {operating}, page {page}"):
             response = session.get(BOKJIRO_ENDPOINT.format(uuid))
             response.raise_for_status()
             time.sleep(1)
