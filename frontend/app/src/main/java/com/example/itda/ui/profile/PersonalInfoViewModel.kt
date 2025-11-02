@@ -42,6 +42,7 @@ class PersonalInfoViewModel @Inject constructor(
     }
 
     // Enum 이름 → 한글 (서버값 -> UI표시)
+    // 참고: 서버가 이미 한글을 반환하는 경우 이 함수는 사용되지 않음
     private fun convertEnumToKorean(enumName: String?, type: String): String {
         return when (type) {
             "gender" -> when (enumName) {
@@ -136,22 +137,18 @@ class PersonalInfoViewModel @Inject constructor(
             try {
                 val user = userRepository.getMe()
 
-                val convertedGender = convertEnumToKorean(user.gender, "gender")
-                val convertedMarital = convertEnumToKorean(user.maritalStatus, "marital")
-                val convertedEducation = convertEnumToKorean(user.educationLevel, "education")
-                val convertedEmployment = convertEnumToKorean(user.employmentStatus, "employment")
-
+                // 🔧 수정: 서버가 이미 한글 값을 반환하므로 변환 없이 그대로 사용
                 _personalInfoUi.update {
                     it.copy(
                         name = user.name ?: "",
                         birthDate = user.birthDate ?: "",
-                        gender = convertedGender,
+                        gender = user.gender ?: "",
                         address = user.address ?: "",
-                        maritalStatus = convertedMarital,
-                        education = convertedEducation,
+                        maritalStatus = user.maritalStatus ?: "",
+                        education = user.educationLevel ?: "",
                         householdSize = user.householdSize?.toString() ?: "",
                         householdIncome = user.householdIncome?.toString() ?: "",
-                        employmentStatus = convertedEmployment,
+                        employmentStatus = user.employmentStatus ?: "",
                         isLoading = false,
                         nameError = null,
                         birthDateError = null,
@@ -217,7 +214,6 @@ class PersonalInfoViewModel @Inject constructor(
         _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
     }
 
-    // 변경점: suspend 제거. 즉시 Boolean 리턴.
     fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
