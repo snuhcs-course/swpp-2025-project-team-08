@@ -253,28 +253,4 @@ class PersonalInfoViewModelTest {
         assertThat(vm.personalInfoUi.value.isLoading).isFalse()
     }
 
-    @Test
-    fun onAddressChange_filtersToDigitsAndMaxFive() = runTest {
-        vm.onAddressChange("12a-3 45XYZ")
-        assertThat(vm.personalInfoUi.value.address).isEqualTo("12345")
-
-        vm.onAddressChange("987654321")
-        assertThat(vm.personalInfoUi.value.address).isEqualTo("98765")
-    }
-
-    @Test
-    fun submit_returnsFalse_when_addressNotFiveDigits() = runTest {
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("남성")
-
-        vm.onAddressChange("")            // 빈값
-        assertThat(vm.submitPersonalInfo()).isFalse()
-        assertThat(vm.personalInfoUi.value.addressError).isEqualTo("우편번호 5자리를 입력해주세요")
-
-        vm.onAddressChange("12")          // 5자 미만
-        assertThat(vm.submitPersonalInfo()).isFalse()
-        assertThat(vm.personalInfoUi.value.addressError).isEqualTo("우편번호 5자리를 입력해주세요")
-    }
-
 }

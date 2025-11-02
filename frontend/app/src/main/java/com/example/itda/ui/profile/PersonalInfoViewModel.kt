@@ -190,8 +190,9 @@ class PersonalInfoViewModel @Inject constructor(
     }
 
     fun onAddressChange(v: String) {
-        val filtered = v.filter { it.isDigit() }.take(5)
-        _personalInfoUi.update { it.copy(address = filtered, addressError = null, generalError = null) }
+        _personalInfoUi.update {
+            it.copy(address = v, addressError = null, generalError = null)
+        }
     }
 
     fun onMaritalStatusChange(v: String) {
@@ -237,8 +238,8 @@ class PersonalInfoViewModel @Inject constructor(
             hasError = true
         }
 
-        if (ui.address.length != 5) {
-            _personalInfoUi.update { it.copy(addressError = "우편번호 5자리를 입력해주세요") }
+        if (ui.address.isBlank()) {
+            _personalInfoUi.update { it.copy(addressError = "우편번호를 입력해주세요") }
             hasError = true
         }
 

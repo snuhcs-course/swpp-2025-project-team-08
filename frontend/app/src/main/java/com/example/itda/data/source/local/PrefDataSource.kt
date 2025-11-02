@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 
 
+@Singleton
 class PrefDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -24,6 +26,7 @@ class PrefDataSource @Inject constructor(
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         val TOKEN_TYPE = stringPreferencesKey("token_type")
         val EXPIRES_IN = intPreferencesKey("expires_in")
+        val USER_CACHE = stringPreferencesKey("user_cache")
     }
 
     // 토큰 Flow
@@ -33,6 +36,11 @@ class PrefDataSource @Inject constructor(
 
     val refreshTokenFlow: Flow<String?> = context.dataStore.data.map {
         it[Keys.REFRESH_TOKEN]
+    }
+
+    // 👇 User 캐시 Flow 추가
+    val userCacheFlow: Flow<String?> = context.dataStore.data.map {
+        it[Keys.USER_CACHE]
     }
 
     // 토큰 저장
@@ -66,6 +74,17 @@ class PrefDataSource @Inject constructor(
         }
     }
 
+    // 👇 User 캐시 저장
+    suspend fun saveUserCache(userJson: String) {
+        try {
+            context.dataStore.edit { prefs ->
+                prefs[Keys.USER_CACHE] = userJson
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     // 로그인 여부 확인
     fun isLoggedIn(): Flow<Boolean> = accessTokenFlow.map {
         !it.isNullOrBlank()
@@ -78,6 +97,20 @@ class PrefDataSource @Inject constructor(
     }
 
     suspend fun getRefreshToken(): String? = refreshTokenFlow.firstOrNull()
+
+    // 👇 User 캐시 가져오기
+    suspend fun getUserCache(): String? = userCacheFlow.firstOrNull()
+
+    // 👇 User 캐시만 제거
+    suspend fun clearUserCache() {
+        try {
+            context.dataStore.edit { prefs ->
+                prefs.remove(Keys.USER_CACHE)
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 
     // 전체 삭제 (로그아웃)
     suspend fun clear() {

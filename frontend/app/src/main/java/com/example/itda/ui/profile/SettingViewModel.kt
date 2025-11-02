@@ -24,18 +24,13 @@ class SettingsViewModel @Inject constructor(
         val isLoading : Boolean = false,
     )
 
-
     private val _settingsUi = MutableStateFlow(SettingsUiState())
     val settingsUi: StateFlow<SettingsUiState> = _settingsUi.asStateFlow()
 
-
     fun toggleDarkMode() {
         viewModelScope.launch {
-            _settingsUi.update { it.copy( isLoading = true) }
-
-             val darkMode = !_settingsUi.value.darkMode
-            // TODO: 실제로 다크모드 적용 로직
-
+            _settingsUi.update { it.copy(isLoading = true) }
+            val darkMode = !_settingsUi.value.darkMode
             _settingsUi.update {
                 it.copy(
                     darkMode = darkMode,
@@ -47,22 +42,21 @@ class SettingsViewModel @Inject constructor(
 
     fun toggleAlarm() {
         viewModelScope.launch {
-            _settingsUi.update { it.copy( isLoading = true) }
-
+            _settingsUi.update { it.copy(isLoading = true) }
             val alarmEnabled = !_settingsUi.value.alarmEnabled
-            // TODO: 실제로 알림 설정 변경 로직
-
             _settingsUi.update {
                 it.copy(
-                    darkMode = alarmEnabled,
+                    alarmEnabled = alarmEnabled,  // 👈 수정
                     isLoading = false
                 )
             }
         }
     }
+
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            authRepository.logout()       // 토큰 제거
+            userRepository.clearUser()    // 캐시 제거
         }
     }
 }
