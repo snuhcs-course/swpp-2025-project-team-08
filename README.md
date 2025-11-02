@@ -32,9 +32,8 @@ In iteration 3, we focused on implementing most of the application and on testin
 ### Goals achieved
 - **Testing**: Implement Testing code and achieve meaningful result in backend
 - **Ready-to-Present UI/UX**: Implement most of UI/UX
-- **Data loader completion**: Program details vectorize and save in vectorDB
-- **Confirmation of recommendation algorithms**: Generate a user preference profile vector by incorporating satisfaction scores (1–5) for the five user policies. Recommend by computing the similarity between the user’s preferenceVector and the program’s detailsVector.
-
+- **Data loader completion**: Program details vectorize and save in vectorDB. Add more data loader.
+- **Confirmation of recommendation algorithms**: Recommend by computing the similarity between the user’s preferenceVector and the program’s detailsVector.
 
 ## Getting Started
 
