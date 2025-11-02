@@ -21,9 +21,7 @@ class AuthRepository @Inject constructor(
     fun isLoggedIn(): Flow<Boolean> = pref.isLoggedIn()
 
     suspend fun login(email: String, password: String): Result<Unit> = runCatching {
-
         val res = api.login(AuthRequest(email, password))
-
         pref.saveTokens(
             access = res.accessToken,
             refresh = res.refreshToken,
@@ -33,7 +31,6 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun signup(email: String, password: String): Result<Unit> {
-
         return try {
             val res = api.signup(AuthRequest(email, password))
             pref.saveTokens(
@@ -62,13 +59,23 @@ class AuthRepository @Inject constructor(
         name: String,
         birthDate: String? = null,
         gender: String? = null,
-        address: String? = null
+        address: String? = null,
+        maritalStatus: String? = null,      // 추가
+        educationLevel: String? = null,     // 추가
+        householdSize: Int? = null,         // 추가
+        householdIncome: Int? = null,       // 추가
+        employmentStatus: String? = null    // 추가
     ): Result<Unit> = runCatching {
         val request = ProfileRequest(
             name = name,
             birthDate = birthDate,
             gender = gender,
-            address = address
+            address = address,
+            maritalStatus = maritalStatus,
+            educationLevel = educationLevel,
+            householdSize = householdSize,
+            householdIncome = householdIncome,
+            employmentStatus = employmentStatus
         )
         api.updateProfile(request)
     }

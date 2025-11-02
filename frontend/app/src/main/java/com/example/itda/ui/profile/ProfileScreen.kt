@@ -43,16 +43,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.border
+import com.example.itda.ui.common.theme.*
+import androidx.compose.runtime.LaunchedEffect
 
+
+// ProfileScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     ui : ProfileViewModel.ProfileUiState,
     onSettingClick : () -> Unit,
     onPersonalInfoClick : () -> Unit,
+    onRefresh: () -> Unit,
     modifier : Modifier = Modifier,
 ) {
-
+    LaunchedEffect(Unit) {
+        onRefresh()
+    }
 
     Scaffold(
         topBar = {
@@ -61,18 +70,17 @@ fun ProfileScreen(
                 actions = {
                     IconButton(
                         onClick = onSettingClick,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "설정",
-                            tint = Color(0xFF6B4C7A)
+                            tint = Purple40
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFFAF8FC)
+                    containerColor = Color.White
                 )
             )
         }
@@ -82,16 +90,22 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .background(Color(0xFFFAF8FC))
-                .padding(20.dp)
+                .background(Color.White)
+                .padding(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             // 사용자 프로필 카드
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(16.dp)),
+                    .border(
+                        width = 1.dp,
+                        color = Neutral90,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = Primary95),
+                elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -101,20 +115,16 @@ fun ProfileScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(70.dp)
+                            .size(60.dp)
                             .clip(CircleShape)
-                            .background(
-                                androidx.compose.ui.graphics.Brush.linearGradient(
-                                    colors = listOf(Color(0xFFE0BBE4), Color(0xFF9C7BA8))
-                                )
-                            ),
+                            .background(Primary99),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Person,
                             contentDescription = null,
-                            modifier = Modifier.size(40.dp),
-                            tint = Color.White
+                            modifier = Modifier.size(32.dp),
+                            tint = Primary95
                         )
                     }
 
@@ -122,179 +132,177 @@ fun ProfileScreen(
 
                     Column {
                         Text(
-                            text = "", // userInfo.userName,
-                            fontSize = 20.sp,
+                            text = ui.user.name ?: "사용자",  // 실제 데이터 사용
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D2D2D)
+                            color = Neutral10
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "", //userInfo.userId,
-                            fontSize = 14.sp,
-                            color = Color(0xFF9E9E9E)
-                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+//                        Text(
+//                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",  // 실제 데이터 사용
+//                            fontSize = 13.sp,
+//                            color = Color(0xFF79747E)
+//                        )
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // 맞춤 정보 헤더
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(2.dp, RoundedCornerShape(12.dp)),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF0E6F6)
-                )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Info,
-                                contentDescription = null,
-                                tint = Color(0xFF6B4C7A),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "맞춤 정보",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF6B4C7A)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "정책 추천을 위한 개인정보",
-                            fontSize = 12.sp,
-                            color = Color(0xFF8B6B9A)
-                        )
-                    }
-                    Button(
-                        onClick = onPersonalInfoClick,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF9C7BA8)
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        elevation = ButtonDefaults.buttonElevation(4.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("수정", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 정보 카드
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(2.dp, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-//                Column(modifier = Modifier.padding(20.dp)) {
-//                    ProfileInfoItemStyled("이름", userInfo.name, Icons.Default.Person)
-//                    ProfileInfoItemStyled("유신청", userInfo.category, Icons.Default.CheckCircle)
-//                    ProfileInfoItemStyled("나이", "${userInfo.age}세", Icons.Default.DateRange)
-//                    ProfileInfoItemStyled("성별", userInfo.gender, Icons.Default.Face)
-//                    ProfileInfoItemStyled("주소지", userInfo.address, Icons.Default.Place)
-//                    ProfileInfoItemStyled("결혼 여부", userInfo.maritalStatus, Icons.Default.FavoriteBorder)
-//                    ProfileInfoItemStyled("학력", userInfo.education, Icons.Default.School)
-//                    ProfileInfoItemStyled("가구원 수", "${userInfo.householdSize}인", Icons.Default.Home)
-//                    ProfileInfoItemStyled("가구원 소득", "${userInfo.householdIncome}만원", Icons.Default.AccountBalance)
-//                    ProfileInfoItemStyled(
-//                        "제외 알고리즘",
-//                        userInfo.excludedKeywords.ifEmpty { "없음" },
-//                        Icons.Default.Close,
-//                        isLast = true
-//                    )
-//                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // 맞춤 정보 헤더
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "맞춤 정보",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Neutral10
+                    )
+                    Text(
+                        text = "아래 정보를 이용하여 개인에게 알맞은 정책을 추천해드립니다.",
+                        fontSize = 11.sp,
+                        color = Neutral50,
+                        lineHeight = 14.sp
+                    )
+                }
+                Button(
+                    onClick = onPersonalInfoClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Primary50
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        horizontal = 16.dp,
+                        vertical = 8.dp
+                    )
+                ) {
+                    Text("수정", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 정보 카드
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Primary95),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    val user = ui.user
+
+                    ProfileInfoItem("이름", user.name ?: "")
+                    ProfileInfoItem("생년월일", user.birthDate ?: "")
+                    ProfileInfoItem("성별", convertEnumToKorean(user.gender, "gender"))
+                    ProfileInfoItem("우편번호", user.address ?: "")
+                    ProfileInfoItem("결혼 여부", convertEnumToKorean(user.maritalStatus, "marital"))
+                    ProfileInfoItem("학력", convertEnumToKorean(user.educationLevel, "education"))
+                    ProfileInfoItem("가구원 수", user.householdSize?.toString() ?: "")
+                    ProfileInfoItem("가구원 소득", user.householdIncome?.let { "${it}만원" } ?: "")
+                    ProfileInfoItem("취업 상태", convertEnumToKorean(user.employmentStatus, "employment"), isLast = true)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
+// Enum → 한글 변환 함수 추가
+private fun convertEnumToKorean(enumName: String?, type: String): String {
+    if (enumName.isNullOrBlank()) return ""
+
+    return when (type) {
+        "gender" -> when (enumName) {
+            "MALE" -> "남성"
+            "FEMALE" -> "여성"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "marital" -> when (enumName) {
+            "SINGLE" -> "미혼"
+            "MARRIED" -> "기혼"
+            "DIVORCED_OR_BEREAVED" -> "이혼/사별"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "education" -> when (enumName) {
+            "HIGHSCHOOL" -> "고졸"
+            "STUDENT" -> "재학생"
+            "LEAVE_OF_ABSENCE" -> "휴학생"
+            "EXPECTED_GRADUATE" -> "졸업예정"
+            "ASSOCIATE" -> "전문대졸"
+            "BACHELOR" -> "대졸"
+            "MASTER" -> "석사"
+            "PHD" -> "박사"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        "employment" -> when (enumName) {
+            "EMPLOYED" -> "재직자"
+            "UNEMPLOYED" -> "미취업자"
+            "SELF_EMPLOYED" -> "자영업자"
+            "ANY" -> "무관"
+            else -> ""
+        }
+        else -> ""
+    }
+}
+
 @Composable
-fun ProfileInfoItemStyled(
+fun ProfileInfoItem(
     label: String,
     value: String,
-    icon: ImageVector,
+    highlight: Boolean = false,
     isLast: Boolean = false
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp)
+            .padding(vertical = 10.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Text(
+            text = label,
+            fontSize = 15.sp,
+            color = Neutral50,
+            fontWeight = FontWeight.Normal
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+
+        if (highlight) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFF0E6F6)),
-                contentAlignment = Alignment.Center
+                    .background(
+                        color = YellowSecondary.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
             ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = Color(0xFF9C7BA8),
-                    modifier = Modifier.size(20.dp)
+                Text(
+                    text = value.ifEmpty { "-" },  // 빈 값이면 "-" 표시
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Neutral10
                 )
             }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label,
-                    fontSize = 13.sp,
-                    color = Color(0xFF9E9E9E),
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = value,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF2D2D2D)
-                )
-            }
-        }
-        if (!isLast) {
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(
-                color = Color(0xFFF0F0F0),
-                thickness = 1.dp
+        } else {
+            Text(
+                text = value.ifEmpty { "-" },  // 빈 값이면 "-" 표시
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = Neutral10
             )
+        }
+
+        if (!isLast) {
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Preview(showBackground = true)
-//@Composable
-//fun ProfileScreenPreview() {
-//    ProfileScreen(
-//        viewModel = ProfileViewModel(),
-//        navController = rememberNavController()
-//    )
-//}
