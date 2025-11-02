@@ -57,7 +57,7 @@ fun HomeScreen(
     ) { paddingValues ->
         Column(modifier = modifier) {
             HomeHeader(
-                username = ui.user.name ?: "사용자",
+                username = ui.username,
                 programCount = filteredFeedPrograms.size
             )
             ProgramFilterRow(

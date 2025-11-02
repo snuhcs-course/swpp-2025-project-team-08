@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.model.DummyData
-import com.example.itda.data.model.FeedItem
+import com.example.itda.data.model.Program
 import com.example.itda.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -22,7 +22,7 @@ class FeedViewModel @Inject constructor(
 
 
     data class FeedUiState(
-        val feed: FeedItem = DummyData.dummyFeedItems[0], // 피드 데이터[0], // 사용자 정보
+        val feed: Program = DummyData.dummyFeedItems[0], // 피드 데이터[0], // 사용자 정보
         val isLoading: Boolean = false
     )
 
