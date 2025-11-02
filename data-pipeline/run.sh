@@ -1,4 +1,6 @@
 python ./src/main.py \
-    --db-commit-batch-size 10 \
+    all \
     --api-page-size 10 \
-    --api-max-page-num 1
+    --api-max-page-num 1 \
+    --vectorize-batch-size 32 \
+    --db-commit-batch-size 10 \
