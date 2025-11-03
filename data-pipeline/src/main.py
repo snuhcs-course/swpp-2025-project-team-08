@@ -183,9 +183,7 @@ def do_save(args, db_manager: PostgresManager):
 
     with trimmed_path.open("r", encoding="utf-8") as f_p, embedding_path.open(
         "r", encoding="utf-8"
-    ) as f_e, tqdm(
-        total=total_bytes, desc="Vectorize", unit="B", unit_scale=True
-    ) as pbar:
+    ) as f_e, tqdm(total=total_bytes, desc="Save", unit="B", unit_scale=True) as pbar:
         for line_p, line_e in zip(f_p, f_e):
             program = json.loads(line_p)
             embedding = json.loads(line_e)
@@ -196,7 +194,7 @@ def do_save(args, db_manager: PostgresManager):
             program["embedding"] = str(embedding["embedding"])
             batch.append(program)
 
-            if batch >= batch_size:
+            if len(batch) >= batch_size:
                 count += db_manager.save_programs(batch)
                 batch = []
 
