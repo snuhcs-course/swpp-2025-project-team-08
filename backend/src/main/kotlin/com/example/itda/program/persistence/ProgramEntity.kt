@@ -5,7 +5,6 @@ import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.program.persistence.enums.ProgramCategory
-import com.pgvector.PGvector
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -14,6 +13,9 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.Array
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.OffsetDateTime
 
 @Entity
@@ -81,6 +83,8 @@ class ProgramEntity(
     var createdAt: OffsetDateTime? = null,
     @Column(name = "operating_entity", nullable = false)
     var operatingEntity: String,
-    @Column(columnDefinition = "vector(1024)", nullable = false)
-    var embedding: PGvector,
+    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 1024)
+    var embedding: FloatArray,
 )
