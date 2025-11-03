@@ -4,8 +4,11 @@ import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
+import com.pgvector.PGvector
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -30,14 +33,19 @@ class UserEntity(
     var gender: Gender? = null,
     @Column(nullable = true)
     var address: String? = null,
-    @Column(name = "marital_status", nullable = true)
-    var maritalStatus: MaritalStatus? = null,
-    @Column(name = "education_level", nullable = true)
-    var educationLevel: EducationLevel? = null,
     @Column(name = "household_size", nullable = true)
     var householdSize: Int? = null,
     @Column(name = "household_income", nullable = true)
     var householdIncome: Int? = null,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "education_level", nullable = true)
+    var educationLevel: EducationLevel? = null,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "marital_status", nullable = true)
+    var maritalStatus: MaritalStatus? = null,
+    @Enumerated(EnumType.STRING)
     @Column(name = "employment_status", nullable = true)
     var employmentStatus: EmploymentStatus? = null,
+    @Column(name = "preference_embedding", columnDefinition = "vector(1024)")
+    var preferenceEmbedding: PGvector? = null,
 )

@@ -23,12 +23,12 @@ data class User(
                 email = entity.email,
                 name = entity.name,
                 birthDate = entity.birthDate?.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                gender = entity.gender?.dbValue,
                 address = entity.address,
-                maritalStatus = entity.maritalStatus?.dbValue,
-                educationLevel = entity.educationLevel?.dbValue,
                 householdSize = entity.householdSize,
                 householdIncome = entity.householdIncome,
+                gender = entity.gender?.value,
+                maritalStatus = entity.maritalStatus?.value,
+                educationLevel = entity.educationLevel?.value,
                 employmentStatus = entity.employmentStatus?.dbValue,
             )
         }
