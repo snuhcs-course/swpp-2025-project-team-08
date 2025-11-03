@@ -156,7 +156,7 @@ fun SettingSectionTitleSimple(title: String) {
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Neutral10,
+            color = Neutral90,
             textAlign = TextAlign.Center
         )
     }
@@ -179,7 +179,7 @@ fun SettingToggleItemSimple(
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Neutral10,
+            color = Neutral90,
             fontWeight = FontWeight.Normal
         )
         Switch(

@@ -75,7 +75,7 @@ fun ProfileScreen(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "설정",
-                            tint = Purple40
+                            tint = Primary40
                         )
                     }
                 },
