@@ -328,7 +328,8 @@ fun PersonalInfoDropdown(
 
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Primary95)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -336,7 +337,8 @@ fun PersonalInfoDropdown(
                         onClick = {
                             onValueChange(option)
                             expanded = false
-                        }
+                        },
+                        modifier = Modifier.background(Primary95)
                     )
                 }
             }

@@ -8,35 +8,66 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+// 👇 다크모드 ColorScheme (앱 색상 기반)
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Primary60,
+    onPrimary = Neutral10,
+    primaryContainer = Primary30,
+    onPrimaryContainer = Primary90,
+
+    secondary = Neutral60,
+    onSecondary = Neutral10,
+
+    tertiary = YellowPrimary,
+    onTertiary = Neutral10,
+
+    background = Neutral10,
+    onBackground = Neutral95,
+
+    surface = Neutral20,
+    onSurface = Neutral95,
+
+    surfaceVariant = Neutral30,
+    onSurfaceVariant = Neutral90,
+
+    error = RedPrimary,
+    onError = Neutral100
 )
 
+// 👇 라이트모드 ColorScheme (앱 색상 기반)
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Primary50,
+    onPrimary = Neutral100,
+    primaryContainer = Primary95,
+    onPrimaryContainer = Primary10,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = Neutral50,
+    onSecondary = Neutral100,
+
+    tertiary = YellowPrimary,
+    onTertiary = Neutral10,
+
+    background = Neutral100,
+    onBackground = Neutral10,
+
+    surface = Neutral99,
+    onSurface = Neutral10,
+
+    surfaceVariant = Neutral95,
+    onSurfaceVariant = Neutral30,
+
+    error = RedPrimary,
+    onError = Neutral100
 )
 
 @Composable
 fun ItdaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,  // 👈 false로 변경 (앱 고유 색상 사용)
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
