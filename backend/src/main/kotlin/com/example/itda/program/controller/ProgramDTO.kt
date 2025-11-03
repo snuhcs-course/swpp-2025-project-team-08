@@ -1,17 +1,22 @@
 package com.example.itda.program.controller
 
 import com.example.itda.program.persistence.ProgramEntity
+import com.example.itda.program.persistence.enums.ProgramCategory
 import java.time.OffsetDateTime
 
 data class ProgramSummaryResponse(
     val id: Int,
     val title: String,
+    val preview: String,
+    val operatingEntity: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
             ProgramSummaryResponse(
-                id = entity.id ?: error("ProgramEntity.id is null"),
+                id = entity.id,
                 title = entity.title,
+                preview = entity.preview,
+                operatingEntity = entity.operatingEntity,
             )
     }
 }
@@ -19,50 +24,58 @@ data class ProgramSummaryResponse(
 data class ProgramResponse(
     val id: Int,
     val uuid: String,
+    val category: ProgramCategory,
     val title: String,
-    val details: String?,
+    val details: String,
+    val summary: String,
+    val preview: String,
     val applicationMethod: String?,
+    val applyUrl: String?,
     val referenceUrl: String?,
-    val eligibilityGender: String?,
     val eligibilityMinAge: Int?,
     val eligibilityMaxAge: Int?,
-    val eligibilityRegion: String?,
-    val eligibilityMaritalStatus: String?,
-    val eligibilityEducation: String?,
     val eligibilityMinHousehold: Int?,
     val eligibilityMaxHousehold: Int?,
-    val eligibilityMinIncome: Long?,
-    val eligibilityMaxIncome: Long?,
+    val eligibilityMinIncome: Int?,
+    val eligibilityMaxIncome: Int?,
+    val eligibilityRegion: String?,
+    val eligibilityGender: String?,
+    val eligibilityMaritalStatus: String?,
+    val eligibilityEducation: String?,
     val eligibilityEmployment: String?,
     val applyStartAt: OffsetDateTime?,
     val applyEndAt: OffsetDateTime?,
     val createdAt: OffsetDateTime?,
-    val updatedAt: OffsetDateTime?,
+    var operatingEntity: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramResponse =
             ProgramResponse(
-                id = entity.id ?: error("ProgramEntity.id is null"),
+                id = entity.id,
                 uuid = entity.uuid,
+                category = entity.category,
                 title = entity.title,
                 details = entity.details,
+                summary = entity.summary,
+                preview = entity.preview,
                 applicationMethod = entity.applicationMethod,
+                applyUrl = entity.applyUrl,
                 referenceUrl = entity.referenceUrl,
-                eligibilityGender = entity.eligibilityGender?.dbValue,
                 eligibilityMinAge = entity.eligibilityMinAge,
                 eligibilityMaxAge = entity.eligibilityMaxAge,
                 eligibilityRegion = entity.eligibilityRegion,
-                eligibilityMaritalStatus = entity.eligibilityMaritalStatus?.dbValue,
-                eligibilityEducation = entity.eligibilityEducation?.dbValue,
                 eligibilityMinHousehold = entity.eligibilityMinHousehold,
                 eligibilityMaxHousehold = entity.eligibilityMaxHousehold,
                 eligibilityMinIncome = entity.eligibilityMinIncome,
                 eligibilityMaxIncome = entity.eligibilityMaxIncome,
+                eligibilityGender = entity.eligibilityGender?.value,
+                eligibilityMaritalStatus = entity.eligibilityMaritalStatus?.value,
+                eligibilityEducation = entity.eligibilityEducation?.value,
                 eligibilityEmployment = entity.eligibilityEmployment?.dbValue,
                 applyStartAt = entity.applyStartAt,
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,
-                updatedAt = entity.updatedAt,
+                operatingEntity = entity.operatingEntity,
             )
     }
 }

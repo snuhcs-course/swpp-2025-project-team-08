@@ -147,7 +147,7 @@ class UserTest(
                 gender = Gender.FEMALE,
                 address = "Busan",
                 maritalStatus = MaritalStatus.MARRIED,
-                educationLevel = EducationLevel.HIGHSCHOOL,
+                educationLevel = EducationLevel.HIGH_SCHOOL,
                 householdSize = 4,
                 householdIncome = 70000000,
                 employmentStatus = EmploymentStatus.EMPLOYED,
@@ -259,7 +259,7 @@ class UserTest(
                 gender = Gender.FEMALE,
                 address = "Seoul",
                 maritalStatus = MaritalStatus.MARRIED,
-                educationLevel = EducationLevel.HIGHSCHOOL,
+                educationLevel = EducationLevel.HIGH_SCHOOL,
                 householdSize = 4,
                 householdIncome = 70000000,
                 employmentStatus = EmploymentStatus.EMPLOYED,
@@ -287,6 +287,9 @@ class UserTest(
 
     @BeforeAll
     fun setupEnvironment() {
-        System.setProperty("JWT_SECRET_KEY", "test-secret-key-for-local-development-and-tests-must-be-at-least-32-chars")
+        System.setProperty(
+            "JWT_SECRET_KEY",
+            "test-secret-key-for-local-development-and-tests-must-be-at-least-32-chars",
+        )
     }
 }

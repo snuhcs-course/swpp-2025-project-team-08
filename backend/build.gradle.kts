@@ -40,6 +40,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     implementation("com.google.cloud.sql:postgres-socket-factory:1.25.3")
+    implementation("com.pgvector:pgvector:0.1.4")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
