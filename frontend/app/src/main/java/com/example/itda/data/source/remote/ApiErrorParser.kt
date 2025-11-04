@@ -59,6 +59,9 @@ object ApiErrorParser {
             message.contains("Authenticate failed", ignoreCase = true) -> {
                 ApiError.Unauthorized()
             }
+            message.contains("Invalid birth date", ignoreCase = true) -> {
+                ApiError.InvalidBirth()
+            }
             code == "UNAUTHORIZED" -> {
                 ApiError.Unauthorized()
             }

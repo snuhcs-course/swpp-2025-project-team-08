@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.anyOrNull
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
@@ -37,20 +38,13 @@ class AuthViewModelTest {
         viewModel = AuthViewModel(authRepository)
     }
 
-    // ========================================
-    // Part 1: 로그인 입력값 검증 테스트
-    // ========================================
-
     @Test
     fun login_emptyEmail_showsEmailError() = runTest {
-        // Given
         viewModel.onLoginEmailChange("")
         viewModel.onLoginPasswordChange("password123")
 
-        // When
         val result = viewModel.submitLogin()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.loginUi.test {
             val state = awaitItem()
@@ -62,14 +56,11 @@ class AuthViewModelTest {
 
     @Test
     fun login_emptyPassword_showsPasswordError() = runTest {
-        // Given
         viewModel.onLoginEmailChange("test@test.com")
         viewModel.onLoginPasswordChange("")
 
-        // When
         val result = viewModel.submitLogin()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.loginUi.test {
             val state = awaitItem()
@@ -81,14 +72,11 @@ class AuthViewModelTest {
 
     @Test
     fun login_bothEmpty_showsEmailErrorFirst() = runTest {
-        // Given
         viewModel.onLoginEmailChange("")
         viewModel.onLoginPasswordChange("")
 
-        // When
         val result = viewModel.submitLogin()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.loginUi.test {
             val state = awaitItem()
@@ -97,22 +85,15 @@ class AuthViewModelTest {
         }
     }
 
-    // ========================================
-    // Part 2: 회원가입 입력값 검증 테스트
-    // ========================================
-
     @Test
     fun signUp_emptyEmail_showsEmailError() = runTest {
-        // Given
         viewModel.onSignUpEmailChange("")
         viewModel.onSignUpPasswordChange("password123")
         viewModel.onSignUpConfirmChange("password123")
         viewModel.onAgreeTermsChange(true)
 
-        // When
         val result = viewModel.submitSignUp()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.signUpUi.test {
             val state = awaitItem()
@@ -121,22 +102,134 @@ class AuthViewModelTest {
         }
     }
 
-    // ========================================
-    // Part 3: 개인정보 입력값 검증 테스트
-    // ========================================
+    @Test
+    fun signUp_invalidEmail_showsEmailError() = runTest {
+        viewModel.onSignUpEmailChange("invalidemail")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("password123")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.emailError).isEqualTo("올바른 이메일 형식이 아닙니다")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_emptyPassword_showsPasswordError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("")
+        viewModel.onSignUpConfirmChange("")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.passwordError).isEqualTo("비밀번호를 입력해주세요")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_shortPassword_showsPasswordError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("short")
+        viewModel.onSignUpConfirmChange("short")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.passwordError).isEqualTo("비밀번호는 8~16자여야 합니다")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_longPassword_showsPasswordError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("verylongpassword12345")
+        viewModel.onSignUpConfirmChange("verylongpassword12345")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.passwordError).isEqualTo("비밀번호는 8~16자여야 합니다")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_emptyConfirmPassword_showsConfirmPasswordError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.confirmPasswordError).isEqualTo("비밀번호를 다시 입력해주세요")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_passwordMismatch_showsConfirmPasswordError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("differentpass")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.confirmPasswordError).isEqualTo("비밀번호가 일치하지 않습니다")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun signUp_termsNotAgreed_showsGeneralError() = runTest {
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("password123")
+        viewModel.onAgreeTermsChange(false)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isEqualTo("약관에 동의해주세요")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun personalInfo_emptyName_showsNameError() = runTest {
-        // Given
         viewModel.onNameChange("")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("MALE")
+        viewModel.onGenderChange("남성")
         viewModel.onAddressChange("서울시")
 
-        // When
         val result = viewModel.submitPersonalInfo()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
@@ -147,16 +240,13 @@ class AuthViewModelTest {
 
     @Test
     fun personalInfo_emptyBirthDate_showsBirthDateError() = runTest {
-        // Given
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("")
-        viewModel.onGenderChange("MALE")
+        viewModel.onGenderChange("남성")
         viewModel.onAddressChange("서울시")
 
-        // When
         val result = viewModel.submitPersonalInfo()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
@@ -167,16 +257,13 @@ class AuthViewModelTest {
 
     @Test
     fun personalInfo_incompleteBirthDate_showsBirthDateError() = runTest {
-        // Given
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("1999")
-        viewModel.onGenderChange("M")
+        viewModel.onGenderChange("남성")
         viewModel.onAddressChange("서울시")
 
-        // When
         val result = viewModel.submitPersonalInfo()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
@@ -186,17 +273,31 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun personalInfo_invalidBirthDate_showsBirthDateError() = runTest {
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("99991301")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.birthDateError).isEqualTo("올바른 생년월일을 입력해주세요")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun personalInfo_emptyGender_showsGenderError() = runTest {
-        // Given
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
         viewModel.onGenderChange("")
         viewModel.onAddressChange("서울시")
 
-        // When
         val result = viewModel.submitPersonalInfo()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
@@ -207,16 +308,13 @@ class AuthViewModelTest {
 
     @Test
     fun personalInfo_emptyAddress_showsAddressError() = runTest {
-        // Given
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("MALE")
+        viewModel.onGenderChange("남성")
         viewModel.onAddressChange("")
 
-        // When
         val result = viewModel.submitPersonalInfo()
 
-        // Then
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
@@ -225,20 +323,13 @@ class AuthViewModelTest {
         }
     }
 
-    // ========================================
-    // Part 4: StateFlow 변화 테스트
-    // ========================================
-
     @Test
     fun loginEmailChange_clearsErrors() = runTest {
-        // Given
         viewModel.onLoginEmailChange("")
         viewModel.submitLogin()
 
-        // When
         viewModel.onLoginEmailChange("test@test.com")
 
-        // Then
         viewModel.loginUi.test {
             val state = awaitItem()
             assertThat(state.emailError).isNull()
@@ -249,18 +340,158 @@ class AuthViewModelTest {
 
     @Test
     fun loginPasswordChange_clearsErrors() = runTest {
-        // Given
         viewModel.onLoginPasswordChange("")
-        viewModel.submitLogin() // 에러 발생
+        viewModel.submitLogin()
 
-        // When
         viewModel.onLoginPasswordChange("password123")
 
-        // Then: 에러가 사라짐
         viewModel.loginUi.test {
             val state = awaitItem()
             assertThat(state.passwordError).isNull()
             assertThat(state.generalError).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun login_success_callsRepositoryAndUpdatesState() = runTest {
+        Mockito.`when`(authRepository.login(anyOrNull(), anyOrNull()))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.onLoginEmailChange("test@test.com")
+        viewModel.onLoginPasswordChange("password123")
+
+        val result = viewModel.submitLogin()
+
+        assertThat(result).isTrue()
+        Mockito.verify(authRepository).login("test@test.com", "password123")
+
+        assertThat(viewModel.isLoggedIn.value).isTrue()
+    }
+
+    @Test
+    fun login_failure_showsError() = runTest {
+        val exception = Exception("Login failed")
+        Mockito.`when`(authRepository.login(anyOrNull(), anyOrNull()))
+            .thenReturn(Result.failure(exception))
+
+        viewModel.onLoginEmailChange("test@test.com")
+        viewModel.onLoginPasswordChange("wrongpassword")
+
+        val result = viewModel.submitLogin()
+
+        assertThat(result).isFalse()
+
+        viewModel.loginUi.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isNotNull()
+            assertThat(state.isLoading).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertThat(viewModel.isLoggedIn.value).isFalse()
+    }
+
+    @Test
+    fun signUp_success_callsRepository() = runTest {
+        Mockito.`when`(authRepository.signup(anyOrNull(), anyOrNull()))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("password123")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isTrue()
+        Mockito.verify(authRepository).signup("test@test.com", "password123")
+    }
+
+    @Test
+    fun signUp_failure_showsError() = runTest {
+        val exception = Exception("Signup failed")
+        Mockito.`when`(authRepository.signup(anyOrNull(), anyOrNull()))
+            .thenReturn(Result.failure(exception))
+
+        viewModel.onSignUpEmailChange("test@test.com")
+        viewModel.onSignUpPasswordChange("password123")
+        viewModel.onSignUpConfirmChange("password123")
+        viewModel.onAgreeTermsChange(true)
+
+        val result = viewModel.submitSignUp()
+
+        assertThat(result).isFalse()
+
+        viewModel.signUpUi.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isNotNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun personalInfo_success_callsRepository() = runTest {
+        Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull()
+        )).thenReturn(Result.success(Unit))
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19990101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isTrue()
+        Mockito.verify(authRepository).updateProfile(
+            name = "홍길동",
+            birthDate = "1999-01-01",
+            gender = "남성",
+            address = "서울시",
+            maritalStatus = null,
+            educationLevel = null,
+            householdSize = null,
+            householdIncome = null,
+            employmentStatus = null
+        )
+    }
+
+    @Test
+    fun personalInfo_failure_showsError() = runTest {
+        val exception = Exception("Update failed")
+        Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull()
+        )).thenReturn(Result.failure(exception))
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19990101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.generalError).isNotNull()
             cancelAndIgnoreRemainingEvents()
         }
     }
