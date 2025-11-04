@@ -4,6 +4,9 @@ import com.example.itda.program.controller.ProgramResponse
 import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.ProgramEntity
 import com.example.itda.program.persistence.ProgramRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -30,16 +33,28 @@ class ProgramService(
         return ProgramResponse.fromEntity(program)
     }
 
-    fun searchPrograms(
-        text: String,
-        articleId: Long,
-    ): List<ProgramResponse> {
-        val programEntities: List<ProgramEntity> =
-            programRepository.findTop10ByTitleContainingIgnoreCaseOrDetailsContainingIgnoreCaseAndIdLessThanOrderByIdDesc(
-                text,
-                text,
-                articleId,
+    @Transactional
+    fun searchLatestPrograms(
+        searchTerm: String,
+        page: Int,
+        pageSize: Int,
+    ): Page<ProgramSummaryResponse> {
+        val pageable =
+            PageRequest.of(
+                page,
+                pageSize,
+                Sort.by(Sort.Direction.DESC, "createdAt"),
             )
-        return programEntities.map { ProgramResponse.fromEntity(it) }
+
+        val programEntitiesPage: Page<ProgramEntity> =
+            programRepository.findByTitleContainingIgnoreCaseOrPreviewContainingIgnoreCase(
+                title = searchTerm,
+                preview = searchTerm,
+                pageable = pageable,
+            )
+
+        return programEntitiesPage.map { entity ->
+            ProgramSummaryResponse.fromEntity(entity)
+        }
     }
 }

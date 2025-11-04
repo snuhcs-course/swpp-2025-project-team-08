@@ -1,11 +1,13 @@
 package com.example.itda.program.persistence
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
-    fun findTop10ByTitleContainingIgnoreCaseOrDetailsContainingIgnoreCaseAndIdLessThanOrderByIdDesc(
+    fun findByTitleContainingIgnoreCaseOrPreviewContainingIgnoreCase(
         title: String,
-        details: String,
-        id: Long,
-    ): List<ProgramEntity>
+        preview: String,
+        pageable: Pageable,
+    ): Page<ProgramEntity>
 }

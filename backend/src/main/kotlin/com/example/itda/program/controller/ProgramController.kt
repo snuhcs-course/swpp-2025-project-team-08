@@ -1,6 +1,7 @@
 package com.example.itda.program.controller
 
 import com.example.itda.program.service.ProgramService
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,12 +26,18 @@ class ProgramController(
         return programService.getProgram(id)
     }
 
-    @GetMapping("/programs/search/{id}")
-    fun searchPrograms(
-        @PathVariable id: Long,
-        @RequestParam("text") text: String,
-    ): ResponseEntity<List<ProgramResponse>> {
-        val response = programService.searchPrograms(text, id)
+    @GetMapping("/programs/search/latest")
+    fun searchLatestPrograms(
+        @RequestParam("query") searchTerm: String,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") pageSize: Int,
+    ): ResponseEntity<Page<ProgramSummaryResponse>> {
+        val response: Page<ProgramSummaryResponse> =
+            programService.searchLatestPrograms(
+                searchTerm = searchTerm,
+                page = page,
+                pageSize = pageSize,
+            )
         return ResponseEntity.ok(response)
     }
 }
