@@ -29,6 +29,9 @@ sealed class ApiError(val message: String) {
     // 인증 에러
     data class Unauthorized(val msg: String = "로그인이 필요합니다") : ApiError(msg)
 
+    // 생년월일 에러
+    data class InvalidBirth(val msg: String = "올바른 생년월일을 입력해주세요") : ApiError(msg)
+
     // 기타
     data class Unknown(val msg: String = "알 수 없는 오류가 발생했습니다") : ApiError(msg)
     data class NetworkError(val msg: String = "네트워크 연결을 확인해주세요") : ApiError(msg)

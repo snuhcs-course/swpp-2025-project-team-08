@@ -142,6 +142,11 @@ class AuthViewModel @Inject constructor(
         _signUpUi.update { it.copy(agreeTerms = v, generalError = null) }
     }
 
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        return emailRegex.matches(email)
+    }
+
     suspend fun submitSignUp(): Boolean {
         val ui = _signUpUi.value
 
@@ -150,7 +155,7 @@ class AuthViewModel @Inject constructor(
         if (ui.email.isBlank()) {
             _signUpUi.update { it.copy(emailError = "이메일을 입력해주세요") }
             hasError = true
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(ui.email).matches()) {
+        } else if (!isValidEmail(ui.email)) {
             _signUpUi.update { it.copy(emailError = "올바른 이메일 형식이 아닙니다") }
             hasError = true
         }
