@@ -4,7 +4,6 @@ import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
-import com.pgvector.PGvector
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -13,6 +12,9 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.Array
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.LocalDate
 
 @Entity
@@ -46,6 +48,8 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "employment_status", nullable = true)
     var employmentStatus: EmploymentStatus? = null,
-    @Column(name = "preference_embedding", columnDefinition = "vector(1024)")
-    var preferenceEmbedding: PGvector? = null,
+    @Column(name = "preference_embedding")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 1024)
+    var preferenceEmbedding: FloatArray? = null,
 )

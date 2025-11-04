@@ -1,5 +1,7 @@
 package com.example.itda.user.service
 
+import com.example.itda.program.ProgramNotFoundException
+import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
 import com.example.itda.user.LogInInvalidPasswordException
@@ -24,6 +26,7 @@ import java.time.format.DateTimeParseException
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val programRepository: ProgramRepository,
 ) {
     @Transactional
     fun authenticate(accessToken: String): User {
@@ -116,6 +119,34 @@ class UserService(
         request.householdSize?.let { userEntity.householdSize = it }
         request.householdIncome?.let { userEntity.householdIncome = it }
         request.employmentStatus?.let { userEntity.employmentStatus = it }
+        userRepository.save(userEntity)
+    }
+
+    @Transactional
+    fun updateUserPreferenceVector(
+        userId: String,
+        satisfactionScores: List<Int>,
+    ) {
+        val programIds: List<Long> = listOf(26, 27, 28, 29, 30)
+        val programEmbeddings: List<FloatArray> =
+            programIds.map { id ->
+                val programEntity = programRepository.findByIdOrNull(id) ?: throw ProgramNotFoundException()
+                programEntity.embedding
+            }
+
+        val finalVector = FloatArray(1024) { 0.0f }
+
+        for (index in 0 until 5) {
+            val score = satisfactionScores[index]
+            val vector = programEmbeddings[index]
+
+            for (i in vector.indices) {
+                finalVector[i] += vector[i] * score
+            }
+        }
+
+        val userEntity: UserEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        userEntity.preferenceEmbedding = finalVector
         userRepository.save(userEntity)
     }
 }

@@ -54,6 +54,15 @@ class UserController(
         )
         return ResponseEntity.ok().build()
     }
+
+    @PostMapping("/update/preferences")
+    fun updateUserPreferences(
+        @AuthUser user: User,
+        @RequestBody request: UserPreferenceUpdateRequest,
+    ): ResponseEntity<Void> {
+        userService.updateUserPreferenceVector(user.id, request.satisfactionScores)
+        return ResponseEntity.ok().build()
+    }
 }
 
 data class AuthRequest(
@@ -78,4 +87,8 @@ data class ProfileRequest(
     val householdSize: Int?,
     val householdIncome: Int?,
     val employmentStatus: EmploymentStatus?,
+)
+
+data class UserPreferenceUpdateRequest(
+    val satisfactionScores: List<Int>,
 )
