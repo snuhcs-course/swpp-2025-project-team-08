@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.ui.common.theme.*
 
 /**
  * 최근 검색어 칩
@@ -27,8 +26,9 @@ fun RecentSearchChip(
     Surface(
         modifier = modifier.clickable(onClick = onItemClick),
         shape = RoundedCornerShape(16.dp),
-        color = Neutral90,
-        tonalElevation = 0.dp
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 0.dp,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Row(
             modifier = Modifier
@@ -41,16 +41,15 @@ fun RecentSearchChip(
                 text = searchQuery,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
-                color = Neutral20
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             // 삭제 아이콘
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "삭제",
-                tint = Neutral50,
-                modifier = Modifier
-                    .size(16.dp)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
                     .clickable(onClick = onDeleteClick)
             )
         }

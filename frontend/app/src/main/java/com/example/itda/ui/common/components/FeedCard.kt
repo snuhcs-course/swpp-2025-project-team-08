@@ -52,7 +52,7 @@ fun FeedCard(
             .padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp),
         onClick = onClick,
@@ -75,14 +75,14 @@ fun FeedCard(
                         Text(
                             text = department, // 정부 기관명
                             fontSize = 14.sp,
-                            color = Neutral20
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
                             for (category in categories) {
                                 Text(
                                     text = category, // 카테고리
                                     fontSize = 12.sp,
-                                    color = Neutral60
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                             }
@@ -104,7 +104,7 @@ fun FeedCard(
                     text = title,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 //if (isEligible) StatusTag("신청 대상자", StatusType.POSITIVE) // 신청 대상자 버튼
             }
@@ -115,7 +115,7 @@ fun FeedCard(
             Text(
                 text = content,
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -110,8 +111,8 @@ fun HomeScreen(
                         Indicator(
                             modifier = Modifier.align(Alignment.TopCenter),
                             isRefreshing = ui.isRefreshing,
-                            containerColor = Neutral100,
-                            color = Primary50,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            color = MaterialTheme.colorScheme.primary,
                             state = pullToRefreshState
                         )
                     }
@@ -125,7 +126,7 @@ fun HomeScreen(
                             Text(
                                 text = ui.generalError ?: "추천 정책이 없어요 :(",
                                 fontSize = 18.sp,
-                                color = Primary40,
+                                color = MaterialTheme.colorScheme.tertiary,
                             )
                         }
                     }

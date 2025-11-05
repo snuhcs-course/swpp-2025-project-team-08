@@ -8,66 +8,99 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// 👇 다크모드 ColorScheme (앱 색상 기반)
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary60,
-    onPrimary = Neutral10,
-    primaryContainer = Primary30,
-    onPrimaryContainer = Primary90,
+    // Primary colors - 다크모드에서는 어두운 청록
+    primary = Primary40,                    // 버튼 배경
+    onPrimary = Neutral100,                 // 버튼 텍스트
+    primaryContainer = Primary30,           // 카드 배경 (어두운 청록)
+    onPrimaryContainer = Neutral95,         // 카드 내 텍스트 (밝게)
 
-    secondary = Neutral60,
-    onSecondary = Neutral10,
+    // Secondary colors - 섹션 제목 등에 사용
+    secondary = Primary50,
+    onSecondary = Neutral100,
+    secondaryContainer = Primary40,         // 섹션 제목 배경 (중간 청록)
+    onSecondaryContainer = Neutral95,       // 섹션 제목 텍스트 (밝게)
 
-    tertiary = YellowPrimary,
+    // Tertiary colors - 아이콘 등에 사용
+    tertiary = Primary60,                   // 밝은 청록 (아이콘용)
     onTertiary = Neutral10,
+    tertiaryContainer = Primary30,
+    onTertiaryContainer = Primary90,
 
-    background = Neutral10,
-    onBackground = Neutral95,
+    // Background & Surface
+    background = Neutral10,                 // 메인 배경 (거의 검정)
+    onBackground = Neutral95,               // 배경 위 텍스트 (밝게)
+    surface = Neutral20,                    // TopAppBar 등
+    onSurface = Neutral95,                  // 일반 텍스트 (밝게)
+    surfaceVariant = Primary20,             // 아이콘 배경 (어두운 청록)
+    onSurfaceVariant = Neutral80,           // 보조 텍스트 (밝게)
 
-    surface = Neutral20,
-    onSurface = Neutral95,
+    // Borders & Outlines
+    outline = Neutral40,                    // 테두리 (어둡게)
+    outlineVariant = Neutral30,
 
-    surfaceVariant = Neutral30,
-    onSurfaceVariant = Neutral90,
+    // 추가 Surface 레벨
+    surfaceTint = Primary40,
+    inverseSurface = Neutral90,
+    inverseOnSurface = Neutral10,
 
-    error = RedPrimary,
-    onError = Neutral100
+    // Error states
+    error = RedSecondary,
+    onError = Neutral10,
+    errorContainer = RedPrimary,
+    onErrorContainer = Neutral95,
 )
 
-// 👇 라이트모드 ColorScheme (앱 색상 기반)
 private val LightColorScheme = lightColorScheme(
-    primary = Primary50,
-    onPrimary = Neutral100,
-    primaryContainer = Primary95,
-    onPrimaryContainer = Primary10,
+    // Primary colors - 라이트모드에서는 밝은 청록
+    primary = Primary50,                    // 버튼 배경
+    onPrimary = Neutral100,                 // 버튼 텍스트
+    primaryContainer = Primary95,           // 카드 배경 (밝은 청록)
+    onPrimaryContainer = Neutral10,         // 카드 내 텍스트 (어둡게)
 
-    secondary = Neutral50,
+    // Secondary colors - 섹션 제목 등에 사용
+    secondary = Primary40,
     onSecondary = Neutral100,
+    secondaryContainer = Primary80,         // 섹션 제목 배경 (밝은 청록)
+    onSecondaryContainer = Neutral30,       // 섹션 제목 텍스트 (어둡게)
 
-    tertiary = YellowPrimary,
-    onTertiary = Neutral10,
+    // Tertiary colors - 아이콘 등에 사용
+    tertiary = Primary40,                   // 진한 청록 (아이콘용)
+    onTertiary = Neutral100,
+    tertiaryContainer = Primary95,
+    onTertiaryContainer = Primary20,
 
-    background = Neutral100,
-    onBackground = Neutral10,
+    // Background & Surface
+    background = Neutral100,                // 메인 배경 (흰색)
+    onBackground = Neutral10,               // 배경 위 텍스트 (어둡게)
+    surface = Neutral100,                   // TopAppBar 등
+    onSurface = Neutral10,                  // 일반 텍스트 (어둡게)
+    surfaceVariant = Primary99,             // 아이콘 배경 (거의 흰 청록)
+    onSurfaceVariant = Neutral50,           // 보조 텍스트 (회색)
 
-    surface = Neutral99,
-    onSurface = Neutral10,
+    // Borders & Outlines
+    outline = Neutral90,                    // 테두리 (밝게)
+    outlineVariant = Neutral80,
 
-    surfaceVariant = Neutral95,
-    onSurfaceVariant = Neutral30,
+    // 추가 Surface 레벨
+    surfaceTint = Primary50,
+    inverseSurface = Neutral20,
+    inverseOnSurface = Neutral95,
 
+    // Error states
     error = RedPrimary,
-    onError = Neutral100
+    onError = Neutral100,
+    errorContainer = RedSecondary,
+    onErrorContainer = Neutral10,
 )
 
 @Composable
 fun ItdaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,  // 👈 false로 변경 (앱 고유 색상 사용)
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

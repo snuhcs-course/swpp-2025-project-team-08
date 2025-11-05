@@ -6,23 +6,20 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.itda.ui.common.theme.Neutral10
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Primary20
-import com.example.itda.ui.common.theme.Primary40
+import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Home : BottomNavItem("home", Icons.Default.Home, "Home")
@@ -40,7 +37,7 @@ fun BottomNavBar(navController: NavController) {
         BottomNavItem.Profile
     )
     NavigationBar(
-        containerColor = Neutral100,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 5.dp,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -60,16 +57,11 @@ fun BottomNavBar(navController: NavController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    // 선택된 아이콘/텍스트 색상
-                    selectedIconColor = Neutral100,
-                    selectedTextColor = Primary20,
-
-                    // 선택되지 않은 아이콘/텍스트 색상
-                    unselectedIconColor = Neutral10,
-                    unselectedTextColor = Neutral10,
-
-                    // 아이템 배경에 표시되는 물결 효과의 배경색 (투명하게 하려면 투명색 사용)
-                    indicatorColor = Primary40
+                    selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer
                 ),
             )
         }

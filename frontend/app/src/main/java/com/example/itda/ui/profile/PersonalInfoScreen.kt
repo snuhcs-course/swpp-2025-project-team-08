@@ -38,7 +38,7 @@ fun PersonalInfoScreen(
                         "개인정보 수정",
                         fontWeight = FontWeight.Medium,
                         fontSize = 18.sp,
-                        color = Neutral30
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -46,12 +46,12 @@ fun PersonalInfoScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "뒤로가기",
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -61,7 +61,7 @@ fun PersonalInfoScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .background(Neutral99)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(20.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -71,12 +71,12 @@ fun PersonalInfoScreen(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = Neutral90,
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(12.dp)
                     ),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
@@ -180,8 +180,8 @@ fun PersonalInfoScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Neutral20,
-                            disabledContainerColor = Neutral80
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         shape = RoundedCornerShape(8.dp),
                         enabled = !ui.isLoading
@@ -189,13 +189,13 @@ fun PersonalInfoScreen(
                         if (ui.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 strokeWidth = 2.dp
                             )
                         } else {
                             Text(
                                 "완료",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -228,7 +228,7 @@ fun PersonalInfoFieldSimple(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
-            color = if (enabled) Neutral10 else Neutral50,
+            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         OutlinedTextField(
@@ -238,23 +238,23 @@ fun PersonalInfoFieldSimple(
             placeholder = {
                 Text(
                     placeholder,
-                    color = Neutral70,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
             },
             enabled = enabled,
             isError = errorMessage != null,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Neutral20,
-                unfocusedBorderColor = Neutral90,
-                disabledBorderColor = Neutral95,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
                 errorBorderColor = MaterialTheme.colorScheme.error,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                disabledContainerColor = Neutral99,
-                focusedTextColor = Neutral10,
-                unfocusedTextColor = Neutral10,
-                disabledTextColor = Neutral50
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(8.dp)
         )
@@ -292,7 +292,7 @@ fun PersonalInfoDropdown(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
-            color = Neutral10,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -310,7 +310,7 @@ fun PersonalInfoDropdown(
                 placeholder = {
                     Text(
                         "선택해주세요",
-                        color = Neutral70,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp
                     )
                 },
@@ -319,11 +319,11 @@ fun PersonalInfoDropdown(
                 },
                 isError = errorMessage != null,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Neutral20,
-                    unfocusedBorderColor = Neutral90,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     errorBorderColor = MaterialTheme.colorScheme.error,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -331,16 +331,21 @@ fun PersonalInfoDropdown(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Primary95)
+                modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option) },
+                        text = {
+                            Text(
+                                option,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        },
                         onClick = {
                             onValueChange(option)
                             expanded = false
                         },
-                        modifier = Modifier.background(Primary95)
+                        modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)
                     )
                 }
             }

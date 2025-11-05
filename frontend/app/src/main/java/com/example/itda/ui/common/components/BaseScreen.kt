@@ -2,12 +2,12 @@ package com.example.itda.ui.common.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import com.example.itda.ui.common.theme.Neutral100
 
 interface ScreenContract {
-    val route: String;
+    val route: String
     val title: String
 }
 
@@ -30,7 +30,7 @@ fun BaseScreen(
             )
         },
         bottomBar = bottomBar,
-        containerColor = Neutral100,
+        containerColor = MaterialTheme.colorScheme.background,
         content = content
     )
 }

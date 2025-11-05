@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -75,14 +76,14 @@ fun FeedScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary40,
-                        disabledContainerColor = Neutral80
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                     ),
                     enabled = true
                 ) {
                     Text(
                         text = "신청하러가기",
-                        color = Neutral100,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 16.sp
                     )
                 }
@@ -100,7 +101,7 @@ fun FeedScreen(
                     .padding(paddingValues)
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(Neutral100)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
 
                 // 상단 제목 / 태그
