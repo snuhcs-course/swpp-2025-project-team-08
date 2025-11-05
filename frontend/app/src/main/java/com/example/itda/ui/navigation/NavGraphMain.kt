@@ -2,6 +2,7 @@ package com.example.itda.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.feed.FeedRoute
 import com.example.itda.ui.home.HomeRoute
 import com.example.itda.ui.notification.NotificationScreen
+import com.example.itda.ui.profile.PersonalInfoRoute
 import com.example.itda.ui.profile.PersonalInfoScreen
 import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
@@ -93,8 +95,14 @@ fun NavGraphBuilder.mainGraph(
         }
 
         composable("personal_info") {
-            PersonalInfoScreen(
+            PersonalInfoRoute(
                 onBack = { navController.popBackStack() },
+                onComplete = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("profile_refresh", true)
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -113,7 +121,7 @@ fun MainScaffoldWrapper(
     // 여기서는 BottomNavBar가 필요한 탭 화면을 감싸는 역할만 수행합니다.
     Scaffold(
         bottomBar = { BottomNavBar(navController = navController) }, // 👈 BottomNavBar가 여기에 위치
-        containerColor = Neutral100, // 배경색
+        containerColor = MaterialTheme.colorScheme.background, // 배경색
     ) { innerPadding -> // 👈 BottomBar의 높이만큼 계산된 PaddingValues가 innerPadding으로 제공됨
         content(innerPadding) // 👈 이 innerPadding이 content 람다를 통해 Route로 전달됩니다.
     }
