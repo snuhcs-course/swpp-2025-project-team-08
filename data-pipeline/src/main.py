@@ -66,10 +66,10 @@ def save_raw_programs(programs: List[Dict[str, Any]]):
             f.write(json_string)
             f_ts.write(json_string)
 
-    print(f"Saved {len(programs)} raw programs. \n")
+    print(f"Saved {len(programs)} raw programs.")
 
 
-def do_load(args, db_manager: PostgresManager):
+def do_load(args):
     print("[*] Start loading...")
     loaders = [
         BokjiroLoader(
@@ -87,7 +87,7 @@ def do_load(args, db_manager: PostgresManager):
 
         count += len(programs)
 
-    print(f"Total {count} programs are loaded.")
+    print(f"Total {count} programs are loaded.\n")
 
 
 def do_trim(args) -> List[Dict[str, Any]]:
@@ -115,7 +115,7 @@ def do_trim(args) -> List[Dict[str, Any]]:
                 count += 1
             pbar.update(len(line.encode("utf-8")))
 
-        print(f"Total {count} programs are trimmed.")
+        print(f"Total {count} programs are trimmed.\n")
 
 
 def do_vectorize(args):
@@ -169,42 +169,50 @@ def do_vectorize(args):
                 text_batch = []
                 uuid_batch = []
 
-    print(f"Total {count} programs are vectorized.")
+    print(f"Total {count} programs are vectorized.\n")
 
 
-def do_save(args, db_manager: PostgresManager):
+def do_save(args):
     print("[*] Start saving to DB...")
 
-    count = 0
-    total_bytes = trimmed_path.stat().st_size + embedding_path.stat().st_size
+    with PostgresManager(
+        conn_string=DATABASE_URL,
+        min_pool_size=args.db_min_pool_size,
+        max_pool_size=args.db_max_pool_size,
+    ) as db_manager:
 
-    batch = []
-    batch_size = args.db_commit_batch_size
+        count = 0
+        total_bytes = trimmed_path.stat().st_size + embedding_path.stat().st_size
 
-    with trimmed_path.open("r", encoding="utf-8") as f_p, embedding_path.open(
-        "r", encoding="utf-8"
-    ) as f_e, tqdm(total=total_bytes, desc="Save", unit="B", unit_scale=True) as pbar:
-        for line_p, line_e in zip(f_p, f_e):
-            program = json.loads(line_p)
-            embedding = json.loads(line_e)
+        batch = []
+        batch_size = args.db_commit_batch_size
 
-            if program["uuid"] != embedding["uuid"]:
-                raise MismatchError("[!] The Embedding does not match the Program.")
+        with trimmed_path.open("r", encoding="utf-8") as f_p, embedding_path.open(
+            "r", encoding="utf-8"
+        ) as f_e, tqdm(
+            total=total_bytes, desc="Save", unit="B", unit_scale=True
+        ) as pbar:
+            for line_p, line_e in zip(f_p, f_e):
+                program = json.loads(line_p)
+                embedding = json.loads(line_e)
 
-            program["embedding"] = str(embedding["embedding"])
-            batch.append(program)
+                if program["uuid"] != embedding["uuid"]:
+                    raise MismatchError("[!] The Embedding does not match the Program.")
 
-            if len(batch) >= batch_size:
+                program["embedding"] = str(embedding["embedding"])
+                batch.append(program)
+
+                if len(batch) >= batch_size:
+                    count += db_manager.save_programs(batch)
+                    batch = []
+
+                pbar.update(len(line_p.encode("utf-8")) + len(line_e.encode("utf-8")))
+
+            if batch:
                 count += db_manager.save_programs(batch)
                 batch = []
 
-            pbar.update(len(line_p.encode("utf-8")) + len(line_e.encode("utf-8")))
-
-        if batch:
-            count += db_manager.save_programs(batch)
-            batch = []
-
-    print(f"Total {count} programs are saved to DB.")
+    print(f"Total {count} programs are saved to DB.\n")
 
 
 def main():
@@ -213,29 +221,19 @@ def main():
 
     mode = args.mode
 
-    try:
-        db_manager = PostgresManager(
-            conn_string=DATABASE_URL,
-            min_pool_size=args.db_min_pool_size,
-            max_pool_size=args.db_max_pool_size,
-        )
-
-        if mode == "load":
-            do_load(args, db_manager)
-        elif mode == "trim":
-            do_trim(args)
-        elif mode == "vectorize":
-            do_vectorize(args)
-        elif mode == "save":
-            do_save(args, db_manager)
-        elif mode == "all":
-            do_load(args, db_manager)
-            do_trim(args)
-            do_vectorize(args)
-            do_save(args, db_manager)
-
-    finally:
-        db_manager.close()
+    if mode == "load":
+        do_load(args)
+    elif mode == "trim":
+        do_trim(args)
+    elif mode == "vectorize":
+        do_vectorize(args)
+    elif mode == "save":
+        do_save(args)
+    elif mode == "all":
+        do_load(args)
+        do_trim(args)
+        do_vectorize(args)
+        do_save(args)
 
 
 if __name__ == "__main__":
