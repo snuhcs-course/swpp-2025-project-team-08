@@ -38,7 +38,7 @@ class UserEntity(
     @Column(nullable = true)
     var address: String? = null,
     @Column(nullable = true)
-    var postcode: Int? = null,
+    var postcode: String? = null,
     @Column(name = "household_size", nullable = true)
     var householdSize: Int? = null,
     @Column(name = "household_income", nullable = true)

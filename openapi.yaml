@@ -336,7 +336,7 @@ components:
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
         postcode:
-          type: integer
+          type: string
           description: 우편번호
           example: 06134
         maritalStatus:
@@ -401,7 +401,7 @@ components:
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
         postcode:
-          type: integer
+          type: string
           description: 우편번호
           example: 06134
         maritalStatus:
