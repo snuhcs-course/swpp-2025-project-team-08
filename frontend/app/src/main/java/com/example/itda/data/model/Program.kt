@@ -46,6 +46,7 @@ data class ProgramResponse(
     val title: String,
     val preview : String,
     val operatingEntity : String,
+    val operatingEntityType : String,
     val category : String,
     val categoryValue: String,
 )
@@ -76,5 +77,6 @@ data class ProgramDetailResponse(
     val applyStartAt: String?,
     val applyEndAt: String?,
     val createdAt: String?,
-    val operatingEntity: String
+    val operatingEntity: String,
+    val operatingEntityType : String,
 )

@@ -241,6 +241,7 @@ object DummyData {
         applyStartAt = "",
         applyEndAt = "",
         createdAt = "",
-        operatingEntity = ""
+        operatingEntity = "",
+        operatingEntityType = ""
     )
 }

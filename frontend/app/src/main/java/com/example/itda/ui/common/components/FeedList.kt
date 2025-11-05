@@ -69,19 +69,15 @@ fun FeedList(
                     id = item.id,
                     title = item.title,
                     categories = listOf(filterCategory),
-                    department =
-                        if(item.operatingEntity == "central")
-                            "중앙정부"
-                        else
-                            item.operatingEntity,
+                    department = item.operatingEntity,
                     content = item.preview,
 
                     isStarred = false, // TODO - 변수로 지정 필요
                     logo =
-                        if(item.operatingEntity == "central")
+                        if(item. operatingEntityType == "central")
                             R.drawable.gov_logo
                         else
-                            R.drawable.local, // TODO - operatingEntity에 지자체 들어오면 그에 맞춘 로고를 넣어줘야할텐디...
+                            R.drawable.local,
                     onClick = { onItemClick(item) }
                 )
             }

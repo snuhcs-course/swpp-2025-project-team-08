@@ -2,7 +2,9 @@ package com.example.itda.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.ProgramResponse
 import com.example.itda.data.repository.AuthRepository
+import com.example.itda.data.repository.ProgramRepository
 import com.example.itda.data.source.remote.ApiError
 import com.example.itda.data.source.remote.ApiErrorParser
 import com.example.itda.data.source.remote.PreferenceRequest
@@ -21,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val programRepository: ProgramRepository
 ) : ViewModel() {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
@@ -335,6 +338,7 @@ class AuthViewModel @Inject constructor(
 
 
     data class PreferenceUIState(
+        val examplePrograms : List<ProgramResponse> = emptyList<ProgramResponse>(),
         val preferenceRequestList : PreferenceRequestList = emptyList<PreferenceRequest>(),
         val isLoading: Boolean = false,
         val generalError: String? = null
@@ -342,8 +346,49 @@ class AuthViewModel @Inject constructor(
     private val _preferenceUi = MutableStateFlow(PreferenceUIState())
     val preferenceUi: StateFlow<PreferenceUIState> = _preferenceUi.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            getExamples()
+        }
+    }
 
-    suspend fun updatePreference() {
+    suspend fun getExamples() {
+        _preferenceUi.update { it.copy(isLoading = true) }
+
+        val examples = programRepository.getExamples()
+        examples
+            .onFailure { exception ->
+                val apiError = ApiErrorParser.parseError(exception)
+                _preferenceUi.update {
+                    it.copy(
+                        generalError = apiError.message,
+                        isLoading = false
+                    )
+                }
+            }
+        examples
+            .onSuccess { examples ->
+                _preferenceUi.update {
+                    it.copy(
+                        examplePrograms = examples,
+                        preferenceRequestList = examples.map { p -> PreferenceRequest(id = p.id, score = 0)},
+                        isLoading = false
+                    )
+                }
+            }
+    }
+
+    fun onPreferenceScoreChange(programId : Int, newScore : Int) {
+        _preferenceUi.update { ui ->
+            val updatedList = ui.preferenceRequestList.map {
+                if (it.id == programId) it.copy(score = newScore) else it
+            }
+            ui.copy(preferenceRequestList = updatedList)
+        }
+    }
+
+
+    suspend fun updatePreference(): Boolean {
         val ui = _preferenceUi.value
         _preferenceUi.update { it.copy(isLoading = true) }
 
@@ -351,9 +396,18 @@ class AuthViewModel @Inject constructor(
 
         result.onFailure { exception ->
             val apiError = ApiErrorParser.parseError(exception)
-            _personalInfoUi.update { it.copy(generalError = apiError.message) }
+            _personalInfoUi.update { it.copy(generalError = apiError.message, isLoading = false) }
+            return false
         }
 
-        _preferenceUi.update { it.copy(isLoading = false) }
+        result.onSuccess {
+            _preferenceUi.update { it.copy(isLoading = false) }
+            return true
+        }
+
+        return false
+
+
     }
+
 }

@@ -93,11 +93,13 @@ fun PreferenceUpdateRoute(
 
     PreferenceUpdateScreen(
         ui = ui,
+        onPreferenceScoreChange = vm::onPreferenceScoreChange,
         onSubmit = {
             scope.launch {
-                // if (vm.submitPreference())
-                vm.updatePreference()
-                onComplete()
+                val success = vm.updatePreference()
+                if (success) {
+                    onComplete()
+                }
             }
         }
     )
