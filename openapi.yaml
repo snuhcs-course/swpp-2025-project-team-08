@@ -522,12 +522,12 @@ components:
           example: 4
         eligibilityMinIncome:
           type: integer
-          description: '최소 가구 소득 (원)'
+          description: '최소 가구 소득 (만원)'
           example: 0
         eligibilityMaxIncome:
           type: integer
-          description: '최대 가구 소득 (원)'
-          example: 70000000
+          description: '최대 가구 소득 (만원)'
+          example: 7000
         eligibilityRegion:
           type: string
           description: '지원 대상 지역'
