@@ -82,7 +82,7 @@ data class ProfileRequest(
     val birthDate: String?,
     val gender: Gender?,
     val address: String?,
-    val postcode: Int?,
+    val postcode: String?,
     val maritalStatus: MaritalStatus?,
     val educationLevel: EducationLevel?,
     val householdSize: Int?,
