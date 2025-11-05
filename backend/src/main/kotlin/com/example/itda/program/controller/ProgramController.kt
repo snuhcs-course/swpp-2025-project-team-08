@@ -40,6 +40,18 @@ class ProgramController(
         return programService.getProgramCategories()
     }
 
+    @GetMapping("/programs/examples")
+    fun getProgramExamples(): List<ProgramSummaryResponse> {
+        return programService.getProgramExamples()
+    }
+
+    @GetMapping("/programs/examples/{id}")
+    fun getProgramExamples(
+        @PathVariable id: Long,
+    ): ProgramResponse {
+        return programService.getProgramExample(id)
+    }
+
     @GetMapping("/programs/search/latest")
     fun searchLatestPrograms(
         @RequestParam("query") searchTerm: String,
