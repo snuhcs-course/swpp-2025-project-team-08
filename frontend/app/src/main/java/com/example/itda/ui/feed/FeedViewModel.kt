@@ -4,8 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.model.DummyData
-import com.example.itda.data.model.Program
+import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.repository.ProgramRepository
+import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,9 @@ class FeedViewModel @Inject constructor(
 
 
     data class FeedUiState(
-        val feed: Program = DummyData.dummyFeedItems[0], // 피드 데이터[0], // 사용자 정보
-        val isLoading: Boolean = false
+        val feed: ProgramDetailResponse = DummyData.dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
+        val isLoading: Boolean = false,
+        val generalError : String? = null,
     )
 
 
@@ -34,13 +36,29 @@ class FeedViewModel @Inject constructor(
     fun getFeedItem(feedId: Int) {
         viewModelScope.launch {
             _feedUi.update {it.copy(isLoading = true)}
-            val feedItem = programRepository.getFeed(feedId) // TODO - getFeed 말고 getProgram?
-            _feedUi.update {
-                it.copy(
-                    feed = feedItem,
-                    isLoading = false
-                )
-            }
+
+            val feedItem = programRepository.getProgramDetails(feedId)
+            feedItem
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _feedUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isLoading = false
+                        )
+                    }
+                }
+            feedItem
+                .onSuccess { feedItem ->
+                    _feedUi.update {
+                        it.copy(
+                            feed = feedItem,
+                            isLoading = false
+                        )
+                    }
+                }
+
+
         }
 
 

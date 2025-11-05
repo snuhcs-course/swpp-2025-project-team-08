@@ -20,6 +20,7 @@ fun HomeRoute(
         onCategorySelected = vm::onCategorySelected,
         onFeedClick = onFeedClick,
         onRefresh = vm::refreshHomeData,
+        onLoadNext = vm::loadNextPage,
         modifier = modifier
     )
 }

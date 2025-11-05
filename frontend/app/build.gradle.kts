@@ -131,4 +131,5 @@ dependencies {
     androidTestImplementation("app.cash.turbine:turbine:1.1.0")
     androidTestImplementation("com.google.truth:truth:1.4.4")
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    implementation(libs.compose.markdown)
 }

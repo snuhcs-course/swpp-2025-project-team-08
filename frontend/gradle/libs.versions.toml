@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.0"
+composeMarkdown = "0.5.7"
 kotlin = "2.0.21"
 hilt = "2.57.1"
 ksp = "2.0.21-1.0.26"
@@ -18,6 +19,7 @@ foundation = "1.9.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "composeMarkdown" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

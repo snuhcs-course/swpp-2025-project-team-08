@@ -1,6 +1,8 @@
 package com.example.itda.ui.feed
 
-import android.util.Log
+import android.annotation.SuppressLint
+import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,19 +20,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.Neutral90
 import com.example.itda.ui.common.theme.Primary40
 import com.example.itda.ui.feed.components.FeedContentCard
-import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
+import com.example.itda.ui.feed.components.FeedSummaryCard
+import com.example.itda.ui.navigation.LoadingScreen
 
 
+@SuppressLint("QueryPermissionsNeeded")
 @Composable
 fun FeedScreen(
     ui: FeedViewModel.FeedUiState, // UiState를 인자로 받음
@@ -41,18 +46,14 @@ fun FeedScreen(
     val scrollState = rememberScrollState()
     var detailExpanded by remember { mutableStateOf(false) }
 
-    val feed = try {
-        ui.feed
-    } catch (e: Exception) {
-        Log.e("FeedScreen", "Feed load failed: $e")
-        null
+    val context = LocalContext.current
+
+    var url = ""
+    if(ui.feed.applyUrl.toBoolean()) {
+        url = ui.feed.applyUrl.toString()
     }
-
-    Log.d("FeedScreen", "Feed load success: ${feed?.content}")
-
-    if (feed == null) {
-        Text("피드 데이터를 불러오지 못했습니다.")
-        return
+    else {
+        url = ui.feed.referenceUrl.toString()
     }
 
     BaseScreen(
@@ -60,71 +61,86 @@ fun FeedScreen(
         onBack = onBack,
         topBarVisible = true,
         bottomBar = {
-            Button(
-                onClick = { /* feed.link (신청 페이지) 로 이동 */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (feed.isEligible)
-                        Primary40  // 활성화 시 메인 컬러
-                    else
-                        Neutral90,
-                    disabledContainerColor = Neutral80
-                ),
-                enabled = feed.isEligible
-            ) {
-                Text(
-                    text = "신청하러가기",
-                    color = Neutral100,
-                    fontSize = 16.sp
-                )
+            if(!ui.isLoading && url.toBoolean()) {
+                Button(
+                    onClick = {  /* feed.link (신청 페이지) 로 이동 */
+                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                        // 안전을 위해 resolveActivity를 사용하여 처리 가능한 앱이 있는지 확인 후 실행하는 것이 좋습니다.
+                        if (intent.resolveActivity(context.packageManager) != null) {
+                            context.startActivity(intent)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Primary40,
+                        disabledContainerColor = Neutral80
+                    ),
+                    enabled = true
+                ) {
+                    Text(
+                        text = "신청하러가기",
+                        color = Neutral100,
+                        fontSize = 16.sp
+                    )
+                }
             }
+
         }
     ) { paddingValues ->
 
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-
-            // 상단 제목 / 태그
-            FeedHeaderSection(
-                title = feed.title,
-                endDate = feed.end_date,
-                tags = feed.categories,
-                isEligible = feed.isEligible,
-                isStarred = feed.isStarred
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // 지원혜택 카드
-            FeedInfoCard(
-                categories = feed.categories,
-                startDate = feed.start_date,
-                endDate = feed.end_date,
-                department = feed.department
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // 내용 카드
-            FeedContentCard()
-
-            Spacer(Modifier.height(12.dp))
-
-            // 상세내용 (접히는 영역)
-            FeedDetailCard(
-                expanded = detailExpanded,
-                onToggle = { detailExpanded = !detailExpanded }
-            )
-
-            Spacer(Modifier.height(60.dp)) // 하단 버튼 여유 공간
+        if(ui.isLoading) {
+            LoadingScreen()
         }
+        else {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .background(Neutral100)
+            ) {
+
+                // 상단 제목 / 태그
+                FeedHeaderSection(
+                    title = ui.feed.title,
+                    endDate = ui.feed.applyEndAt ?: "",
+                    tags = listOf(ui.feed.categoryValue),
+                    isEligible = true,
+                    isStarred = false // ui.feed.isStarred
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                // 지원혜택 카드
+                FeedInfoCard(
+                    categories = listOf(ui.feed.categoryValue),
+                    startDate = ui.feed.applyStartAt ?: "",
+                    endDate = ui.feed.applyEndAt ?: "",
+                    department =
+                        if(ui.feed.operatingEntity == "central")
+                            "중앙정부"
+                        else
+                            ui.feed.operatingEntity,
+                )
+                Spacer(Modifier.height(12.dp))
+
+                FeedSummaryCard(
+                    expanded = detailExpanded,
+                    onToggle = { detailExpanded = !detailExpanded },
+                    summary = ui.feed.summary
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                FeedContentCard(content = ui.feed.details)
+
+                Spacer(Modifier.height(60.dp)) // 하단 버튼 여유 공간
+            }
+        }
+
     }
 }
 

@@ -3,13 +3,13 @@ package com.example.itda.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.model.Category
-import com.example.itda.data.model.DummyData
-import com.example.itda.data.model.Program
+import com.example.itda.data.model.ProgramResponse
+import com.example.itda.data.model.dummyCategories
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.repository.ProgramRepository
+import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,9 +26,14 @@ class HomeViewModel @Inject constructor(
     data class HomeUiState(
     val userId: String = "", // 사용자 정보
     val username: String = "", // 사용자 정보
-    val categories: List<Category> = emptyList<Category>(), // 필터 카테고리
-    val selectedCategoryName: String = DummyData.dummyCategories.first().name, // 선택된 카테고리
-    val feedItems: List<Program> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+    val categories: List<Category> = dummyCategories, // 필터 카테고리
+    val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
+    val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+    val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
+    val isLastPage: Boolean = false,        // 마지막 페이지 여부
+    val totalPages: Int = 0,                // 전체 페이지 수
+    val totalElements : Int = 0,             // 전체 정책 수
+
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val generalError: String? = null
@@ -57,17 +62,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _homeUi.update { it.copy(isLoading = true) }
 
-            val user = DummyData.dummyUser[0]
-            _homeUi.update {
-                it.copy(
-                    userId = user.id,
-                    username = user.name ?: "사용자",
-                    isLoading = false
-                )
-            }
-
-
-            /* TODO : program api 완성 후 아래 함수로 변경
             val user = authRepository.getProfile()
             user
                 .onFailure { exception ->
@@ -84,42 +78,25 @@ class HomeViewModel @Inject constructor(
                     _homeUi.update {
                         it.copy(
                             userId = user.id,
-                            username = user.name,
+                            username = user.name ?: "사용자",
                             isLoading = false
                         )
                     }
                 }
-             */
         }
     }
 
     // 홈 화면에 필요한 모든 데이터를 로드
     private fun loadHomeData() {
         viewModelScope.launch {
-        _homeUi.update { it.copy(isLoading = true) }
-        delay(2000L) // TODO - 실제 통신에서는 실제 딜레이가 있을거라 빼도 됨
+            _homeUi.update { it.copy(isLoading = true, currentPage = 0) }
+            // delay(2000L) // TODO - 실제 통신에서는 실제 딜레이가 있을거라 빼도 됨
 
-        // 1. 피드 데이터 로드
-        val programs = programRepository.getFeedList()
-        val newCategories = mutableListOf<Category>(Category(0,  "전체")) // TODO - 실제 category 가 id = 0 이 전체가 아니라면 수정해야함.
-        for (program in programs) {
-            for (category in program.categories) {
-                if (!newCategories.contains(category)) {
-                    newCategories.add(category)
-                }
-            }
-        }
-        _homeUi.update {
-            it.copy(
-                categories = newCategories,
-                feedItems = programs,
-                isLoading = false,
-                isRefreshing = false
+            val programs = programRepository.getPrograms(
+                page = 0,
+                size = 20,
+                category = _homeUi.value.selectedCategory.category
             )
-        }
-        /* TODO : program api 완성 후 아래 함수로 변경
-
-            val programs = programRepository.getPrograms()
             programs
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
@@ -131,33 +108,69 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             programs
-                .onSuccess { programs ->
-
+                .onSuccess { response ->
                     // 빈 list에 programs 의 categories 에 속하는 category 들의 합집합 집어넣어서 newCategories 구성하기
-                    val newCategories = mutableListOf<Category>(Category(0,  "전체")) // TODO - 실제 category 가 id : 0 이 전체가 아니라면 수정해야함.
-                    for (program in programs) {
-                        for (category in program.categories) {
-                            if (!newCategories.contains(category)) {
-                                newCategories.add(category)
-                            }
-                        }
-                    }
-
                     _homeUi.update {
                         it.copy(
-                            categories = newCategories,
-                            feedItems = programs,
+                            feedItems = response.content,
+                            currentPage = response.page,        // 현재 페이지 번호 저장
+                            totalPages = response.totalPages,   // 전체 페이지 수 저장
+                            isLastPage = response.isLast,
+                            totalElements = response.totalElements,   // 전체 정책 수 저장
+                            generalError = null,
                             isLoading = false
                         )
                     }
                 }
-             */
-
         }
     }
 
-// 카테고리 필터링 로직
-fun onCategorySelected(categoryName: String) {
-_homeUi.update { it.copy(selectedCategoryName = categoryName) }
-}
+    fun loadNextPage() {
+        val nextPageIndex = homeUi.value.currentPage + 1
+        val isLast = homeUi.value.isLastPage
+
+        // 1. 이미 로딩 중이거나 마지막 페이지면 더 이상 호출하지 않음
+        if (homeUi.value.isLoading || isLast) return
+
+        viewModelScope.launch {
+            _homeUi.update { it.copy(isLoading = true) }
+
+            programRepository.getPrograms(page = nextPageIndex, size = 20)
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _homeUi.update {
+                        it.copy(
+                            // 2. 기존 목록에 새로운 content를 추가
+                            feedItems = it.feedItems + response.content,
+                            currentPage = response.page,
+                            isLastPage = response.isLast,
+                            generalError = null,
+                            isLoading = false
+                        )
+                    }
+                }
+        }
+    }
+
+    // 카테고리 필터링 로직
+    fun onCategorySelected(categoryName: String) {
+        _homeUi.update {
+            it.copy(
+                // TODO - 현재는 Category.kt 에 저장해둔 dummy list 에서 찾지만 나중에 categories 찾는 api 구현 시 programRepository 통해 api 로 찾아서 저장해둔 category 에서 찾아오기
+                selectedCategory = dummyCategories.find { category ->
+                    category.value == categoryName
+                } ?: Category("", "전체")
+            )
+        }
+
+        loadHomeData()
+    }
 }
