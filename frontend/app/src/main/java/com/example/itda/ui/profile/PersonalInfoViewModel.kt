@@ -2,7 +2,9 @@ package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import retrofit2.HttpException
 import com.example.itda.data.repository.UserRepository
+import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,15 +67,15 @@ class PersonalInfoViewModel @Inject constructor(
             }
 
             "education" -> when (enumName) {
-                "HIGHSCHOOL" -> "고졸"
-                "STUDENT" -> "재학생"
-                "LEAVE_OF_ABSENCE" -> "휴학생"
-                "EXPECTED_GRADUATE" -> "졸업예정"
+                "ELEMENTARY_SCHOOL_STUDENT" -> "초등학생"
+                "MIDDLE_SCHOOL_STUDENT" -> "중학생"
+                "HIGH_SCHOOL_STUDENT" -> "고등학생"
+                "COLLEGE_STUDENT" -> "대학생"
+                "ELEMENTARY_SCHOOL" -> "초졸"
+                "MIDDLE_SCHOOL" -> "중졸"
+                "HIGH_SCHOOL" -> "고졸"
                 "ASSOCIATE" -> "전문대졸"
                 "BACHELOR" -> "대졸"
-                "MASTER" -> "석사"
-                "PHD" -> "박사"
-                "ANY" -> "무관"
                 else -> ""
             }
 
@@ -145,7 +147,7 @@ class PersonalInfoViewModel @Inject constructor(
                 _personalInfoUi.update {
                     it.copy(
                         name = user.name ?: "",
-                        birthDate = user.birthDate ?: "",
+                        birthDate = user.birthDate?.replace("-", "") ?: "",
                         gender = user.gender ?: "",
                         address = user.address ?: "",
                         postcode = user.postcode ?: "",
@@ -181,20 +183,8 @@ class PersonalInfoViewModel @Inject constructor(
     }
 
     fun onBirthDateChange(v: String) {
-        // 숫자만 필터링, 최대 8자리
         val filtered = v.filter { it.isDigit() }.take(8)
-
-        // 자동 포맷팅 (4자리 이상 입력 시)
-        val formatted = if (filtered.length >= 4) {
-            formatBirthDate(filtered.padEnd(8, '0'))?.take(filtered.length + filtered.length / 2)
-                ?: filtered
-        } else {
-            filtered
-        }
-
-        _personalInfoUi.update {
-            it.copy(birthDate = formatted, birthDateError = null, generalError = null)
-        }
+        _personalInfoUi.update { it.copy(birthDate = filtered, birthDateError = null, generalError = null) }
     }
 
     fun onGenderChange(v: String) {
@@ -203,10 +193,12 @@ class PersonalInfoViewModel @Inject constructor(
         }
     }
 
-    fun onPostcodeChange(v: String) {
-        _personalInfoUi.update {
-            it.copy(postcode = v, postcodeError = null, generalError = null)
-        }
+    fun onAddressChange(v: String) {
+        _personalInfoUi.update { it.copy(address = v, addressError = null, generalError = null) }
+    }
+
+    fun onPostCodeChange(v: String) {
+        _personalInfoUi.update { it.copy(postcode = v, postcodeError = null, generalError = null) }
     }
 
     fun onChange(v: String) {
@@ -237,7 +229,7 @@ class PersonalInfoViewModel @Inject constructor(
         _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
     }
 
-    fun submitPersonalInfo(): Boolean {
+    suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
         var hasError = false
@@ -270,11 +262,6 @@ class PersonalInfoViewModel @Inject constructor(
             hasError = true
         }
 
-        if (ui.postcode.isBlank()) {
-            _personalInfoUi.update { it.copy(postcodeError = "우편번호를 입력해주세요") }
-            hasError = true
-        }
-
         if (hasError) {
             return false
         }
@@ -282,38 +269,41 @@ class PersonalInfoViewModel @Inject constructor(
         // 검증 통과. 저장 시작.
         _personalInfoUi.update { it.copy(isLoading = true, generalError = null) }
 
+        val formattedBirthDate = formatBirthDate(ui.birthDate)
         val genderEnum = convertKoreanToEnum(ui.gender, "gender")
         val maritalEnum = convertKoreanToEnum(ui.maritalStatus, "marital")
         val educationEnum = convertKoreanToEnum(ui.education, "education")
         val employmentEnum = convertKoreanToEnum(ui.employmentStatus, "employment")
 
-        // 실제 저장 호출은 비동기. 테스트는 advanceUntilIdle()로 기다린다.
-        viewModelScope.launch {
-            val result = userRepository.updateProfile(
-                name = ui.name,
-                birthDate = formatBirthDate(birthDateDigits),
-                gender = genderEnum,
-                address = ui.address,
-                postcode = ui.postcode,
-                maritalStatus = maritalEnum,
-                educationLevel = educationEnum,
-                householdSize = ui.householdSize.toIntOrNull(),
-                householdIncome = ui.householdIncome.toIntOrNull(),
-                employmentStatus = employmentEnum
-            )
+        val result = userRepository.updateProfile(
+            name = ui.name,
+            birthDate = formattedBirthDate,
+            gender = genderEnum,
+            address = ui.address,
+            postcode = ui.postcode,
+            maritalStatus = maritalEnum,
+            educationLevel = educationEnum,
+            householdSize = ui.householdSize.toIntOrNull(),
+            householdIncome = ui.householdIncome.toIntOrNull(),
+            employmentStatus = employmentEnum
+        )
 
-            result.onSuccess {
-            }
-
-            result.onFailure { exception ->
+        result.onFailure { exception ->
+            if (exception is HttpException) {
+                val body = exception.response()?.errorBody()?.string().orEmpty()
+                val code = exception.code()
                 _personalInfoUi.update {
-                    it.copy(generalError = "저장 실패: ${exception.message}")
+                    it.copy(generalError = "HTTP $code: $body")
+                }
+            } else {
+                _personalInfoUi.update {
+                    it.copy(generalError = "네트워크 오류: ${exception.message}")
                 }
             }
-
-            _personalInfoUi.update { it.copy(isLoading = false) }
         }
 
-        return true
+
+        _personalInfoUi.update { it.copy(isLoading = false) }
+        return result.isSuccess
     }
 }
