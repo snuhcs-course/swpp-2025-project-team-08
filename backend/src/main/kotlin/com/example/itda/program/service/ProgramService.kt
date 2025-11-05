@@ -70,4 +70,30 @@ class ProgramService(
         return ProgramCategory.entries
             .find { it.dbValue.contains(searchTerm) }
     }
+
+    @Transactional
+    fun searchProgramsByRank(
+        searchTerm: String,
+        page: Int,
+        pageSize: Int,
+    ): Page<ProgramSummaryResponse> {
+        val pageable =
+            PageRequest.of(
+                page,
+                pageSize,
+            )
+
+        val categoryEnum: ProgramCategory? = mapSearchTermToCategory(searchTerm)
+
+        val programEntitiesPage: Page<ProgramEntity> =
+            programRepository.searchAndRankPrograms(
+                query = searchTerm,
+                categoryEnum = categoryEnum,
+                pageable = pageable,
+            )
+
+        return programEntitiesPage.map { entity ->
+            ProgramSummaryResponse.fromEntity(entity)
+        }
+    }
 }

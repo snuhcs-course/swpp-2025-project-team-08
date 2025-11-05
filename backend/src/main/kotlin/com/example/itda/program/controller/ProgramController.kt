@@ -40,4 +40,19 @@ class ProgramController(
             )
         return ResponseEntity.ok(response)
     }
+
+    @GetMapping("/programs/search/rank")
+    fun searchProgramsByRank(
+        @RequestParam("query") searchTerm: String,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") pageSize: Int,
+    ): ResponseEntity<Page<ProgramSummaryResponse>> {
+        val response: Page<ProgramSummaryResponse> =
+            programService.searchProgramsByRank(
+                searchTerm = searchTerm,
+                page = page,
+                pageSize = pageSize,
+            )
+        return ResponseEntity.ok(response)
+    }
 }
