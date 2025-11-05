@@ -45,6 +45,13 @@ data class ProfileResponse(
     val employmentStatus: String?
 )
 
+typealias PreferenceRequestList = List<PreferenceRequest>
+
+data class PreferenceRequest(
+    val id : Int,
+    val value : Int
+)
+
 
 interface AuthAPI {
     @POST("auth/signup")
@@ -61,4 +68,7 @@ interface AuthAPI {
 
     @PUT("my-profile")
     suspend fun updateProfile(@Body request: ProfileRequest): Unit
+
+    @POST("update/preferences")
+    suspend fun updatePreferences(@Body request: PreferenceRequestList): Unit
 }
