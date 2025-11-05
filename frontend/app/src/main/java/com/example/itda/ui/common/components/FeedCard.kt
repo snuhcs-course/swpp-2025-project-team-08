@@ -23,8 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.R
-import com.example.itda.data.model.Category
-import com.example.itda.data.model.DummyData
+import com.example.itda.data.model.dummyCategories
 import com.example.itda.ui.common.theme.Neutral20
 import com.example.itda.ui.common.theme.Neutral60
 
@@ -33,7 +32,7 @@ import com.example.itda.ui.common.theme.Neutral60
 fun FeedCard(
     id: Int,                // 프로그램 고유 ID
     title: String,          // 프로그램 제목
-    categories: List<Category>,       // 프로그램 카테고리
+    categories: List<String>,       // 프로그램 카테고리
     department: String,     // 주관 부서
     link: String? = null,           // 관련 링크 (URL)
     content: String,        // 프로그램 설명 (text)
@@ -44,7 +43,7 @@ fun FeedCard(
     logo: Int = R.drawable.gov_logo,    // 로고 ID?
     // TODO - coil library 를 활용해 url 을 받아와 붙여넣는 방법도 고민중
     // logoUrl : String ? = null
-    isEligible: Boolean,    // 신청 대상자 여부
+    isEligible: Boolean = true,    // 신청 대상자 여부
     onClick: () -> Unit,
 ) {
     Card(
@@ -81,7 +80,7 @@ fun FeedCard(
                         Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
                             for (category in categories) {
                                 Text(
-                                    text = category.name, // 카테고리
+                                    text = category, // 카테고리
                                     fontSize = 12.sp,
                                     color = Neutral60
                                 )
@@ -107,7 +106,7 @@ fun FeedCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-                if (isEligible) StatusTag("신청 대상자", StatusType.POSITIVE) // 신청 대상자 버튼
+                //if (isEligible) StatusTag("신청 대상자", StatusType.POSITIVE) // 신청 대상자 버튼
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -131,7 +130,7 @@ fun PreviewFeedItem() {
             FeedCard(
                 id = 1,
                 title = "민생회복 소비쿠폰",
-                categories = DummyData.dummyCategories,
+                categories = dummyCategories.map { it -> it.value },
                 department = "행정안전부",
                 content = "25만원 받을 수 있음",
                 isStarred = true, // 즐겨찾기 설정됨

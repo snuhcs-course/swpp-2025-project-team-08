@@ -68,17 +68,18 @@ object DummyData {
         */
     )
 
-    val dummyCategories = listOf<Category>(
-        Category(0,  "전체"),
-        Category(1,  "대회"),
-        Category(2,  "소비지원"),
-        Category(3,  "교육"),
-        Category(4,  "자산형성"),
-        Category(5,  "민간사업"),
-        Category(6,  "정부사업"),
-        Category(7,  "AI"),
-        Category(8,  "IT"),
-    )
+//    val dummyCategories = listOf<Category>(
+//        Category(0,  "전체"),
+//        Category(1,  "대회"),
+//        Category(2,  "소비지원"),
+//        Category(3,  "교육"),
+//        Category(4,  "자산형성"),
+//        Category(5,  "민간사업"),
+//        Category(6,  "정부사업"),
+//        Category(7,  "AI"),
+//        Category(8,  "IT"),
+//    )
+
 
     val dummyFeedItems = listOf<Program>(
         Program(
@@ -214,4 +215,32 @@ object DummyData {
         )
     )
 
+    val dummyProgramDetailResponse = ProgramDetailResponse(
+        id = 0,
+        uuid = "",
+        category = "",
+        categoryValue = "",
+        title = "",
+        details = "",
+        summary = "",
+        preview = "",
+        applicationMethod = "",
+        applyUrl = "",
+        referenceUrl = "",
+        eligibilityMinAge = 0,
+        eligibilityMaxAge = 0,
+        eligibilityMinHousehold = 0,
+        eligibilityMaxHousehold = 0,
+        eligibilityMinIncome = 0,
+        eligibilityMaxIncome = 0,
+        eligibilityRegion = "",
+        eligibilityGender = "",
+        eligibilityMaritalStatus = "",
+        eligibilityEducation = "",
+        eligibilityEmployment = "",
+        applyStartAt = "",
+        applyEndAt = "",
+        createdAt = "",
+        operatingEntity = ""
+    )
 }

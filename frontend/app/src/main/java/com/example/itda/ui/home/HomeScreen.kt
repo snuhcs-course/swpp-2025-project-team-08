@@ -1,18 +1,26 @@
 package com.example.itda.ui.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.components.ScreenContract
 import com.example.itda.ui.common.theme.Neutral100
+import com.example.itda.ui.common.theme.Primary40
 import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
@@ -30,6 +38,7 @@ fun HomeScreen(
     onFeedClick: (Int) -> Unit,
     onCategorySelected: (String) -> Unit,
     onRefresh: () -> Unit,
+    onLoadNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -39,13 +48,35 @@ fun HomeScreen(
     //  Feedlist 인자 타입도 FeedItem으로 바꾸고.
     //  근데 Program에 logoURl, user와의 star, eligible 관계 모두 들어있거나 불러올 수 있으면 노상관
 
-    val filteredFeedPrograms = if (ui.selectedCategoryName == "전체" || ui.selectedCategoryName.isEmpty()) {
-        ui.feedItems
-    } else {
-        ui.feedItems.filter { item ->
-            item.categories.any { category ->
-                category.name == ui.selectedCategoryName
-            } }
+    val listState = rememberLazyListState()
+
+
+    LaunchedEffect(listState) {
+        // 마지막에서 N번째 아이템에 도달했을 때 로딩을 시작하도록 임계점 설정
+        val threshold = 4
+
+        // listState의 스크롤 변화를 지속적으로 관찰
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .collect { visibleItems ->
+                val totalItemCount = listState.layoutInfo.totalItemsCount
+                val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
+
+                // 3. 로딩 조건 확인
+                // 마지막 보이는 아이템의 인덱스가 전체 아이템 수 - 임계점보다 클 경우
+                val shouldLoadMore = lastVisibleItemIndex >= (totalItemCount - threshold)
+
+                // 4. 로딩 함수 호출
+                if (shouldLoadMore && totalItemCount > 0) {
+                    onLoadNext() // HomeRoute에서 넘겨받은 함수
+                }
+            }
+    }
+
+    LaunchedEffect(ui.feedItems) {
+        if (ui.feedItems.isNotEmpty()) {
+            // scrollToItem 대신 animateScrollToItem을 사용하여 부드러운 애니메이션 적용 가능
+            listState.animateScrollToItem(0)
+        }
     }
 
     val pullToRefreshState = rememberPullToRefreshState()
@@ -58,11 +89,11 @@ fun HomeScreen(
         Column(modifier = modifier) {
             HomeHeader(
                 username = ui.username,
-                programCount = filteredFeedPrograms.size
+                programCount = ui.totalElements
             )
             ProgramFilterRow(
-                categories = ui.categories.map { category -> category.name },
-                selectedCategory = ui.selectedCategoryName,
+                categories = ui.categories.map { category -> category.value },
+                selectedCategory = ui.selectedCategory.value,
                 onCategorySelected = onCategorySelected
             )
             if(ui.isLoading) {
@@ -85,11 +116,27 @@ fun HomeScreen(
                         )
                     }
                 ) {
-                    FeedList(
-                        items = filteredFeedPrograms, // TODO - FeedItem Type으로 되어있는 것들 Program Type 개선되면 수정필요
-                        filterCategory = ui.selectedCategoryName,
-                        onItemClick = { feed -> onFeedClick(feed.id) }
-                    )
+                    if(ui.feedItems.size == 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = ui.generalError ?: "추천 정책이 없어요 :(",
+                                fontSize = 18.sp,
+                                color = Primary40,
+                            )
+                        }
+                    }
+                    else {
+                        FeedList(
+                            items = ui.feedItems, // TODO
+                            listState = listState,
+                            filterCategory = ui.selectedCategory.value,
+                            onItemClick = { feed -> onFeedClick(feed.id) }
+                        )
+                    }
                 }
             }
         }
@@ -104,6 +151,7 @@ private fun PreviewHomeScreen() {
         ui = HomeViewModel.HomeUiState(),
         onFeedClick = {},
         onCategorySelected = {},
-        onRefresh = {}
+        onRefresh = {},
+        onLoadNext = {}
     )
 }
