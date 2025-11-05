@@ -4,6 +4,7 @@ import com.example.itda.program.controller.ProgramResponse
 import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.ProgramEntity
 import com.example.itda.program.persistence.ProgramRepository
+import com.example.itda.program.persistence.enums.ProgramCategory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -46,15 +47,27 @@ class ProgramService(
                 Sort.by(Sort.Direction.DESC, "createdAt"),
             )
 
+        val categoryEnum: ProgramCategory? = mapSearchTermToCategory(searchTerm)
+
         val programEntitiesPage: Page<ProgramEntity> =
-            programRepository.findByTitleContainingIgnoreCaseOrPreviewContainingIgnoreCase(
-                title = searchTerm,
-                preview = searchTerm,
+            programRepository.searchWithCategoryFilter(
+                query = searchTerm,
+                category = categoryEnum,
                 pageable = pageable,
             )
 
         return programEntitiesPage.map { entity ->
             ProgramSummaryResponse.fromEntity(entity)
         }
+    }
+
+    private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
+        val matchedByName =
+            ProgramCategory.entries
+                .find { it.name.equals(searchTerm, ignoreCase = true) }
+        if (matchedByName != null) return matchedByName
+
+        return ProgramCategory.entries
+            .find { it.dbValue.contains(searchTerm) }
     }
 }
