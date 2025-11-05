@@ -15,8 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.common.components.BaseScreen
-import com.example.itda.ui.common.theme.Neutral20
-import com.example.itda.ui.common.theme.Neutral50
 import com.example.itda.ui.search.components.RecentSearchChip
 import com.example.itda.ui.search.components.SearchInputField
 
@@ -59,14 +57,14 @@ fun SearchScreen(
                         text = "최근 검색어",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Neutral20
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // 전체 삭제 버튼
                     Text(
                         text = "전체 삭제",
                         fontSize = 14.sp,
-                        color = Neutral50,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.clickable {
                             viewModel.onClearAllRecentSearches()
                         }
@@ -96,17 +94,6 @@ fun SearchScreen(
                     }
                 }
             }
-
-            // TODO: 🔥 인기 검색어 섹션 (추후 추가 예정)
-//            Spacer(modifier = Modifier.height(32.dp))
-//
-//            // 인기 검색어 헤더
-//            Text(
-//                text = "🔥 인기 검색어",
-//                fontSize = 16.sp,
-//                fontWeight = FontWeight.Medium,
-//                color = Neutral20
-//            )
         }
     }
 }

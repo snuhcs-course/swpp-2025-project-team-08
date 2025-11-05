@@ -1,6 +1,7 @@
 package com.example.itda.ui.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -49,7 +51,6 @@ import com.example.itda.ui.common.theme.*
 import androidx.compose.runtime.LaunchedEffect
 
 
-// ProfileScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -66,7 +67,14 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Neutral30) },
+                title = {
+                    Text(
+                        "Profile",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
                 actions = {
                     IconButton(
                         onClick = onSettingClick,
@@ -75,12 +83,12 @@ fun ProfileScreen(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "설정",
-                            tint = Primary40
+                            tint = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -90,21 +98,24 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
             // 사용자 프로필 카드
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = Neutral90,
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(16.dp)
                     ),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Primary95),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(
@@ -117,14 +128,14 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(60.dp)
                             .clip(CircleShape)
-                            .background(Primary99),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(32.dp),
-                            tint = Primary95
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -135,13 +146,13 @@ fun ProfileScreen(
                             text = ui.user.name ?: "사용자",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Neutral10
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 //                        Text(
 //                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",
 //                            fontSize = 13.sp,
-//                            color = Color(0xFF79747E)
+//                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
 //                        )
                     }
                 }
@@ -162,19 +173,20 @@ fun ProfileScreen(
                         text = "맞춤 정보",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Neutral10
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         text = "아래 정보를 이용하여 개인에게 알맞은 정책을 추천해드립니다.",
                         fontSize = 11.sp,
-                        color = Neutral50,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 14.sp
                     )
                 }
                 Button(
                     onClick = onPersonalInfoClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary50
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(
@@ -192,13 +204,14 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Primary95),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     val user = ui.user
 
-                    // 🔧 수정: 서버가 이미 한글을 반환하므로 변환 없이 그대로 표시
                     ProfileInfoItem("이름", user.name ?: "")
                     ProfileInfoItem("생년월일", user.birthDate ?: "")
                     ProfileInfoItem("성별", user.gender ?: "")
@@ -231,7 +244,7 @@ fun ProfileInfoItem(
         Text(
             text = label,
             fontSize = 15.sp,
-            color = Neutral50,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Normal
         )
         Spacer(modifier = Modifier.height(6.dp))
@@ -249,7 +262,7 @@ fun ProfileInfoItem(
                     text = value.ifEmpty { "-" },
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Neutral10
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         } else {
@@ -257,7 +270,7 @@ fun ProfileInfoItem(
                 text = value.ifEmpty { "-" },
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = Neutral10
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 

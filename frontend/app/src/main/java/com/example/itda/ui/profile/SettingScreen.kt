@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -60,7 +61,7 @@ fun SettingScreen(
                         "Setting",
                         fontWeight = FontWeight.Medium,
                         fontSize = 18.sp,
-                        color = Neutral30
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -68,12 +69,12 @@ fun SettingScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "뒤로가기",
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -83,7 +84,7 @@ fun SettingScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(20.dp)
         ) {
             // 계정 설정
@@ -96,7 +97,7 @@ fun SettingScreen(
                     checked = ui.darkMode,
                     onCheckedChange = { toggleDarkMode() }
                 )
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingToggleItemSimple(
                     title = "알림 설정",
                     checked = ui.alarmEnabled,
@@ -114,11 +115,11 @@ fun SettingScreen(
                 SettingMenuItemSimple("공지사항") {
                     onNavigateToDestination(SettingDestination.Notice)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("자주 묻는 질문") {
                     onNavigateToDestination(SettingDestination.FAQ)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("고객 문의") {
                     onNavigateToDestination(SettingDestination.CustomerSupport)
                 }
@@ -134,27 +135,27 @@ fun SettingScreen(
                 SettingMenuItemSimple("이용 약관") {
                     onNavigateToDestination(SettingDestination.Terms)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("개인정보 처리방침") {
                     onNavigateToDestination(SettingDestination.Privacy)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("개인정보 수집/이용 동의 (맞춤정책)") {
                     onNavigateToDestination(SettingDestination.PersonalInfo)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("민감정보 수집/이용 동의 (맞춤정책)") {
                     onNavigateToDestination(SettingDestination.SensitiveInfo)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("위치기반서비스 이용약관 동의") {
                     onNavigateToDestination(SettingDestination.Location)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("마케팅 이용동의") {
                     onNavigateToDestination(SettingDestination.Marketing)
                 }
-                HorizontalDivider(color = Neutral90)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 SettingMenuItemSimple("로그아웃") { onLogout() }
             }
 
@@ -169,7 +170,7 @@ fun SettingSectionTitleSimple(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Primary80,
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(vertical = 12.dp),
@@ -179,7 +180,7 @@ fun SettingSectionTitleSimple(title: String) {
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Neutral30,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Center
         )
     }
@@ -194,7 +195,7 @@ fun SettingToggleItemSimple(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Primary95)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -202,17 +203,17 @@ fun SettingToggleItemSimple(
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Neutral30,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Normal
         )
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = Neutral60,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = Neutral90
+                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.surface,
+                uncheckedTrackColor = MaterialTheme.colorScheme.outline
             )
         )
     }
@@ -223,7 +224,7 @@ fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Primary95)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -232,14 +233,14 @@ fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Neutral30,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.weight(1f)
         )
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = Neutral60,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)
         )
     }

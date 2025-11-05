@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -36,20 +37,20 @@ fun HomeHeader(
                 text = "${username}님의 맞춤 정책",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = "${programCount}개",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "위로 드래그하여 더 많은 정보를 로드해보세요!",
             fontSize = 12.sp,
-            color = Neutral60
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
