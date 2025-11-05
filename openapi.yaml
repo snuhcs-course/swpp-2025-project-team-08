@@ -111,8 +111,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /update/preferences:
-    post:
+  /my-profile/preferences:
+    put:
       tags:
         - My Profile
       summary: Update user preferences
@@ -125,7 +125,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPreferenceUpdateRequest'
+              type: array
+              items:
+                $ref: '#/components/schemas/PreferenceUpdateRequest'
       responses:
         '200':
           description: Success
@@ -187,6 +189,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /programs/examples:
+    get:
+      tags:
+        - Programs
+      summary: Get example programs
+      description: Get example programs for preference update
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramSummaryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /programs/examples/{id}:
+    get:
+      tags:
+        - Programs
+      summary: Get example program details
+      description: Retrieve detailed information about an example program by its ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the program to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /programs/categories:
     get:
       tags:
@@ -682,6 +736,13 @@ components:
             - "사회, 여가문화 활동"
             - "주거 지원"
             - "기타"
+    PreferenceUpdateRequest:
+      type: object
+      properties:
+        id:
+          type: number
+        score:
+          type: number
     Error:
       type: object
       properties:
