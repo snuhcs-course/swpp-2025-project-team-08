@@ -22,8 +22,7 @@ fun AppNavHost() {
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState() // 로그인 여부
 
     val startDestination: String =
-        //if (isLoggedIn) "main_graph" else "auth_graph" // 로그인 되어있으면 MainScreen, 안되어있으면 AuthScreen
-        "main_graph"
+        if (isLoggedIn) "main_graph" else "auth_graph" // 로그인 되어있으면 MainScreen, 안되어있으면 AuthScreen
 
     NavHost(
         navController = navController,
