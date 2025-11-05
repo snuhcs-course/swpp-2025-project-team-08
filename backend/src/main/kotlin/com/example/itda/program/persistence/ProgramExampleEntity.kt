@@ -21,8 +21,8 @@ import org.hibernate.type.SqlTypes
 import java.time.OffsetDateTime
 
 @Entity
-@Table(name = "program")
-class ProgramEntity(
+@Table(name = "program_example")
+class ProgramExampleEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

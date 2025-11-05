@@ -55,12 +55,13 @@ class UserController(
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("/update/preferences")
+    @PutMapping("/my-profile/preferences")
     fun updateUserPreferences(
         @AuthUser user: User,
-        @RequestBody request: UserPreferenceUpdateRequest,
+        @RequestBody request: List<PreferenceRequest>,
     ): ResponseEntity<Void> {
-        userService.updateUserPreferenceVector(user.id, request.satisfactionScores)
+        userService.updateUserPreferences(user.id, request)
+
         return ResponseEntity.ok().build()
     }
 }
@@ -90,6 +91,7 @@ data class ProfileRequest(
     val employmentStatus: EmploymentStatus?,
 )
 
-data class UserPreferenceUpdateRequest(
-    val satisfactionScores: List<Int>,
+data class PreferenceRequest(
+    val id: Long,
+    val score: Int,
 )

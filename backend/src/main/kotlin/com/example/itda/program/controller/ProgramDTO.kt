@@ -1,6 +1,7 @@
 package com.example.itda.program.controller
 
 import com.example.itda.program.persistence.ProgramEntity
+import com.example.itda.program.persistence.ProgramExampleEntity
 import com.example.itda.program.persistence.enums.ProgramCategory
 import java.time.OffsetDateTime
 
@@ -9,6 +10,7 @@ data class ProgramSummaryResponse(
     val title: String,
     val preview: String,
     val operatingEntity: String,
+    val operatingEntityType: String,
     val category: String,
     val categoryValue: String,
 ) {
@@ -19,6 +21,18 @@ data class ProgramSummaryResponse(
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
+                category = entity.category.toString().lowercase(),
+                categoryValue = entity.category.value,
+            )
+
+        fun fromEntity(entity: ProgramExampleEntity): ProgramSummaryResponse =
+            ProgramSummaryResponse(
+                id = entity.id,
+                title = entity.title,
+                preview = entity.preview,
+                operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
             )
@@ -51,7 +65,8 @@ data class ProgramResponse(
     val applyStartAt: OffsetDateTime?,
     val applyEndAt: OffsetDateTime?,
     val createdAt: OffsetDateTime?,
-    var operatingEntity: String,
+    val operatingEntity: String,
+    val operatingEntityType: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramResponse =
@@ -82,6 +97,38 @@ data class ProgramResponse(
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,
                 operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
+            )
+
+        fun fromEntity(entity: ProgramExampleEntity): ProgramResponse =
+            ProgramResponse(
+                id = entity.id,
+                uuid = entity.uuid,
+                category = entity.category.toString().lowercase(),
+                categoryValue = entity.category.value,
+                title = entity.title,
+                details = entity.details,
+                summary = entity.summary,
+                preview = entity.preview,
+                applicationMethod = entity.applicationMethod,
+                applyUrl = entity.applyUrl,
+                referenceUrl = entity.referenceUrl,
+                eligibilityMinAge = entity.eligibilityMinAge,
+                eligibilityMaxAge = entity.eligibilityMaxAge,
+                eligibilityRegion = entity.eligibilityRegion,
+                eligibilityMinHousehold = entity.eligibilityMinHousehold,
+                eligibilityMaxHousehold = entity.eligibilityMaxHousehold,
+                eligibilityMinIncome = entity.eligibilityMinIncome,
+                eligibilityMaxIncome = entity.eligibilityMaxIncome,
+                eligibilityGender = entity.eligibilityGender?.value,
+                eligibilityMaritalStatus = entity.eligibilityMaritalStatus?.value,
+                eligibilityEducation = entity.eligibilityEducation?.value,
+                eligibilityEmployment = entity.eligibilityEmployment?.value,
+                applyStartAt = entity.applyStartAt,
+                applyEndAt = entity.applyEndAt,
+                createdAt = entity.createdAt,
+                operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
             )
     }
 }
