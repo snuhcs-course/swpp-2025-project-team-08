@@ -37,12 +37,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.profile.component.SettingDestination
+import com.example.itda.ui.common.components.BaseScreen
+import com.example.itda.ui.common.theme.Neutral30
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
     ui: SettingsViewModel.SettingsUiState,
     onBack: () -> Unit,
+    onNavigateToDestination: (SettingDestination) -> Unit,
     toggleDarkMode: () -> Unit,
     toggleAlarm: () -> Unit,
     onLogout: () -> Unit,
@@ -55,7 +59,8 @@ fun SettingScreen(
                     Text(
                         "Setting",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        color = Neutral30
                     )
                 },
                 navigationIcon = {
@@ -106,11 +111,17 @@ fun SettingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                SettingMenuItemSimple("공지사항") { }
+                SettingMenuItemSimple("공지사항") {
+                    onNavigateToDestination(SettingDestination.Notice)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("자주 묻는 질문") { }
+                SettingMenuItemSimple("자주 묻는 질문") {
+                    onNavigateToDestination(SettingDestination.FAQ)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("고객 문의") { }
+                SettingMenuItemSimple("고객 문의") {
+                    onNavigateToDestination(SettingDestination.CustomerSupport)
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -120,17 +131,29 @@ fun SettingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                SettingMenuItemSimple("이용 약관") { }
+                SettingMenuItemSimple("이용 약관") {
+                    onNavigateToDestination(SettingDestination.Terms)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("개인정보 처리방침") { }
+                SettingMenuItemSimple("개인정보 처리방침") {
+                    onNavigateToDestination(SettingDestination.Privacy)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("개인정보 수집/이용 동의 (맞춤정책)") { }
+                SettingMenuItemSimple("개인정보 수집/이용 동의 (맞춤정책)") {
+                    onNavigateToDestination(SettingDestination.PersonalInfo)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("민감정보 수집/이용 동의 (맞춤정책)") { }
+                SettingMenuItemSimple("민감정보 수집/이용 동의 (맞춤정책)") {
+                    onNavigateToDestination(SettingDestination.SensitiveInfo)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("위치기반서비스 이용약관 동의") { }
+                SettingMenuItemSimple("위치기반서비스 이용약관 동의") {
+                    onNavigateToDestination(SettingDestination.Location)
+                }
                 HorizontalDivider(color = Neutral90)
-                SettingMenuItemSimple("마케팅 이용동의") { }
+                SettingMenuItemSimple("마케팅 이용동의") {
+                    onNavigateToDestination(SettingDestination.Marketing)
+                }
                 HorizontalDivider(color = Neutral90)
                 SettingMenuItemSimple("로그아웃") { onLogout() }
             }
@@ -156,7 +179,7 @@ fun SettingSectionTitleSimple(title: String) {
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Neutral90,
+            color = Neutral30,
             textAlign = TextAlign.Center
         )
     }
@@ -179,7 +202,7 @@ fun SettingToggleItemSimple(
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Neutral90,
+            color = Neutral30,
             fontWeight = FontWeight.Normal
         )
         Switch(
@@ -209,7 +232,7 @@ fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
         Text(
             text = title,
             fontSize = 15.sp,
-            color = Neutral90,
+            color = Neutral30,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.weight(1f)
         )

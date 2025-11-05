@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.common.theme.Primary60
+import com.example.itda.ui.profile.component.SettingDestination
 
 @Composable
 fun ProfileRoute(
@@ -39,6 +40,7 @@ fun ProfileRoute(
 fun SettingsRoute(
     onBack: () -> Unit,
     onLogoutSuccess: () -> Unit,
+    onNavigateToDestination: (SettingDestination) -> Unit,
     settingsVm: SettingsViewModel = hiltViewModel()
 ) {
     val ui by settingsVm.settingsUi.collectAsState()
@@ -71,6 +73,7 @@ fun SettingsRoute(
     SettingScreen(
         ui = ui,
         onBack = onBack,
+        onNavigateToDestination = onNavigateToDestination,
         toggleDarkMode = settingsVm::toggleDarkMode,
         toggleAlarm = settingsVm::toggleAlarm,
         onLogout = { showLogoutDialog = true }

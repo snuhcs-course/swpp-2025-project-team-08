@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.common.theme.Neutral30
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,8 @@ fun PersonalInfoScreen(
                     Text(
                         "개인정보 수정",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        color = Neutral30
                     )
                 },
                 navigationIcon = {
