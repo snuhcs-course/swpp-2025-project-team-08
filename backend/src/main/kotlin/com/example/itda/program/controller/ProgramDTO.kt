@@ -9,6 +9,7 @@ data class ProgramSummaryResponse(
     val title: String,
     val preview: String,
     val operatingEntity: String,
+    val operatingEntityType: String,
     val category: String,
     val categoryValue: String,
 ) {
@@ -19,6 +20,7 @@ data class ProgramSummaryResponse(
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
             )
@@ -51,7 +53,8 @@ data class ProgramResponse(
     val applyStartAt: OffsetDateTime?,
     val applyEndAt: OffsetDateTime?,
     val createdAt: OffsetDateTime?,
-    var operatingEntity: String,
+    val operatingEntity: String,
+    val operatingEntityType: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramResponse =
@@ -82,6 +85,7 @@ data class ProgramResponse(
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,
                 operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
             )
     }
 }

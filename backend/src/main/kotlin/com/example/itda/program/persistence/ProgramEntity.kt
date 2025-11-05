@@ -5,6 +5,7 @@ import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
+import com.example.itda.program.persistence.enums.OperatingEntityType
 import com.example.itda.program.persistence.enums.ProgramCategory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -84,6 +85,9 @@ class ProgramEntity(
     var createdAt: OffsetDateTime? = null,
     @Column(name = "operating_entity", nullable = false)
     var operatingEntity: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operating_entity_type", nullable = false)
+    var operatingEntityType: OperatingEntityType,
     @Column(nullable = false)
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
