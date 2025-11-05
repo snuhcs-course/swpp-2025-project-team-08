@@ -26,6 +26,58 @@ import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.common.theme.Neutral30
 import kotlinx.coroutines.launch
 import com.example.itda.ui.profile.PersonalInfoViewModel
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+
+// 생년월일 VisualTransformation (20010101 -> 2001-01-01)
+class BirthDateVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val digits = text.text.filter { it.isDigit() }.take(8)
+
+        val formatted = buildString {
+            digits.forEachIndexed { index, char ->
+                append(char)
+                if (index == 3 || index == 5) append('-')
+            }
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 0) return 0
+                if (offset > digits.length) return formatted.length
+
+                var transformedOffset = 0
+                for (i in 0 until minOf(offset, digits.length)) {
+                    transformedOffset++
+                    if (i == 3 || i == 5) transformedOffset++
+                }
+                return transformedOffset
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 0) return 0
+
+                var originalOffset = 0
+                var currentTransformed = 0
+
+                while (currentTransformed < offset && originalOffset < digits.length) {
+                    currentTransformed++
+                    originalOffset++
+                    if (originalOffset == 4 && currentTransformed < offset) currentTransformed++
+                    if (originalOffset == 6 && currentTransformed < offset) currentTransformed++
+                }
+
+                return minOf(originalOffset, digits.length)
+            }
+        }
+
+        return TransformedText(AnnotatedString(formatted), offsetMapping)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,11 +172,11 @@ fun PersonalInfoScreen(
                         errorMessage = ui.nameError
                     )
 
-                    PersonalInfoFieldSimple(
+                    BirthDateField(
                         label = "생년월일",
                         value = ui.birthDate,
                         onValueChange = onBirthDateChange,
-                        placeholder = "YYYYMMDD",
+                        placeholder = "YYYY-MM-DD",
                         errorMessage = ui.birthDateError
                     )
 
@@ -325,6 +377,64 @@ fun PersonalInfoScreen(
                 showAddressDialog = false
             }
         )
+    }
+}
+
+@Composable
+fun BirthDateField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    errorMessage: String? = null
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(
+                    placeholder,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp
+                )
+            },
+            visualTransformation = BirthDateVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = errorMessage != null,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )
+
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = errorMessage,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
 }
 
