@@ -1,5 +1,6 @@
 package com.example.itda.ui.feed.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,13 +30,13 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 fun FeedContentCard(
     content : String
 ) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .border(1.dp, Primary40, RoundedCornerShape(8.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = Primary95
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(8.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Column(
             Modifier
@@ -45,7 +48,7 @@ fun FeedContentCard(
                 modifier = Modifier.padding(8.dp),
                 markdown = content,
                 style = TextStyle(
-                    color = Primary10,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     lineHeight = 10.sp,
                     textAlign = TextAlign.Justify,
