@@ -1,21 +1,27 @@
 package com.example.itda.ui.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.itda.ui.auth.components.AddressResult
+import com.example.itda.ui.auth.components.KakaoAddressSearchDialog
 import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.common.theme.Neutral30
 import kotlinx.coroutines.launch
@@ -29,6 +35,10 @@ fun PersonalInfoScreen(
     val viewModel: PersonalInfoViewModel = hiltViewModel()
     val ui by viewModel.personalInfoUi.collectAsState()
     val scope = rememberCoroutineScope()
+    // 주소 검색 다이얼로그 표시 여부
+    var showAddressDialog by remember { mutableStateOf(false) }
+    // 선택된 주소 정보
+    var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
 
     Scaffold(
         topBar = {
@@ -108,13 +118,96 @@ fun PersonalInfoScreen(
                         errorMessage = ui.genderError
                     )
 
-                    PersonalInfoFieldSimple(
-                        label = "우편번호",
-                        value = ui.postcode,
-                        onValueChange = { viewModel.onPostcodeChange(it) },
-                        placeholder = "우편번호를 입력해주세요",
-                        errorMessage = ui.postcodeError
-                    )
+                    // 주소 검색 영역
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp)
+                    ) {
+                        Text(
+                            text = "주소",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // 주소 표시 카드
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showAddressDialog = true },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            border = BorderStroke(
+                                1.dp,
+                                if (ui.postcodeError != null)
+                                    MaterialTheme.colorScheme.error
+                                else
+                                    MaterialTheme.colorScheme.outline
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                if (selectedAddress != null) {
+                                    // 주소가 선택된 경우
+                                    Text(
+                                        text = "[${selectedAddress!!.zonecode}]",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = selectedAddress!!.address,
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                } else {
+                                    // 주소가 선택되지 않은 경우
+                                    Text(
+                                        text = "주소를 검색해주세요",
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.alpha(0.6f)
+                                    )
+                                }
+                            }
+                        }
+
+                        // 우편번호 찾기 버튼
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showAddressDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "우편번호 찾기",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        if (ui.postcodeError != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = ui.postcodeError ?: "",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+                    }
 
                     // 결혼 여부
                     PersonalInfoDropdown(
@@ -206,6 +299,16 @@ fun PersonalInfoScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+    // 주소 검색 다이얼로그
+    if (showAddressDialog) {
+        KakaoAddressSearchDialog(
+            onDismiss = { showAddressDialog = false },
+            onAddressSelected = { result ->
+                selectedAddress = result
+                showAddressDialog = false
+            }
+        )
     }
 }
 
