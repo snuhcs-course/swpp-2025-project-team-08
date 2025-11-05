@@ -1,5 +1,6 @@
 package com.example.itda.data.repository
 
+import com.example.itda.data.source.remote.PreferenceRequestList
 import com.example.itda.data.source.remote.ProfileResponse
 import kotlinx.coroutines.flow.Flow
 
@@ -28,5 +29,9 @@ interface AuthRepository {
         householdSize: Int? = null,
         householdIncome: Int? = null,
         employmentStatus: String? = null
+    ): Result<Unit>
+
+    suspend fun updatePreference(
+        satisfactionScores: PreferenceRequestList
     ): Result<Unit>
 }

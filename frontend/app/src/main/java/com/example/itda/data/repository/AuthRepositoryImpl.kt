@@ -2,6 +2,7 @@ package com.example.itda.data.repository
 
 import com.example.itda.data.source.local.PrefDataSource
 import com.example.itda.data.source.remote.AuthRequest
+import com.example.itda.data.source.remote.PreferenceRequestList
 import com.example.itda.data.source.remote.ProfileRequest
 import com.example.itda.data.source.remote.ProfileResponse
 import com.example.itda.data.source.remote.RetrofitInstance
@@ -81,5 +82,12 @@ class AuthRepositoryImpl @Inject constructor(
             employmentStatus = employmentStatus
         )
         api.updateProfile(request)
+    }
+
+
+    override suspend fun updatePreference(
+        satisfactionScores: PreferenceRequestList
+    ): Result<Unit> = runCatching {
+        api.updatePreferences(satisfactionScores)
     }
 }

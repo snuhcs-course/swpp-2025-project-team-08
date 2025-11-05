@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiError
 import com.example.itda.data.source.remote.ApiErrorParser
+import com.example.itda.data.source.remote.PreferenceRequest
+import com.example.itda.data.source.remote.PreferenceRequestList
 import com.example.itda.ui.auth.components.formatBirthDate
 import com.example.itda.ui.auth.components.isValidBirthDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -329,5 +331,29 @@ class AuthViewModel @Inject constructor(
         }
 
         return result.isSuccess
+    }
+
+
+    data class PreferenceUIState(
+        val preferenceRequestList : PreferenceRequestList = emptyList<PreferenceRequest>(),
+        val isLoading: Boolean = false,
+        val generalError: String? = null
+    )
+    private val _preferenceUi = MutableStateFlow(PreferenceUIState())
+    val preferenceUi: StateFlow<PreferenceUIState> = _preferenceUi.asStateFlow()
+
+
+    suspend fun updatePreference() {
+        val ui = _preferenceUi.value
+        _preferenceUi.update { it.copy(isLoading = true) }
+
+        val result = authRepository.updatePreference(ui.preferenceRequestList)
+
+        result.onFailure { exception ->
+            val apiError = ApiErrorParser.parseError(exception)
+            _personalInfoUi.update { it.copy(generalError = apiError.message) }
+        }
+
+        _preferenceUi.update { it.copy(isLoading = false) }
     }
 }
