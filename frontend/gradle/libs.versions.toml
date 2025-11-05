@@ -14,6 +14,7 @@ navigationCompose = "2.9.5"
 navigationCommonKtx = "2.9.5"
 material3 = "1.4.0"
 junitJunit = "4.12"
+foundation = "1.9.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ hilt-compiler-ksp = { group = "com.google.dagger", name = "hilt-compiler", versi
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

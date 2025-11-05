@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.itda.ui.auth.components.formatBirthDate
+import com.example.itda.ui.auth.components.isValidBirthDate
 
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
@@ -175,8 +177,19 @@ class PersonalInfoViewModel @Inject constructor(
     }
 
     fun onBirthDateChange(v: String) {
+        // 숫자만 필터링, 최대 8자리
+        val filtered = v.filter { it.isDigit() }.take(8)
+
+        // 자동 포맷팅 (4자리 이상 입력 시)
+        val formatted = if (filtered.length >= 4) {
+            formatBirthDate(filtered.padEnd(8, '0'))?.take(filtered.length + filtered.length / 2)
+                ?: filtered
+        } else {
+            filtered
+        }
+
         _personalInfoUi.update {
-            it.copy(birthDate = v, birthDateError = null, generalError = null)
+            it.copy(birthDate = formatted, birthDateError = null, generalError = null)
         }
     }
 
@@ -224,9 +237,17 @@ class PersonalInfoViewModel @Inject constructor(
             hasError = true
         }
 
-        if (ui.birthDate.isBlank()) {
+        val birthDateDigits = ui.birthDate.filter { it.isDigit() }
+        if (birthDateDigits.isBlank()) {
             _personalInfoUi.update { it.copy(birthDateError = "생년월일을 입력해주세요") }
             hasError = true
+        } else if (!isValidBirthDate(birthDateDigits)) {
+            _personalInfoUi.update { it.copy(birthDateError = "올바른 생년월일을 입력해주세요 (예: 19990101)") }
+            hasError = true
+        }
+
+        if (hasError) {
+            return false
         }
 
         if (ui.gender.isBlank()) {
@@ -255,7 +276,7 @@ class PersonalInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val result = userRepository.updateProfile(
                 name = ui.name,
-                birthDate = ui.birthDate,
+                birthDate = formatBirthDate(birthDateDigits),
                 gender = genderEnum,
                 address = ui.address,
                 maritalStatus = maritalEnum,

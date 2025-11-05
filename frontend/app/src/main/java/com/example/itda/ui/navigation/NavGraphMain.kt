@@ -20,6 +20,7 @@ import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.PersonalInfoScreen
 import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
+import com.example.itda.ui.profile.component.settingNavGraph
 import com.example.itda.ui.search.SearchScreen
 
 // Bottom Navigation 탭의 경로 목록을 정의합니다.
@@ -84,6 +85,9 @@ fun NavGraphBuilder.mainGraph(
                     navController.navigate("auth_graph") {
                         popUpTo("main_graph") { inclusive = true }
                     }
+                },
+                onNavigateToDestination = { destination ->  // 👈 이 부분 추가!
+                    navController.navigate(destination.route)
                 }
             )
         }
@@ -94,6 +98,7 @@ fun NavGraphBuilder.mainGraph(
             )
         }
 
+        settingNavGraph(navController)
     }
 }
 

@@ -66,7 +66,7 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                title = { Text("Profile", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Neutral30) },
                 actions = {
                     IconButton(
                         onClick = onSettingClick,
@@ -75,7 +75,7 @@ fun ProfileScreen(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "설정",
-                            tint = Purple40
+                            tint = Primary40
                         )
                     }
                 },
