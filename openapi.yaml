@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: ITDA
   description: ITDA API docs
@@ -65,23 +65,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /auth/logout:
-    post:
-      tags:
-        - Auth
-      summary: Log out current user
-      description: Invalidate current user token
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Logout successful
-        default:
-          description: Unexpected server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
 
   /my-profile:
     get:
@@ -97,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProfileResponse'
+                $ref: '#/components/schemas/User'
         default:
           description: Unexpected error
           content:
@@ -128,6 +111,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /update/preferences:
+    post:
+      tags:
+        - My Profile
+      summary: Update user preferences
+      description: Update user preferences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: Updated user preferences
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreferenceUpdateRequest'
+      responses:
+        '200':
+          description: Success
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /programs:
     get:
       tags:
@@ -144,7 +152,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProgramSummary'
+                  $ref: '#/components/schemas/ProgramSummaryResponse'
         default:
           description: Unexpected error
           content:
@@ -172,7 +180,93 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Program'
+                $ref: '#/components/schemas/ProgramResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /programs/search/latest:
+    get:
+      tags:
+        - Programs
+      summary: 최신순으로 프로그램 검색
+      description: Get the latest added programs
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: 검색할 프로그램의 검색어입니다.
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          required: false
+          description: 요청할 페이지 번호 (0부터 시작). 기본값은 0입니다.
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          required: false
+          description: 한 페이지에 포함될 항목 수. 기본값은 10입니다.
+      responses:
+        '200':
+          description: 랭킹 순으로 정렬된 프로그램 목록 (페이지네이션 적용).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramSummaryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /programs/search/rank:
+    get:
+      tags:
+        - Programs
+      summary: 랭킹 순으로 프로그램 검색
+      operationId: searchProgramsByRank
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: 검색할 프로그램의 검색어입니다.
+        - in: query
+          name: page
+          schema:
+            type: integer
+            format: int32
+            default: 0
+          required: false
+          description: 요청할 페이지 번호 (0부터 시작). 기본값은 0입니다.
+        - in: query
+          name: size
+          schema:
+            type: integer
+            format: int32
+            default: 10
+          required: false
+          description: 한 페이지에 포함될 항목 수. 기본값은 10입니다.
+      responses:
+        '200':
+          description: 랭킹 순으로 정렬된 프로그램 목록 (페이지네이션 적용).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramSummaryResponse'
         default:
           description: Unexpected error
           content:
@@ -213,7 +307,7 @@ components:
         - code
         - message
 
-    ProfileResponse:
+    User:
       type: object
       properties:
         id:
@@ -227,14 +321,13 @@ components:
           example: John Doe
         birthDate:
           type: string
-          format: date
-          description: 사용자 생년월일
+          format: LocalDate
+          description: 사용자 생년월일(YYYY-MM-DD)
           example: 1988-01-01
         gender:
           type: string
-          description: 성별 (남성/여성/비공개 등)
+          description: 성별 (남성/여성 중 하나, nullable)
           enum:
-            - 무관
             - 남성
             - 여성
           example: 남성
@@ -242,11 +335,14 @@ components:
           type: string
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
+        postcode:
+          type: integer
+          description: 우편번호
+          example: 06134
         maritalStatus:
           type: string
           description: 결혼 여부
           enum:
-            - 무관
             - 미혼
             - 기혼
             - 이혼/사별
@@ -255,32 +351,29 @@ components:
           type: string
           description: 최종 학력
           enum:
-            - 무관
+            - 초등학생
+            - 중학생
+            - 고등학생
+            - 대학생
+            - 초졸
+            - 중졸
             - 고졸
             - 전문대졸
-            - 재학생
-            - 휴학생
-            - 졸업예정
             - 대졸
-            - 석사
-            - 박사
           example: 대졸
         householdSize:
           type: integer
-          format: int32
           description: 가구원 수
           minimum: 1
           example: 4
         householdIncome:
           type: integer
-          format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
         employmentStatus:
           type: string
           description: 고용 상태
           enum:
-            - 무관
             - 재직자
             - 미취업자
             - 자영업자
@@ -293,14 +386,13 @@ components:
           example: John Doe
         birthDate:
           type: string
-          format: date
-          description: 사용자 생년월일
+          format: LocalDate
+          description: 사용자 생년월일(YYYY-MM-DD)
           example: 1988-01-01
         gender:
           type: string
-          description: 성별 (남성/여성/비공개 등)
+          description: 성별 (MALE/FEMALE 중 하나, nullable)
           enum:
-            - ANY
             - MALE
             - FEMALE
           example: FEMALE
@@ -308,11 +400,14 @@ components:
           type: string
           description: 사용자의 주소지
           example: 서울특별시 강남구 테헤란로 123
+        postcode:
+          type: integer
+          description: 우편번호
+          example: 06134
         maritalStatus:
           type: string
           description: 결혼 여부
           enum:
-            - ANY
             - SINGLE
             - MARRIED
             - DIVORCED_OR_BEREAVED
@@ -321,42 +416,49 @@ components:
           type: string
           description: 최종 학력
           enum:
-            - ANY
-            - HIGHSCHOOL
+            - ELEMENTARY_SCHOOL_STUDENT
+            - MIDDLE_SCHOOL_STUDENT
+            - HIGH_SCHOOL_STUDENT
+            - COLLEGE_STUDENT
+            - ELEMENTARY_SCHOOL
+            - MIDDLE_SCHOOL
+            - HIGH_SCHOOL
             - ASSOCIATE
-            - STUDENT
-            - LEAVE_OF_ABSENCE
-            - EXPECTED_GRADUATION
             - BACHELOR
-            - MASTER
-            - PHD
-          example: EXPECTED_GRADUATION
+          example: BACHELOR
         householdSize:
           type: integer
-          format: int32
           description: 가구원 수
           minimum: 1
           example: 4
         householdIncome:
           type: integer
-          format: int64
           description: 연간 가구원 소득(만원)
           example: 7500
         employmentStatus:
           type: string
           description: 고용 상태
           enum:
-            - ANY
             - EMPLOYED
             - UNEMPLOYED
             - SELF_EMPLOYED
           example: EMPLOYED
-    Program:
+    UserPreferenceUpdateRequest:
+      type: object
+      properties:
+        satisfactionScores:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 5
+          description: '프로그램 만족도 점수 리스트 (1~5 사이의 정수)'
+          example: [3, 2, 1, 5, 4]
+    ProgramResponse:
       type: object
       properties:
         id:
           type: integer
-          format: int32
           description: '프로그램의 내부 식별자 (ID)'
           example: 1234
         uuid:
@@ -364,6 +466,19 @@ components:
           format: uuid
           description: '프로그램의 고유 식별자 (UUID)'
           example: abcdef123456
+        category:
+          type: string
+          description: '프로그램 카테고리'
+          enum:
+            - 빈곤 완화
+            - 보건, 의료
+            - 돌봄, 요양
+            - 치매 관련
+            - 고용, 일자리
+            - 사회, 여가문화 활동
+            - 주거 지원
+            - 기타
+          example: 빈곤 완화
         title:
           type: string
           description: '프로그램 제목'
@@ -371,86 +486,85 @@ components:
         details:
           type: string
           description: '프로그램 상세 내용'
+          example: '코로나 19로 인한 경제적 피해를 극복하기 위한 지원금을 제공한다.'
+        summary:
+          type: string
+          description: '프로그램 요약 내용'
+          example: '코로나 19 경제적 피해 극복 지원금'
+        preview:
+          type: string
+          description: '프로그램 미리보기 내용'
           example: '코로나 19로 인한 경제적 피해를 극복하기 위한 지원금'
         applicationMethod:
           type: string
           description: '신청 방법'
           example: '온라인 신청'
-        referenceUrl:
+        applyUrl:
           type: string
           format: url
-          description: '참고 자료 URL'
-          example: 'https://example.com/ref'
-        eligibilityGender:
-          type: string
-          description: '지원 대상 성별 (예: 남성, 여성, 무관)'
-          enum:
-            - 무관
-            - 남성
-            - 여성
-          example: 여성
+          description: '신청 URL'
+          example: 'https://example.com/apply'
         eligibilityMinAge:
           type: integer
-          format: int32
           description: '최소 연령'
           example: 19
         eligibilityMaxAge:
           type: integer
-          format: int32
           description: '최대 연령'
           example: 65
+        eligibilityMinHousehold:
+          type: integer
+          description: '최소 가구원 수'
+          example: 1
+        eligibilityMaxHousehold:
+          type: integer
+          description: '최대 가구원 수'
+          example: 4
+        eligibilityMinIncome:
+          type: integer
+          description: '최소 가구 소득 (원)'
+          example: 0
+        eligibilityMaxIncome:
+          type: integer
+          description: '최대 가구 소득 (원)'
+          example: 70000000
         eligibilityRegion:
           type: string
           description: '지원 대상 지역'
           example: '서울시'
+        eligibilityGender:
+          type: string
+          description: '지원 대상 성별 (예: 남성, 여성)'
+          enum:
+            - 남성
+            - 여성
+          example: 여성
         eligibilityMaritalStatus:
           type: string
           description: '지원 대상 결혼 상태 (예: 미혼, 기혼, 무관)'
           enum:
-            - 무관
             - 미혼
             - 기혼
             - 이혼/사별
           example: 기혼
         eligibilityEducation:
           type: string
-          description: '지원 대상 학력 수준 (예: 고졸, 학사, 무관)'
+          description: '지원 대상 학력 수준'
           enum:
-            - 무관
+            - 초등학생
+            - 중학생
+            - 고등학생
+            - 대학생
+            - 초졸
+            - 중졸
             - 고졸
             - 전문대졸
-            - 재학생
-            - 휴학생
-            - 졸업예정
             - 대졸
-            - 석사
-            - 박사
           example: 대졸
-        eligibilityMinHousehold:
-          type: integer
-          format: int32
-          description: '최소 가구원 수'
-          example: 1
-        eligibilityMaxHousehold:
-          type: integer
-          format: int32
-          description: '최대 가구원 수'
-          example: 4
-        eligibilityMinIncome:
-          type: integer
-          format: int64 
-          description: '최소 가구 소득 (원)'
-          example: 0
-        eligibilityMaxIncome:
-          type: integer
-          format: int64
-          description: '최대 가구 소득 (원)'
-          example: 70000000
         eligibilityEmployment:
           type: string
-          description: '지원 대상 고용 상태 (예: 재직자, 미취업자, 무관)'
+          description: '지원 대상 고용 상태'
           enum:
-            - 무관
             - 재직자
             - 미취업자
             - 자영업자
@@ -470,21 +584,39 @@ components:
           format: OffsetDateTime
           description: '생성 일시'
           example: '2023-12-01T10:00:00+09:00'
-        updatedAt:
+        operatingEntity:
           type: string
-          format: OffsetDateTime
-          description: '최종 수정 일시'
-          example: '2024-01-05T11:30:00+09:00'
-    ProgramSummary:
+          description: '운영 주체'
+          example: '서울특별시'
+    ProgramSummaryResponse:
       type: object
       properties:
         id:
           type: integer
-          format: int32
           example: 1234
         title:
           type: string
           example: "민생지원금 2차"
+        preview:
+          type: string
+          example: "코로나 19로 인한 경제적 피해를 극복하기 위한 지원금"
+        operatingEntity:
+          type: string
+          example: "서울특별시"
+          description: "운영 주체"
+        category:
+          type: string
+          example: "빈곤 완화"
+          description: "프로그램 카테고리"
+          enum:
+            - 빈곤 완화
+            - 보건, 의료
+            - 돌봄, 요양
+            - 치매 관련
+            - 고용, 일자리
+            - 사회, 여가문화 활동
+            - 주거 지원
+            - 기타
     Error:
       type: object
       properties:
@@ -501,3 +633,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: 'JWT를 사용한 Bearer 인증'
