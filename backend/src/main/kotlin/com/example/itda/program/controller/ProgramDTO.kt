@@ -10,6 +10,7 @@ data class ProgramSummaryResponse(
     val preview: String,
     val operatingEntity: String,
     val category: String,
+    val categoryValue: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
@@ -19,6 +20,7 @@ data class ProgramSummaryResponse(
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
                 category = entity.category.toString().lowercase(),
+                categoryValue = entity.category.value,
             )
     }
 }
@@ -26,7 +28,8 @@ data class ProgramSummaryResponse(
 data class ProgramResponse(
     val id: Long,
     val uuid: String,
-    val category: ProgramCategory,
+    val category: String,
+    val categoryValue: String,
     val title: String,
     val details: String,
     val summary: String,
@@ -55,7 +58,8 @@ data class ProgramResponse(
             ProgramResponse(
                 id = entity.id,
                 uuid = entity.uuid,
-                category = entity.category,
+                category = entity.category.toString().lowercase(),
+                categoryValue = entity.category.value,
                 title = entity.title,
                 details = entity.details,
                 summary = entity.summary,
@@ -78,6 +82,19 @@ data class ProgramResponse(
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,
                 operatingEntity = entity.operatingEntity,
+            )
+    }
+}
+
+data class ProgramCategoryResponse(
+    val category: String,
+    val value: String,
+) {
+    companion object {
+        fun fromEntity(category: ProgramCategory): ProgramCategoryResponse =
+            ProgramCategoryResponse(
+                category = category.toString().lowercase(),
+                value = category.value,
             )
     }
 }

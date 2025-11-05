@@ -35,6 +35,11 @@ class ProgramController(
         return programService.getProgram(id)
     }
 
+    @GetMapping("/programs/categories")
+    fun getProgramCategories(): List<ProgramCategoryResponse> {
+        return programService.getProgramCategories()
+    }
+
     @GetMapping("/programs/search/latest")
     fun searchLatestPrograms(
         @RequestParam("query") searchTerm: String,
