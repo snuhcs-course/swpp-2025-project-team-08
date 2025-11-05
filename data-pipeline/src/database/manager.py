@@ -21,7 +21,7 @@ class PostgresManager:
                 eligibility_region, eligibility_marital_status, eligibility_education,
                 eligibility_min_household, eligibility_max_household,
                 eligibility_min_income, eligibility_max_income, eligibility_employment,
-                operating_entity, apply_start_at, apply_end_at, embedding, category
+                operating_entity, operating_entity_type, apply_start_at, apply_end_at, embedding, category
             ) VALUES (
                 %(uuid)s, %(title)s, %(preview)s, %(summary)s, %(details)s, %(application_method)s, 
                 %(apply_url)s, %(reference_url)s,
@@ -29,7 +29,8 @@ class PostgresManager:
                 %(eligibility_region)s, %(eligibility_marital_status)s, %(eligibility_education)s,
                 %(eligibility_min_household)s, %(eligibility_max_household)s,
                 %(eligibility_min_income)s, %(eligibility_max_income)s, %(eligibility_employment)s,
-                %(operating_entity)s, %(apply_start_at)s, %(apply_end_at)s, %(embedding)s, %(category)s
+                %(operating_entity)s, %(operating_entity_type)s, %(apply_start_at)s, %(apply_end_at)s,
+                %(embedding)s, %(category)s
             )
             ON CONFLICT (uuid) DO NOTHING
         """
