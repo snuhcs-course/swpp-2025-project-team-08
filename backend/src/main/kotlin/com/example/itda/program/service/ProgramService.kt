@@ -1,5 +1,6 @@
 package com.example.itda.program.service
 
+import com.example.itda.program.controller.ProgramCategoryResponse
 import com.example.itda.program.controller.ProgramResponse
 import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.ProgramEntity
@@ -39,6 +40,10 @@ class ProgramService(
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found: $id")
 
         return ProgramResponse.fromEntity(program)
+    }
+
+    fun getProgramCategories(): List<ProgramCategoryResponse> {
+        return ProgramCategory.entries.map(ProgramCategoryResponse::fromEntity)
     }
 
     @Transactional(readOnly = true)
