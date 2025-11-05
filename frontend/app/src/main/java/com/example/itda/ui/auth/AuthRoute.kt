@@ -82,3 +82,23 @@ fun PersonalInfoRoute(
         }
     )
 }
+
+@Composable
+fun PreferenceUpdateRoute(
+    onComplete: () -> Unit,
+    vm: AuthViewModel = hiltViewModel()
+) {
+    val ui by vm.preferenceUi.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    PreferenceUpdateScreen(
+        ui = ui,
+        onSubmit = {
+            scope.launch {
+                // if (vm.submitPreference())
+                vm.updatePreference()
+                onComplete()
+            }
+        }
+    )
+}
