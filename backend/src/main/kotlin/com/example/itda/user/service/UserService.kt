@@ -2,7 +2,7 @@ package com.example.itda.user.service
 
 import com.example.itda.program.ProgramNotFoundException
 import com.example.itda.program.config.AppConstants
-import com.example.itda.program.persistence.ProgramRepository
+import com.example.itda.program.persistence.ProgramExampleRepository
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
 import com.example.itda.user.LogInInvalidPasswordException
@@ -12,6 +12,7 @@ import com.example.itda.user.SignUpInvalidEmailException
 import com.example.itda.user.UserAccessTokenUtil
 import com.example.itda.user.UserNotFoundException
 import com.example.itda.user.controller.AuthResponse
+import com.example.itda.user.controller.PreferenceRequest
 import com.example.itda.user.controller.ProfileRequest
 import com.example.itda.user.controller.User
 import com.example.itda.user.persistence.UserEntity
@@ -27,7 +28,7 @@ import java.time.format.DateTimeParseException
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val programRepository: ProgramRepository,
+    private val programExampleRepository: ProgramExampleRepository,
 ) {
     @Transactional
     fun authenticate(accessToken: String): User {
@@ -125,30 +126,25 @@ class UserService(
     }
 
     @Transactional
-    fun updateUserPreferenceVector(
+    fun updateUserPreferences(
         userId: String,
-        satisfactionScores: List<Int>,
+        request: List<PreferenceRequest>,
     ) {
-        val programIds: List<Long> = listOf(26, 27, 28, 29, 30)
-        val programEmbeddings: List<FloatArray> =
-            programIds.map { id ->
-                val programEntity = programRepository.findByIdOrNull(id) ?: throw ProgramNotFoundException()
-                programEntity.embedding
-            }
+        val preferenceEmbedding = FloatArray(AppConstants.EMBEDDING_DIMENSION) { 0.0f }
+        val scoreSum = request.sumOf { r -> r.score }
 
-        val finalVector = FloatArray(AppConstants.EMBEDDING_DIMENSION) { 0.0f }
+        request.forEach { r ->
+            val programEntity = programExampleRepository.findByIdOrNull(r.id) ?: throw ProgramNotFoundException()
+            val embedding = programEntity.embedding
+            val weight = r.score.toFloat() / scoreSum
 
-        for (index in 0 until 5) {
-            val score = satisfactionScores[index]
-            val vector = programEmbeddings[index]
-
-            for (i in vector.indices) {
-                finalVector[i] += vector[i] * score
+            for (i in embedding.indices) {
+                preferenceEmbedding[i] += (embedding[i] * weight)
             }
         }
 
         val userEntity: UserEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        userEntity.preferenceEmbedding = finalVector
+        userEntity.preferenceEmbedding = preferenceEmbedding
         userRepository.save(userEntity)
     }
 }
