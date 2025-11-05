@@ -115,6 +115,7 @@ class UserService(
         }
         request.gender?.let { userEntity.gender = it }
         request.address?.let { userEntity.address = it }
+        request.postcode?.let { userEntity.postcode = it }
         request.maritalStatus?.let { userEntity.maritalStatus = it }
         request.educationLevel?.let { userEntity.educationLevel = it }
         request.householdSize?.let { userEntity.householdSize = it }
