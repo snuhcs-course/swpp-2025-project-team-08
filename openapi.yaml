@@ -187,7 +187,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  
+  /programs/categories:
+    get:
+      tags:
+        - Programs
+      summary: Get program categories
+      description: Get program categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramCategoryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /programs/search/latest:
     get:
       tags:
@@ -606,17 +629,59 @@ components:
           description: "운영 주체"
         category:
           type: string
-          example: "빈곤 완화"
+          example: "cash"
           description: "프로그램 카테고리"
           enum:
-            - 빈곤 완화
-            - 보건, 의료
-            - 돌봄, 요양
-            - 치매 관련
-            - 고용, 일자리
-            - 사회, 여가문화 활동
-            - 주거 지원
-            - 기타
+            - cash
+            - health
+            - care
+            - dementia
+            - employment
+            - leisure
+            - housing
+            - other
+        categoryValue:
+          type: string
+          example: "빈곤 완화"
+          description: "프로그램 카테고리 값"
+          enum:
+            - "빈곤 완화"
+            - "보건, 의료"
+            - "돌봄, 요양"
+            - "치매 관련"
+            - "고용, 일자리"
+            - "사회, 여가문화 활동"
+            - "주거 지원"
+            - "기타"
+    ProgramCategoryResponse:
+      type: object
+      properties:
+        category:
+          type: string
+          description: "Program category identifier"
+          example: cash
+          enum:
+            - cash
+            - health
+            - care
+            - dementia
+            - employment
+            - leisure
+            - housing
+            - other
+        value:
+          type: string
+          description: "Program category display name"
+          example: "빈곤 완화"
+          enum:
+            - "빈곤 완화"
+            - "보건, 의료"
+            - "돌봄, 요양"
+            - "치매 관련"
+            - "고용, 일자리"
+            - "사회, 여가문화 활동"
+            - "주거 지원"
+            - "기타"
     Error:
       type: object
       properties:
