@@ -5,10 +5,11 @@ import com.example.itda.program.persistence.enums.ProgramCategory
 import java.time.OffsetDateTime
 
 data class ProgramSummaryResponse(
-    val id: Int,
+    val id: Long,
     val title: String,
     val preview: String,
     val operatingEntity: String,
+    val category: String,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
@@ -17,12 +18,13 @@ data class ProgramSummaryResponse(
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
+                category = entity.category.toString().lowercase(),
             )
     }
 }
 
 data class ProgramResponse(
-    val id: Int,
+    val id: Long,
     val uuid: String,
     val category: ProgramCategory,
     val title: String,
@@ -71,7 +73,7 @@ data class ProgramResponse(
                 eligibilityGender = entity.eligibilityGender?.value,
                 eligibilityMaritalStatus = entity.eligibilityMaritalStatus?.value,
                 eligibilityEducation = entity.eligibilityEducation?.value,
-                eligibilityEmployment = entity.eligibilityEmployment?.dbValue,
+                eligibilityEmployment = entity.eligibilityEmployment?.value,
                 applyStartAt = entity.applyStartAt,
                 applyEndAt = entity.applyEndAt,
                 createdAt = entity.createdAt,

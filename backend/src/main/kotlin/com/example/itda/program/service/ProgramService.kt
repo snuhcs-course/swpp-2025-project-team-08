@@ -5,8 +5,11 @@ import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.ProgramEntity
 import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.program.persistence.enums.ProgramCategory
+import com.example.itda.user.controller.User
+import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -18,14 +21,18 @@ import org.springframework.web.server.ResponseStatusException
 class ProgramService(
     val programRepository: ProgramRepository,
 ) {
-    @Transactional
-    fun getPrograms(): List<ProgramSummaryResponse> {
-        val programs = programRepository.findAll()
+    @Transactional(readOnly = true)
+    fun getPrograms(
+        user: User,
+        category: ProgramCategory?,
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        val programs = programRepository.findAllByPreference(user.id, category?.toString(), pageable)
 
-        return programs.map { ProgramSummaryResponse.fromEntity(it) }
+        return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getProgram(id: Long): ProgramResponse {
         val program =
             programRepository.findByIdOrNull(id)
@@ -34,7 +41,7 @@ class ProgramService(
         return ProgramResponse.fromEntity(program)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun searchLatestPrograms(
         searchTerm: String,
         page: Int,
@@ -68,7 +75,7 @@ class ProgramService(
         if (matchedByName != null) return matchedByName
 
         return ProgramCategory.entries
-            .find { it.dbValue.contains(searchTerm) }
+            .find { it.value.contains(searchTerm) }
     }
 
     @Transactional

@@ -1,4 +1,4 @@
-package com.example.itda
+package com.example.itda.config
 
 import com.example.itda.user.UserArgumentResolver
 import org.springframework.context.annotation.Configuration

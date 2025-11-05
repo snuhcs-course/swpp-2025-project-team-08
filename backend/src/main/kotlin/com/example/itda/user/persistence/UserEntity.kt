@@ -1,5 +1,6 @@
 package com.example.itda.user.persistence
 
+import com.example.itda.program.config.AppConstants
 import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
@@ -31,6 +32,7 @@ class UserEntity(
     var name: String? = null,
     @Column(name = "birth_date", nullable = true)
     var birthDate: LocalDate? = null,
+    @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     var gender: Gender? = null,
     @Column(nullable = true)
@@ -50,6 +52,6 @@ class UserEntity(
     var employmentStatus: EmploymentStatus? = null,
     @Column(name = "preference_embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = 1024)
+    @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var preferenceEmbedding: FloatArray? = null,
 )

@@ -1,6 +1,7 @@
 package com.example.itda.user.service
 
 import com.example.itda.program.ProgramNotFoundException
+import com.example.itda.program.config.AppConstants
 import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
@@ -134,7 +135,7 @@ class UserService(
                 programEntity.embedding
             }
 
-        val finalVector = FloatArray(1024) { 0.0f }
+        val finalVector = FloatArray(AppConstants.EMBEDDING_DIMENSION) { 0.0f }
 
         for (index in 0 until 5) {
             val score = satisfactionScores[index]
