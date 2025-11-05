@@ -49,7 +49,7 @@ typealias PreferenceRequestList = List<PreferenceRequest>
 
 data class PreferenceRequest(
     val id : Int,
-    val value : Int
+    val score : Int
 )
 
 
@@ -69,6 +69,6 @@ interface AuthAPI {
     @PUT("my-profile")
     suspend fun updateProfile(@Body request: ProfileRequest): Unit
 
-    @POST("update/preferences")
+    @PUT("my-profile/preferences")
     suspend fun updatePreferences(@Body request: PreferenceRequestList): Unit
 }

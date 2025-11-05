@@ -2,6 +2,7 @@ package com.example.itda.data.source.remote
 
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
+import com.example.itda.data.model.ProgramResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -29,4 +30,14 @@ interface ProgramAPI {
      */
     @GET("programs/{id}")
     suspend fun getProgramDetails(@Path("id") id: Int): ProgramDetailResponse
+
+
+
+    @GET("programs/examples")
+    suspend fun getExamples(): List<ProgramResponse>
+
+    @GET("programs/examples/{id}")
+    suspend fun getExampleDetails(@Path("id") id: Int): ProgramDetailResponse
+
 }
+
