@@ -24,6 +24,7 @@ fun PersonalInfoScreen(
     onBirthDateChange: (String) -> Unit,
     onGenderChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
+    onPostCodeChange: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
     // 주소 검색 다이얼로그 표시 여부
@@ -247,10 +248,8 @@ fun PersonalInfoScreen(
 
                     Button(
                         onClick = {
-                            // 백엔드에는 우편번호만 전송
-                            if (selectedAddress != null) {
-                                onAddressChange(selectedAddress!!.zonecode)
-                            }
+                            onAddressChange(selectedAddress!!.address)
+                            onPostCodeChange(selectedAddress!!.zonecode)
                             onSubmit()
                         },
                         modifier = Modifier

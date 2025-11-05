@@ -32,13 +32,10 @@ import kotlinx.coroutines.launch
 
 /**
  * 카카오 로컬 API를 사용하는 주소 검색 다이얼로그
- *
- * @param onDismiss 다이얼로그 닫기 콜백
- * @param onAddressSelected 주소 선택 완료 콜백
  */
 
 data class AddressResult(
-    val zonecode: String,    // 우편번호 (5자리)
+    val zonecode: String,    // 우편번호
     val address: String      // 도로명 주소
 )
 
@@ -197,7 +194,7 @@ fun KakaoAddressSearchDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // 검색 전 Tip 표시 (검색 결과 없을 때만)
+                // 검색 전 Tip 표시
                 if (searchResults.isEmpty() && !isLoading && errorMessage == null) {
                     Card(
                         modifier = Modifier
@@ -296,7 +293,7 @@ fun KakaoAddressSearchDialog(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "건물번호까지 입력해주세요 (예: 동일로216길 42)",
+                                text = "건물번호까지 입력해주세요 (예: 동일로 216길 49)",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
@@ -347,11 +344,11 @@ fun KakaoAddressSearchDialog(
                                     )
                                 } else {
                                     // 우편번호 없음
-                                    errorMessage = "이 주소는 우편번호 정보가 없습니다.\n건물번호까지 입력해주세요. (예: 동일로216길 42)"
+                                    errorMessage = "이 주소는 우편번호 정보가 없습니다.\n건물번호까지 입력해주세요. (예: 동일로 216길 92)"
                                 }
                             }
                         )
-                        Divider()
+                        HorizontalDivider()
                     }
                 }
             }
@@ -367,7 +364,6 @@ private fun AddressItem(
     document: AddressDocument,
     onClick: () -> Unit
 ) {
-    // 우편번호 있는지 확인
     val hasZipCode = (document.roadAddress?.zoneNo?.isNotBlank() == true) ||
             (!document.address?.zipCode.isNullOrBlank())
 
