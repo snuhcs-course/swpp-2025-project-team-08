@@ -1,5 +1,6 @@
 package com.example.itda.program.persistence
 
+import com.example.itda.program.config.AppConstants
 import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
@@ -24,7 +25,7 @@ class ProgramEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Int,
+    var id: Long,
     @Column(name = "uuid", nullable = false, unique = true, length = 255)
     var uuid: String,
     @Enumerated(EnumType.STRING)
@@ -85,6 +86,6 @@ class ProgramEntity(
     var operatingEntity: String,
     @Column(nullable = false)
     @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = 1024)
+    @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var embedding: FloatArray,
 )

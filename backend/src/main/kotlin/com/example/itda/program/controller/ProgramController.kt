@@ -1,7 +1,12 @@
 package com.example.itda.program.controller
 
+import com.example.itda.program.persistence.enums.ProgramCategory
 import com.example.itda.program.service.ProgramService
+import com.example.itda.user.AuthUser
+import com.example.itda.user.controller.User
+import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,8 +20,12 @@ class ProgramController(
     private val programService: ProgramService,
 ) {
     @GetMapping("/programs")
-    fun getPrograms(): List<ProgramSummaryResponse> {
-        return programService.getPrograms()
+    fun getPrograms(
+        @AuthUser user: User,
+        @RequestParam(required = false) category: ProgramCategory?,
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        return programService.getPrograms(user, category, pageable)
     }
 
     @GetMapping("/programs/{id}")

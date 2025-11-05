@@ -1,6 +1,6 @@
 package com.example.itda.program.persistence.enums
 
-enum class ProgramCategory(val dbValue: String) {
+enum class ProgramCategory(val value: String) {
     CASH("빈곤 완화"),
     HEALTH("보건, 의료"),
     CARE("돌봄, 요양"),

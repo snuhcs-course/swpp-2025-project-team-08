@@ -29,7 +29,7 @@ data class User(
                 gender = entity.gender?.value,
                 maritalStatus = entity.maritalStatus?.value,
                 educationLevel = entity.educationLevel?.value,
-                employmentStatus = entity.employmentStatus?.dbValue,
+                employmentStatus = entity.employmentStatus?.value,
             )
         }
     }
