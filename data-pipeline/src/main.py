@@ -50,9 +50,9 @@ def create_parser():
     parser.add_argument("--api-page-size", type=int, default=50)
     parser.add_argument("--api-max-page-num", type=int, default=10)
     parser.add_argument("--vectorize-batch-size", type=int, default=32)
-    parser.add_argument("--db-commit-batch-size", type=int, default=10)
+    parser.add_argument("--db-commit-batch-size", type=int, default=32)
     parser.add_argument("--db-min-pool-size", type=int, default=1)
-    parser.add_argument("--db-max-pool-size", type=int, default=5)
+    parser.add_argument("--db-max-pool-size", type=int, default=3)
 
     return parser
 

@@ -27,8 +27,8 @@ Convert the raw_program JSON into the structured JSON format below.
 - eligibility_education: 'ELEMENTARY_SCHOOL_STUDENT' | 'MIDDLE_SCHOOL_STUDENT' | 'HIGH_SCHOOL_STUDENT' | 'COLLEGE_STUDENT' | 'ELEMENTARY_SCHOOL' | 'MIDDLE_SCHOOL' | 'HIGH_SCHOOL' | 'ASSOCIATE' | 'BACHELOR' | null (Applicant education status)
 - eligibility_employment: 'EMPLOYED' | 'UNEMPLOYED' | 'SELF_EMPLOYED' | null (Applicant employment status)
 - category: 'CASH' | 'HEALTH' | 'CARE' | 'DEMENTIA' | 'EMPLOYMENT' | 'LEISURE' | 'HOUSING' | 'OTHER' (Program's category)
-- operating_entity: string (Full name of the operating organization, e.g., "보건복지부" for the 'central' type or "경기도 용인시" for the 'local' type)
-- operating_entity_type: 'local' | 'center' (Organization type: 'local' for local government, 'center' for central government)
+- operating_entity: string (Full name of the operating organization, e.g., "보건복지부" for the 'CENTRAL' type or "경기도 용인시" for the 'LOCAL' type)
+- operating_entity_type: 'LOCAL' | 'CENTRAL' (Organization type: 'LOCAL' for local government, 'CENTRAL' for central government)
 
 
 **Instructions:**
