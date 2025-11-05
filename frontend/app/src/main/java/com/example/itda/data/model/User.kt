@@ -7,6 +7,7 @@ data class User(
     val birthDate: String?,
     val gender: String?,
     val address: String?,
+    val postcode: String?,
     val maritalStatus: String?,
     val educationLevel: String?,
     val householdSize: Int?,

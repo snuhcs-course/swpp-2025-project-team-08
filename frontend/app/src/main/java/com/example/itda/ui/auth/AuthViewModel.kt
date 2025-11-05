@@ -228,11 +228,13 @@ class AuthViewModel @Inject constructor(
         val birthDate: String = "",
         val gender: String = "",
         val address: String = "",
+        val postcode: String = "",
         val isLoading: Boolean = false,
         val nameError: String? = null,
         val birthDateError: String? = null,
         val genderError: String? = null,
         val addressError: String? = null,
+        val postcodeError: String? = null,
         val generalError: String? = null
     )
 
@@ -254,6 +256,10 @@ class AuthViewModel @Inject constructor(
 
     fun onAddressChange(v: String) {
         _personalInfoUi.update { it.copy(address = v, addressError = null, generalError = null) }
+    }
+
+    fun onPostCodeChange(v: String) {
+        _personalInfoUi.update { it.copy(postcode = v, postcodeError = null, generalError = null) }
     }
 
     suspend fun submitPersonalInfo(): Boolean {
@@ -296,6 +302,7 @@ class AuthViewModel @Inject constructor(
                 birthDateError = null,
                 genderError = null,
                 addressError = null,
+                postcodeError = null,
                 generalError = null
             )
         }
@@ -306,7 +313,8 @@ class AuthViewModel @Inject constructor(
             name = ui.name,
             birthDate = formattedBirthDate,
             gender = ui.gender,
-            address = ui.address
+            address = ui.address,
+            postcode = ui.postcode
         )
 
         result.onFailure { exception ->

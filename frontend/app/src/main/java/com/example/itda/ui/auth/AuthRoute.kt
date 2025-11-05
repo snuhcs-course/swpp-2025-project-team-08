@@ -71,6 +71,8 @@ fun PersonalInfoRoute(
         onBirthDateChange = vm::onBirthDateChange,
         onGenderChange = vm::onGenderChange,
         onAddressChange = vm::onAddressChange,
+        onPostCodeChange = vm::onPostCodeChange,
+
         onSubmit = {
             scope.launch {
                 if (vm.submitPersonalInfo()) {

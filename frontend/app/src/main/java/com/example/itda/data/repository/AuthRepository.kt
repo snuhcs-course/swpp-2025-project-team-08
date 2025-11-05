@@ -22,6 +22,7 @@ interface AuthRepository {
         birthDate: String? = null,
         gender: String? = null,
         address: String? = null,
+        postcode: String? = null,
         maritalStatus: String? = null,
         educationLevel: String? = null,
         householdSize: Int? = null,

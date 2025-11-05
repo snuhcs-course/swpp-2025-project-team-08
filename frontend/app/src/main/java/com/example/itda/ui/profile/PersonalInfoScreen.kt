@@ -110,10 +110,10 @@ fun PersonalInfoScreen(
 
                     PersonalInfoFieldSimple(
                         label = "우편번호",
-                        value = ui.address,
-                        onValueChange = { viewModel.onAddressChange(it) },
+                        value = ui.postcode,
+                        onValueChange = { viewModel.onPostcodeChange(it) },
                         placeholder = "우편번호를 입력해주세요",
-                        errorMessage = ui.addressError
+                        errorMessage = ui.postcodeError
                     )
 
                     // 결혼 여부

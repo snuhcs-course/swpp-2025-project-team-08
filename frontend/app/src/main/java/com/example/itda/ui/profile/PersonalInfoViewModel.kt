@@ -23,6 +23,7 @@ class PersonalInfoViewModel @Inject constructor(
         val birthDate: String = "",
         val gender: String = "",
         val address: String = "",
+        val postcode: String = "",
         val maritalStatus: String = "",
         val education: String = "",
         val householdSize: String = "",
@@ -33,6 +34,7 @@ class PersonalInfoViewModel @Inject constructor(
         val birthDateError: String? = null,
         val genderError: String? = null,
         val addressError: String? = null,
+        val postcodeError: String? = null,
         val generalError: String? = null
     )
 
@@ -146,6 +148,7 @@ class PersonalInfoViewModel @Inject constructor(
                         birthDate = user.birthDate ?: "",
                         gender = user.gender ?: "",
                         address = user.address ?: "",
+                        postcode = user.postcode ?: "",
                         maritalStatus = user.maritalStatus ?: "",
                         education = user.educationLevel ?: "",
                         householdSize = user.householdSize?.toString() ?: "",
@@ -156,6 +159,7 @@ class PersonalInfoViewModel @Inject constructor(
                         birthDateError = null,
                         genderError = null,
                         addressError = null,
+                        postcodeError = null,
                         generalError = null
                     )
                 }
@@ -199,7 +203,13 @@ class PersonalInfoViewModel @Inject constructor(
         }
     }
 
-    fun onAddressChange(v: String) {
+    fun onPostcodeChange(v: String) {
+        _personalInfoUi.update {
+            it.copy(postcode = v, postcodeError = null, generalError = null)
+        }
+    }
+
+    fun onChange(v: String) {
         _personalInfoUi.update {
             it.copy(address = v, addressError = null, generalError = null)
         }
@@ -256,7 +266,12 @@ class PersonalInfoViewModel @Inject constructor(
         }
 
         if (ui.address.isBlank()) {
-            _personalInfoUi.update { it.copy(addressError = "우편번호를 입력해주세요") }
+            _personalInfoUi.update { it.copy(addressError = "주소를 입력해주세요") }
+            hasError = true
+        }
+
+        if (ui.postcode.isBlank()) {
+            _personalInfoUi.update { it.copy(postcodeError = "우편번호를 입력해주세요") }
             hasError = true
         }
 
@@ -279,6 +294,7 @@ class PersonalInfoViewModel @Inject constructor(
                 birthDate = formatBirthDate(birthDateDigits),
                 gender = genderEnum,
                 address = ui.address,
+                postcode = ui.postcode,
                 maritalStatus = maritalEnum,
                 educationLevel = educationEnum,
                 householdSize = ui.householdSize.toIntOrNull(),

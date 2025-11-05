@@ -24,6 +24,7 @@ class ProfileViewModel @Inject constructor(
             birthDate = null,
             gender = null,
             address = null,
+            postcode = null,
             maritalStatus = null,
             educationLevel = null,
             householdSize = null,
