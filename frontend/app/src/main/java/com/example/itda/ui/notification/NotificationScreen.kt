@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,22 +28,26 @@ fun NotificationScreen(
     // TODO: 나중에 ViewModel에서 알림 리스트 가져오기
     val notifications = emptyList<String>() // 임시: 빈 리스트
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "알림",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
-            )
-        },
-        modifier = modifier
+    BaseScreen(
+        title = "알림",
+        topBarVisible = false,
+//    )
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                    Text(
+//                        "알림",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 24.sp
+//                    )
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = Color.White
+//                )
+//            )
+//        },
+//        modifier = modifier
     ) { padding ->
         if (notifications.isEmpty()) {
             // Empty State: 알림이 없을 때
@@ -175,10 +180,10 @@ private fun NotificationList(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun NotificationScreenPreview() {
-//    ItdaTheme {
-//        NotificationScreen()
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun NotificationScreenPreview() {
+    ItdaTheme {
+        NotificationScreen()
+    }
+}
