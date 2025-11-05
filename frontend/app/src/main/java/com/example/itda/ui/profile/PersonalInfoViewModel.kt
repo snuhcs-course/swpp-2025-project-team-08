@@ -54,7 +54,6 @@ class PersonalInfoViewModel @Inject constructor(
             "gender" -> when (enumName) {
                 "MALE" -> "남성"
                 "FEMALE" -> "여성"
-                "ANY" -> "무관"
                 else -> ""
             }
 
@@ -62,7 +61,6 @@ class PersonalInfoViewModel @Inject constructor(
                 "SINGLE" -> "미혼"
                 "MARRIED" -> "기혼"
                 "DIVORCED_OR_BEREAVED" -> "이혼/사별"
-                "ANY" -> "무관"
                 else -> ""
             }
 
@@ -83,7 +81,6 @@ class PersonalInfoViewModel @Inject constructor(
                 "EMPLOYED" -> "재직자"
                 "UNEMPLOYED" -> "미취업자"
                 "SELF_EMPLOYED" -> "자영업자"
-                "ANY" -> "무관"
                 else -> ""
             }
 
@@ -99,7 +96,6 @@ class PersonalInfoViewModel @Inject constructor(
             "gender" -> when (korean) {
                 "남성" -> "MALE"
                 "여성" -> "FEMALE"
-                "무관" -> "ANY"
                 else -> null
             }
 
@@ -107,20 +103,19 @@ class PersonalInfoViewModel @Inject constructor(
                 "미혼" -> "SINGLE"
                 "기혼" -> "MARRIED"
                 "이혼/사별" -> "DIVORCED_OR_BEREAVED"
-                "무관" -> "ANY"
                 else -> null
             }
 
             "education" -> when (korean) {
-                "고졸" -> "HIGHSCHOOL"
-                "재학생" -> "STUDENT"
-                "휴학생" -> "LEAVE_OF_ABSENCE"
-                "졸업예정" -> "EXPECTED_GRADUATE"
+                "초등학생" -> "ELEMENTARY_SCHOOL_STUDENT"
+                "중학생" -> "MIDDLE_SCHOOL_STUDENT"
+                "고등학생" -> "HIGH_SCHOOL_STUDENT"
+                "대학생" -> "COLLEGE_STUDENT"
+                "초졸" -> "ELEMENTARY_SCHOOL"
+                "중졸" -> "MIDDLE_SCHOOL"
+                "고졸" -> "HIGH_SCHOOL"
                 "전문대졸" -> "ASSOCIATE"
                 "대졸" -> "BACHELOR"
-                "석사" -> "MASTER"
-                "박사" -> "PHD"
-                "무관" -> "ANY"
                 else -> null
             }
 
@@ -128,7 +123,6 @@ class PersonalInfoViewModel @Inject constructor(
                 "재직자" -> "EMPLOYED"
                 "미취업자" -> "UNEMPLOYED"
                 "자영업자" -> "SELF_EMPLOYED"
-                "무관" -> "ANY"
                 else -> null
             }
 
@@ -147,7 +141,7 @@ class PersonalInfoViewModel @Inject constructor(
                 _personalInfoUi.update {
                     it.copy(
                         name = user.name ?: "",
-                        birthDate = user.birthDate?.replace("-", "") ?: "",
+                        birthDate = user.birthDate?.replace("-", "") ?: "",  // "2001-01-01" -> "20010101"
                         gender = user.gender ?: "",
                         address = user.address ?: "",
                         postcode = user.postcode ?: "",
