@@ -49,6 +49,7 @@ fun NavGraphBuilder.mainGraph(
                             modifier = Modifier.padding(innerPadding)
                         )
                         "search" -> SearchScreen(
+                            onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)
                          )
                         "notification" -> NotificationScreen(

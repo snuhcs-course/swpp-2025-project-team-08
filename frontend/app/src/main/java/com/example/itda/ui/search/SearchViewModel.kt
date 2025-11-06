@@ -1,51 +1,121 @@
 package com.example.itda.ui.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.Category
+import com.example.itda.data.model.PageResponse
+import com.example.itda.data.model.ProgramResponse
+import com.example.itda.data.model.dummyCategories
+import com.example.itda.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    // 나중에 SearchRepository 추가
+    private val programRepository: ProgramRepository
 ) : ViewModel() {
 
-    // UI 상태
+    enum class SortType {
+        RANK,
+        LATEST
+    }
+
     data class SearchUiState(
-        val searchQuery: String = "",                           // 검색창에 입력된 텍스트
-        val recentSearches: List<String> = emptyList(),         // 최근 검색어 리스트
-        val isSearching: Boolean = false                        // 검색 중인지 여부
+        val searchQuery: String = "",
+        val recentSearches: List<String> = emptyList(),
+        val isSearching: Boolean = false,
+        val hasSearched: Boolean = false,
+        val searchResults: List<ProgramResponse> = emptyList(),
+        val totalElements: Int = 0,
+        val currentPage: Int = 0,
+        val sortType: SortType = SortType.RANK,
+        val categories: List<Category> = dummyCategories,
+        val selectedCategory: Category = Category("","전체"),
+        val feedItems: List<ProgramResponse> = emptyList(),
+        val isLoadingMore: Boolean = false,
+        val hasMorePages: Boolean = true,
+        val generalError: String? = null
     )
+
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    // 검색어 입력 시 호출
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(
             searchQuery = query
         )
     }
 
-    // 검색 실행 (엔터 또는 검색 버튼 클릭 시)
     fun onSearch() {
         val query = _uiState.value.searchQuery.trim()
         if (query.isEmpty()) return
 
-        // 최근 검색어 추가
         val updatedSearches = listOf(query) +
                 _uiState.value.recentSearches.filter { it != query }
 
         _uiState.value = _uiState.value.copy(
             recentSearches = updatedSearches.take(10),
-            searchQuery = "" // 검색 후 입력창 초기화
+            isSearching = true,
+            hasSearched = true,
+            currentPage = 0,
+            searchResults = emptyList(),
+            generalError = null
         )
 
-        // TODO: searchRepository.search(query)
+        performSearch(query, 0, _uiState.value.sortType, _uiState.value.selectedCategory.category)
     }
 
-    // 최근 검색어 클릭 시
+    fun onSortTypeChange(sortType: SortType) {
+        if (_uiState.value.sortType == sortType) return
+
+        _uiState.value = _uiState.value.copy(
+            sortType = sortType,
+            isSearching = true,
+            currentPage = 0,
+            searchResults = emptyList()
+        )
+
+        val query = _uiState.value.recentSearches.firstOrNull() ?: return
+        performSearch(query, 0, sortType, _uiState.value.selectedCategory.category)
+    }
+
+    fun onCategorySelected(category: Category) {
+
+        _uiState.value = _uiState.value.copy(
+            selectedCategory = category,
+            isSearching = true,
+            currentPage = 0,
+            searchResults = emptyList()
+        )
+
+        val query = _uiState.value.recentSearches.firstOrNull() ?: return
+        performSearch(query, 0, _uiState.value.sortType, _uiState.value.selectedCategory.category)
+    }
+
+    fun onLoadNext() {
+        val currentState = _uiState.value
+
+        if (currentState.isLoadingMore || !currentState.hasMorePages) return
+
+        _uiState.value = currentState.copy(isLoadingMore = true)
+
+        val query = currentState.recentSearches.firstOrNull() ?: return
+        val nextPage = currentState.currentPage + 1
+
+        performSearch(
+            query = query,
+            page = nextPage,
+            sortType = currentState.sortType,
+            category = currentState.selectedCategory.category,
+            isLoadMore = true
+        )
+    }
+
     fun onRecentSearchClick(query: String) {
         _uiState.value = _uiState.value.copy(
             searchQuery = query
@@ -53,7 +123,6 @@ class SearchViewModel @Inject constructor(
         onSearch()
     }
 
-    // 최근 검색어 삭제
     fun onDeleteRecentSearch(query: String) {
         val updatedSearches = _uiState.value.recentSearches.filter { it != query }
         _uiState.value = _uiState.value.copy(
@@ -61,10 +130,66 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    // 모든 최근 검색어 삭제
     fun onClearAllRecentSearches() {
         _uiState.value = _uiState.value.copy(
             recentSearches = emptyList()
         )
+    }
+
+    private fun handleSearchResults(response: PageResponse<ProgramResponse>, isLoadMore: Boolean) {
+        _uiState.value = _uiState.value.let { currentState ->
+            val currentList = if (isLoadMore) currentState.searchResults else emptyList()
+            val newList = response.content
+
+            val combinedList = (currentList + newList).distinctBy { it.id }
+
+            currentState.copy(
+                searchResults = combinedList,
+                totalElements = response.totalElements,
+                currentPage = response.number,
+                hasMorePages = !response.last,
+                isSearching = false,
+                isLoadingMore = false,
+                generalError = null
+            )
+        }
+    }
+
+    private fun performSearch(
+        query: String,
+        page: Int,
+        sortType: SortType,
+        category: String?,
+        isLoadMore: Boolean = false
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = when (sortType) {
+                    SortType.RANK -> programRepository.searchByRank(
+                        query = query,
+                        page = page,
+                        size = 10,
+                        category = category
+                    )
+                    SortType.LATEST -> programRepository.searchByLatest(
+                        query = query,
+                        page = page,
+                        size = 10,
+                        category = category
+                    )
+                }
+
+                handleSearchResults(response, isLoadMore)
+
+
+
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSearching = false,
+                    isLoadingMore = false,
+                    generalError = "검색 중 오류가 발생했습니다: ${e.message}"
+                )
+            }
+        }
     }
 }
