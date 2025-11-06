@@ -2,7 +2,10 @@ package com.example.itda.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -16,13 +19,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.components.ScreenContract
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Primary40
-import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
@@ -37,12 +39,15 @@ object HomeContract : ScreenContract {
 fun HomeScreen(
     ui: HomeViewModel.HomeUiState, // UiState를 인자로 받음
     onFeedClick: (Int) -> Unit,
-    onCategorySelected: (String) -> Unit,
+    onCategorySelected: (Category) -> Unit,
     onRefresh: () -> Unit,
     onLoadNext: () -> Unit,
+    onRefreshProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
+    LaunchedEffect(Unit) {
+        onRefreshProfile()
+    }
     // TODO
     //  이런식으로 homeviewmodel 에서 program 을 가져오고
     //  이걸 가공해서 feedList 에 FeedItem Type 으로 넣어줘야할듯.
@@ -67,11 +72,12 @@ fun HomeScreen(
                 val shouldLoadMore = lastVisibleItemIndex >= (totalItemCount - threshold)
 
                 // 4. 로딩 함수 호출
-                if (shouldLoadMore && totalItemCount > 0) {
+                if (shouldLoadMore && totalItemCount > 0 && !ui.isPaginating) {
                     onLoadNext() // HomeRoute에서 넘겨받은 함수
                 }
             }
     }
+
 
     LaunchedEffect(ui.feedItems) {
         if (ui.feedItems.isNotEmpty()) {
@@ -87,14 +93,19 @@ fun HomeScreen(
         title = "home",
         topBarVisible = false,
     ) { paddingValues ->
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier) {
+            Spacer(Modifier.height(20.dp).fillMaxWidth())
             HomeHeader(
                 username = ui.username,
                 programCount = ui.totalElements
             )
+//            Text("loadhomedata : ${ui.loadDataCount} 번 로드됨")
+//            Text("loadProfile : ${ui.loadProfileCount} 번 로드됨")
+//            Text("loadNext : ${ui.loadNextCount} 번 로드됨")
             ProgramFilterRow(
-                categories = ui.categories.map { category -> category.value },
-                selectedCategory = ui.selectedCategory.value,
+                categories = ui.categories,
+                selectedCategory = ui.selectedCategory,
                 onCategorySelected = onCategorySelected
             )
             if(ui.isLoading) {
@@ -105,7 +116,7 @@ fun HomeScreen(
             else {
                 PullToRefreshBox(
                     isRefreshing = ui.isRefreshing,
-                    onRefresh = { onRefresh() },
+                    onRefresh = onRefresh,
                     state = pullToRefreshState,
                     indicator = {
                         Indicator(
@@ -153,6 +164,7 @@ private fun PreviewHomeScreen() {
         onFeedClick = {},
         onCategorySelected = {},
         onRefresh = {},
-        onLoadNext = {}
+        onLoadNext = {},
+        onRefreshProfile = {}
     )
 }

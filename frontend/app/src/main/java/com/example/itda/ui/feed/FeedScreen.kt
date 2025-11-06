@@ -26,10 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.example.itda.ui.common.components.BaseScreen
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.Primary40
-import com.example.itda.ui.feed.components.FeedContentCard
+import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
 import com.example.itda.ui.feed.components.FeedSummaryCard
@@ -128,15 +125,17 @@ fun FeedScreen(
                 )
                 Spacer(Modifier.height(12.dp))
 
-                FeedSummaryCard(
-                    expanded = detailExpanded,
-                    onToggle = { detailExpanded = !detailExpanded },
-                    summary = ui.feed.summary
-                )
+                FeedSummaryCard(content = ui.feed.summary)
 
                 Spacer(Modifier.height(12.dp))
 
-                FeedContentCard(content = ui.feed.details)
+
+
+                FeedDetailCard(
+                    expanded = detailExpanded,
+                    onToggle = { detailExpanded = !detailExpanded },
+                    details = ui.feed.details
+                )
 
                 Spacer(Modifier.height(60.dp)) // 하단 버튼 여유 공간
             }

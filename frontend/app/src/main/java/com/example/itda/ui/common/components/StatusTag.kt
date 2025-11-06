@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.GreenPrimary
 import com.example.itda.ui.common.theme.GreenSecondary
-import com.example.itda.ui.common.theme.Neutral40
-import com.example.itda.ui.common.theme.Neutral90
+import com.example.itda.ui.common.theme.Primary40
+import com.example.itda.ui.common.theme.Primary90
 import com.example.itda.ui.common.theme.RedPrimary
 
 enum class StatusType {
@@ -39,12 +39,12 @@ fun StatusTag(
 ) {
     val primaryColor = when (status) {
         StatusType.POSITIVE -> GreenPrimary
-        StatusType.NEUTRAL -> Neutral40
+        StatusType.NEUTRAL -> Primary40
         StatusType.NEGATIVE -> RedPrimary
     }
     val secondaryColor = when (status) {
         StatusType.POSITIVE -> GreenSecondary
-        StatusType.NEUTRAL -> Neutral90
+        StatusType.NEUTRAL -> Primary90
         StatusType.NEGATIVE -> Color.Transparent
     }
     Row(

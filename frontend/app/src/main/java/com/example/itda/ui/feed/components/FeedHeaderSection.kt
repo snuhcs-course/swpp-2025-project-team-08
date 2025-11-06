@@ -4,21 +4,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.components.StarButton
 import com.example.itda.ui.common.components.StatusTag
 import com.example.itda.ui.common.components.StatusType
@@ -45,16 +44,18 @@ fun FeedHeaderSection(
             .fillMaxWidth()
             .padding(12.dp),
     ) {
-        Row(
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .widthIn(120.dp, 240.dp),
                 text = title,
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2
             )
             StarButton(isStarred = isStarred)
         }
@@ -80,11 +81,6 @@ fun FeedHeaderSection(
             tags.map { tag ->
                 StatusTag(tag, StatusType.NEUTRAL)
             }
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-            )
             if (isEligible)
                 StatusTag("신청 대상자", StatusType.POSITIVE)
         }

@@ -21,6 +21,7 @@ fun HomeRoute(
         onFeedClick = onFeedClick,
         onRefresh = vm::refreshHomeData,
         onLoadNext = vm::loadNextPage,
+        onRefreshProfile = vm::loadMyProfile,
         modifier = modifier
     )
 }
