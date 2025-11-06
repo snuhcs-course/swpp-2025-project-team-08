@@ -140,11 +140,11 @@ fun SearchScreen(
                             )
                         }
 
-                        ProgramFilterRow(
-                            categories = dummyCategories.map { category -> category.value },
-                            selectedCategory = uiState.selectedCategory.value,
-                            onCategorySelected = { viewModel.onCategorySelected(uiState.selectedCategory) }
-                        )
+//                        ProgramFilterRow(
+//                            categories = dummyCategories,
+//                            selectedCategory = uiState.selectedCategory,
+//                            onCategorySelected = { viewModel.onCategorySelected(uiState.selectedCategory) }
+//                        )
 
                         FeedList(
                             items = uiState.searchResults,
