@@ -1,7 +1,9 @@
 package com.example.itda.data.source.remote
 
+import com.example.itda.data.model.PageResponse
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
+import com.example.itda.data.model.ProgramResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

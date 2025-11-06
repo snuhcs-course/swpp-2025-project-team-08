@@ -94,6 +94,17 @@ fun SearchScreen(
                     }
                 }
             }
+
+            // TODO: 🔥 인기 검색어 섹션 (추후 추가 예정)
+//            Spacer(modifier = Modifier.height(32.dp))
+//
+//            // 인기 검색어 헤더
+//            Text(
+//                text = "🔥 인기 검색어",
+//                fontSize = 16.sp,
+//                fontWeight = FontWeight.Medium,
+//                color = Neutral20
+//            )
         }
     }
 }
