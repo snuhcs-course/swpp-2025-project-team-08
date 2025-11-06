@@ -61,7 +61,8 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
            OR (LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')))
            OR (:category IS NOT NULL AND p.category = :category)
            
-        ORDER BY p.createdAt DESC
+        ORDER BY p.createdAt DESC,
+        p.id ASC
     """,
     )
     fun searchWithCategoryFilter(
@@ -85,12 +86,13 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
             (CASE WHEN p.category = :categoryEnum THEN 3 ELSE 0 END) +
             (CASE WHEN LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')) THEN 2 ELSE 0 END) +
             (CASE WHEN LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%')) THEN 1 ELSE 0 END) DESC,
-            p.createdAt DESC
+            p.createdAt DESC,
+            p.id ASC
     """,
     )
     fun searchAndRankPrograms(
         @Param("query") query: String,
-        @Param("categoryEnum") categoryEnum: ProgramCategory?,
+        @Param("categoryEnum") category: ProgramCategory?,
         pageable: Pageable,
     ): Page<ProgramEntity>
 }
