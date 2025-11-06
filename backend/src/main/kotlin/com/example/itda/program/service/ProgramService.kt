@@ -10,9 +10,7 @@ import com.example.itda.program.persistence.enums.ProgramCategory
 import com.example.itda.user.controller.User
 import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -63,28 +61,17 @@ class ProgramService(
     @Transactional(readOnly = true)
     fun searchLatestPrograms(
         searchTerm: String,
-        page: Int,
-        pageSize: Int,
-    ): Page<ProgramSummaryResponse> {
-        val pageable =
-            PageRequest.of(
-                page,
-                pageSize,
-                Sort.by(Sort.Direction.DESC, "createdAt"),
-            )
-
-        val categoryEnum: ProgramCategory? = mapSearchTermToCategory(searchTerm)
-
-        val programEntitiesPage: Page<ProgramEntity> =
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
+        val programs: Page<ProgramEntity> =
             programRepository.searchWithCategoryFilter(
                 query = searchTerm,
-                category = categoryEnum,
+                category = category,
                 pageable = pageable,
             )
 
-        return programEntitiesPage.map { entity ->
-            ProgramSummaryResponse.fromEntity(entity)
-        }
+        return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
     }
 
     private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
@@ -100,26 +87,17 @@ class ProgramService(
     @Transactional
     fun searchProgramsByRank(
         searchTerm: String,
-        page: Int,
-        pageSize: Int,
-    ): Page<ProgramSummaryResponse> {
-        val pageable =
-            PageRequest.of(
-                page,
-                pageSize,
-            )
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
 
-        val categoryEnum: ProgramCategory? = mapSearchTermToCategory(searchTerm)
-
-        val programEntitiesPage: Page<ProgramEntity> =
+        val programs: Page<ProgramEntity> =
             programRepository.searchAndRankPrograms(
                 query = searchTerm,
-                categoryEnum = categoryEnum,
+                category = category,
                 pageable = pageable,
             )
 
-        return programEntitiesPage.map { entity ->
-            ProgramSummaryResponse.fromEntity(entity)
-        }
+        return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
     }
 }
