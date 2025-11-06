@@ -139,15 +139,15 @@ fun PersonalInfoScreen(
                             )
                         }
 
-                        if (ui.genderError != null) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = ui.genderError,
-                                fontSize = 12.scaledSp,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(start = 4.dp)
-                            )
-                        }
+                    if (ui.genderError != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = ui.genderError,
+                            fontSize = 12.scaledSp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
