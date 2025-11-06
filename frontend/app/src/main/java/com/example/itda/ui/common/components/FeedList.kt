@@ -33,7 +33,7 @@ fun FeedList(
 // TODO - item id 를 보고 user 와의 관계에 대한 정보 가공 in program repository?
     //  ex : isStared, isEligible..
     //  homeViewmodel.getFeedInfo() -> programRepository.starred
-
+    var isInitialLoadComplete by remember { mutableStateOf(false) }
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(8.dp),
@@ -43,8 +43,17 @@ fun FeedList(
             var isVisible by remember { mutableStateOf(false) }
             LaunchedEffect(key1 = item.id) {
                 // index * 50L 만큼 지연 후 상태 변경 (차르르륵 효과)
-                delay(index * 5L)
+                val delayTime =
+                    if (!isInitialLoadComplete && index < 20)
+                        index * 5L
+                    else
+                        0L
+                delay(delayTime)
                 isVisible = true
+
+                if (index >= 20 && !isInitialLoadComplete) {
+                    isInitialLoadComplete = true
+                }
             }
 
             AnimatedVisibility(
@@ -53,13 +62,13 @@ fun FeedList(
                     // 1. 애니메이션 지속 시간 설정
                     animationSpec = tween(
                         durationMillis = 300, // 애니메이션 지속 시간 (0.3초)
-                        delayMillis = index * 50 // 아이템 인덱스에 따라 지연 시간 추가 (차르르륵 효과)
+                        // delayMillis = index * 50 // 아이템 인덱스에 따라 지연 시간 추가 (차르르륵 효과)
                     )
                 ) + slideInVertically(
                     // 수직 방향으로 살짝 내려오면서 나타나는 효과
                     animationSpec = tween(
                         durationMillis = 300,
-                        delayMillis = index * 50
+                        // delayMillis = index * 50
                     ),
                     // 시작 위치 (y= -100px에서 시작하여 0으로 이동)
                     initialOffsetY = { fullHeight -> fullHeight / 2 }
@@ -68,7 +77,7 @@ fun FeedList(
                 FeedCard(
                     id = item.id,
                     title = item.title,
-                    categories = listOf(filterCategory),
+                    categories = listOf(item.categoryValue),
                     department = item.operatingEntity,
                     content = item.preview,
 

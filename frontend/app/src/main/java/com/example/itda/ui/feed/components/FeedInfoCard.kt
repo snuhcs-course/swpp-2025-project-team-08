@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,13 +43,22 @@ fun FeedInfoCard(
                 Text("신청기간", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Text("정책기관", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             }
-            Column(Modifier.padding(12.dp)) {
+            Column(
+                Modifier.padding(12.dp),
+                horizontalAlignment = Alignment.End
+
+            ) {
                 Row {
                     categories.forEach { category ->
                         Text(category, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
-                Text("$startDate ~ $endDate", color = MaterialTheme.colorScheme.onSurface)
+                if(startDate == "" && endDate == "") {
+                    Text("상시 신청 가능", color = MaterialTheme.colorScheme.onSurface)
+                }
+                else {
+                    Text("$startDate ~ $endDate", color = MaterialTheme.colorScheme.onSurface)
+                }
                 Text(department, color = MaterialTheme.colorScheme.onSurface)
             }
         }

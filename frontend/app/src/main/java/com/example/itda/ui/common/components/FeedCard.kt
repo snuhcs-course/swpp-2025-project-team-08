@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,15 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.R
 import com.example.itda.data.model.dummyCategories
-import com.example.itda.ui.common.theme.Neutral20
-import com.example.itda.ui.common.theme.Neutral60
 
 
 @Composable
@@ -61,10 +60,14 @@ fun FeedCard(
             // 상단 섹션: 로고, 기관명, 카테고리, 즐겨찾기 아이콘
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .widthIn(120.dp, 240.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
                     // 기관 로고
                     CircleImage(
                         imgId = logo,
@@ -75,6 +78,7 @@ fun FeedCard(
                         Text(
                             text = department, // 정부 기관명
                             fontSize = 14.sp,
+                            lineHeight = 16.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
@@ -94,7 +98,7 @@ fun FeedCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 중앙 섹션: 쿠폰 제목 및 신청 대상 여부
+            // 중앙 섹션: 제목 및 신청 대상 여부
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
