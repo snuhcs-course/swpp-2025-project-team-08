@@ -26,20 +26,10 @@ fun SearchFilterRow(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .horizontalScroll(rememberScrollState()),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "정렬",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Neutral40
-        )
-
         SortChip(
             text = "추천순",
             isSelected = sortType == SearchViewModel.SortType.RANK,

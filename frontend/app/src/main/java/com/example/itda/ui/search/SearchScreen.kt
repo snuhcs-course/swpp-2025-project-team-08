@@ -122,8 +122,14 @@ fun SearchScreen(
                 }
                 else if (uiState.searchResults.isNotEmpty()) {
                     Column {
-                        Row {
+                        Row (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
                             SearchResultHeader(
+                                modifier = Modifier.weight(1f),
                                 searchQuery = uiState.recentSearches.firstOrNull() ?: "",
                                 totalResults = uiState.totalElements
                             )
@@ -203,3 +209,4 @@ fun SearchScreen(
         }
     }
 }
+
