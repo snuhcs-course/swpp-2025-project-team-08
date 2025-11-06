@@ -2,7 +2,6 @@ package com.example.itda.data.source.remote
 
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
-import com.example.itda.data.model.ProgramResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -39,5 +38,21 @@ interface ProgramAPI {
     @GET("programs/examples/{id}")
     suspend fun getExampleDetails(@Path("id") id: Int): ProgramDetailResponse
 
+
+    @GET("programs/search/rank")
+    suspend fun searchProgramsByRank(
+        @Query("query") query: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("category") category: String? = null
+    ): PageResponse<ProgramResponse>
+
+    @GET("programs/search/latest")
+    suspend fun searchProgramsByLatest(
+        @Query("query") query: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("category") category: String? = null
+    ): PageResponse<ProgramResponse>
 }
 

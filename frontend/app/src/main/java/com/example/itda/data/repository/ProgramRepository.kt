@@ -1,5 +1,8 @@
 package com.example.itda.data.repository
 
+import com.example.itda.data.model.DummyData
+import com.example.itda.data.model.PageResponse
+import com.example.itda.data.model.Program
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
@@ -27,4 +30,36 @@ class ProgramRepository @Inject constructor(
         api.getExampleDetails(exampleId )
     }
 
+    // TODO - 임시 함수. User에 맞는 program list를 전부 불러오는 함수. 현재는 dummyFeedList 불러오기
+    fun getFeedList(): List<Program> {
+        return DummyData.dummyFeedItems
+    }
+
+    suspend fun searchByRank(
+        query: String,
+        page: Int,
+        size: Int,
+        category: String?
+    ): PageResponse<ProgramResponse> {
+        return api.searchProgramsByRank(
+            query = query,
+            page = page,
+            size = size,
+            category = category
+        )
+    }
+
+    suspend fun searchByLatest(
+        query: String,
+        page: Int,
+        size: Int,
+        category: String?
+    ): PageResponse<ProgramResponse> {
+        return api.searchProgramsByLatest(
+            query = query,
+            page = page,
+            size = size,
+            category = category
+        )
+    }
 }
