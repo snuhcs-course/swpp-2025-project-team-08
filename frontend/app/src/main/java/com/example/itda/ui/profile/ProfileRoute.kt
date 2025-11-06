@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.common.theme.Primary60
 import com.example.itda.ui.profile.component.SettingDestination
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileRoute(
@@ -83,9 +84,30 @@ fun SettingsRoute(
 @Composable
 fun PersonalInfoRoute(
     onBack: () -> Unit,
+    onComplete: () -> Unit,
     vm: PersonalInfoViewModel = hiltViewModel()
 ) {
+    val ui by vm.personalInfoUi.collectAsState()
+    val scope = rememberCoroutineScope()
     PersonalInfoScreen(
-        onBack = onBack
+        ui = ui,
+        onBack = onBack,
+        onNameChange = vm::onNameChange,
+        onBirthDateChange = vm::onBirthDateChange,
+        onGenderChange = vm::onGenderChange,
+        onAddressChange = vm::onAddressChange,
+        onPostCodeChange = vm::onPostCodeChange,
+        onEducationChange = vm::onEducationChange,
+        onHouseholdSizeChange = vm::onHouseholdSizeChange,
+        onHouseholdIncomeChange = vm::onHouseholdIncomeChange,
+        onMaritalStatusChange = vm::onMaritalStatusChange,
+        onEmploymentStatusChange = vm::onEmploymentStatusChange,
+        onSubmit = {
+            scope.launch {
+                if (vm.submitPersonalInfo()) {
+                    onComplete()
+                }
+            }
+        }
     )
 }

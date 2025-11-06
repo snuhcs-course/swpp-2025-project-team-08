@@ -29,8 +29,8 @@ class UserRepository @Inject constructor(
 
             // User 객체로 변환
             val user = User(
-                id = response.id ?: "",
-                email = response.email ?: "",
+                id = response.id,
+                email = response.email,
                 name = response.name,
                 birthDate = response.birthDate,
                 gender = response.gender,
@@ -95,7 +95,7 @@ class UserRepository @Inject constructor(
 
         // 서버로 전송
         val request = ProfileRequest(
-            name = name ?: "",
+            name = name,
             birthDate = birthDate,
             gender = gender,
             address = address,

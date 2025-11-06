@@ -25,20 +25,91 @@ import com.example.itda.ui.auth.components.KakaoAddressSearchDialog
 import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.common.theme.Neutral30
 import kotlinx.coroutines.launch
+import com.example.itda.ui.profile.PersonalInfoViewModel
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+
+// 생년월일 VisualTransformation (20010101 -> 2001-01-01)
+class BirthDateVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val digits = text.text.filter { it.isDigit() }.take(8)
+
+        val formatted = buildString {
+            digits.forEachIndexed { index, char ->
+                append(char)
+                if (index == 3 || index == 5) append('-')
+            }
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (offset <= 0) return 0
+                if (offset > digits.length) return formatted.length
+
+                var transformedOffset = 0
+                for (i in 0 until minOf(offset, digits.length)) {
+                    transformedOffset++
+                    if (i == 3 || i == 5) transformedOffset++
+                }
+                return transformedOffset
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                if (offset <= 0) return 0
+
+                var originalOffset = 0
+                var currentTransformed = 0
+
+                while (currentTransformed < offset && originalOffset < digits.length) {
+                    currentTransformed++
+                    originalOffset++
+                    if (originalOffset == 4 && currentTransformed < offset) currentTransformed++
+                    if (originalOffset == 6 && currentTransformed < offset) currentTransformed++
+                }
+
+                return minOf(originalOffset, digits.length)
+            }
+        }
+
+        return TransformedText(AnnotatedString(formatted), offsetMapping)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalInfoScreen(
+    ui: PersonalInfoViewModel.PersonalInfoUiState,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier,
+    onNameChange: (String) -> Unit,
+    onBirthDateChange: (String) -> Unit,
+    onGenderChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onPostCodeChange: (String) -> Unit,
+    onMaritalStatusChange: (String) -> Unit,
+    onEducationChange: (String) -> Unit,
+    onHouseholdSizeChange: (String) -> Unit,
+    onHouseholdIncomeChange: (String) -> Unit,
+    onEmploymentStatusChange: (String) -> Unit,
+    onSubmit: () -> Unit
 ) {
-    val viewModel: PersonalInfoViewModel = hiltViewModel()
-    val ui by viewModel.personalInfoUi.collectAsState()
-    val scope = rememberCoroutineScope()
     // 주소 검색 다이얼로그 표시 여부
     var showAddressDialog by remember { mutableStateOf(false) }
     // 선택된 주소 정보
     var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
+
+    // 🔧 서버에서 불러온 주소가 있으면 selectedAddress 초기화
+    LaunchedEffect(ui.address, ui.postcode) {
+        if (ui.address.isNotBlank() && ui.postcode.isNotBlank() && selectedAddress == null) {
+            selectedAddress = AddressResult(
+                address = ui.address,
+                zonecode = ui.postcode
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -94,17 +165,17 @@ fun PersonalInfoScreen(
                     modifier = Modifier.padding(24.dp)
                 ) {
                     PersonalInfoFieldSimple(
-                        label = "이름",
+                        label = "성함",
                         value = ui.name,
-                        onValueChange = { viewModel.onNameChange(it) },
-                        placeholder = "이름을 입력해주세요",
+                        onValueChange = onNameChange,
+                        placeholder = "성함을 입력해주세요",
                         errorMessage = ui.nameError
                     )
 
-                    PersonalInfoFieldSimple(
+                    BirthDateField(
                         label = "생년월일",
                         value = ui.birthDate,
-                        onValueChange = { viewModel.onBirthDateChange(it) },
+                        onValueChange = onBirthDateChange,
                         placeholder = "YYYY-MM-DD",
                         errorMessage = ui.birthDateError
                     )
@@ -114,7 +185,7 @@ fun PersonalInfoScreen(
                         label = "성별",
                         value = ui.gender,
                         options = listOf("남성", "여성"),
-                        onValueChange = { viewModel.onGenderChange(it) },
+                        onValueChange = onGenderChange,
                         errorMessage = ui.genderError
                     )
 
@@ -214,28 +285,28 @@ fun PersonalInfoScreen(
                         label = "결혼 여부",
                         value = ui.maritalStatus,
                         options = listOf("미혼", "기혼", "이혼/사별"),
-                        onValueChange = { viewModel.onMaritalStatusChange(it) }
+                        onValueChange = onMaritalStatusChange
                     )
 
                     // 학력
                     PersonalInfoDropdown(
                         label = "학력",
                         value = ui.education,
-                        options = listOf("고졸", "재학생", "휴학생", "졸업예정", "전문대졸", "대졸", "석사", "박사"),
-                        onValueChange = { viewModel.onEducationChange(it) }
+                        options = listOf("초등학생", "중학생", "고등학생", "대학생", "초졸", "중졸", "고졸", "전문대졸", "대졸"),
+                        onValueChange = onEducationChange
                     )
 
                     PersonalInfoFieldSimple(
                         label = "가구원 수",
                         value = ui.householdSize,
-                        onValueChange = { viewModel.onHouseholdSizeChange(it) },
+                        onValueChange = onHouseholdSizeChange,
                         placeholder = "숫자만 입력"
                     )
 
                     PersonalInfoFieldSimple(
                         label = "가구원 소득 (만원)",
                         value = ui.householdIncome,
-                        onValueChange = { viewModel.onHouseholdIncomeChange(it) },
+                        onValueChange = onHouseholdIncomeChange,
                         placeholder = "숫자만 입력"
                     )
 
@@ -244,7 +315,7 @@ fun PersonalInfoScreen(
                         label = "취업 상태",
                         value = ui.employmentStatus,
                         options = listOf("재직자", "미취업자", "자영업자"),
-                        onValueChange = { viewModel.onEmploymentStatusChange(it) },
+                        onValueChange = onEmploymentStatusChange,
                         isLast = true
                     )
 
@@ -262,12 +333,9 @@ fun PersonalInfoScreen(
 
                     Button(
                         onClick = {
-                            scope.launch {
-                                val success = viewModel.submitPersonalInfo()
-                                if (success) {
-                                    onBack()
-                                }
-                            }
+                            onAddressChange(selectedAddress!!.address)
+                            onPostCodeChange(selectedAddress!!.zonecode)
+                            onSubmit()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -309,6 +377,64 @@ fun PersonalInfoScreen(
                 showAddressDialog = false
             }
         )
+    }
+}
+
+@Composable
+fun BirthDateField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    errorMessage: String? = null
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(
+                    placeholder,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp
+                )
+            },
+            visualTransformation = BirthDateVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = errorMessage != null,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )
+
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = errorMessage,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
 }
 

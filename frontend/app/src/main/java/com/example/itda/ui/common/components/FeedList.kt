@@ -39,7 +39,7 @@ fun FeedList(
         contentPadding = PaddingValues(8.dp),
         state = listState
     ) {
-        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+        itemsIndexed(items, key = { index, item -> "${item.id}_$index" }) { index, item ->
             var isVisible by remember { mutableStateOf(false) }
             LaunchedEffect(key1 = item.id) {
                 // index * 50L 만큼 지연 후 상태 변경 (차르르륵 효과)
