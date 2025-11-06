@@ -57,14 +57,14 @@ fun SearchScreen(
                         text = "최근 검색어",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = Neutral20
                     )
 
                     // 전체 삭제 버튼
                     Text(
                         text = "전체 삭제",
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Neutral50,
                         modifier = Modifier.clickable {
                             viewModel.onClearAllRecentSearches()
                         }
