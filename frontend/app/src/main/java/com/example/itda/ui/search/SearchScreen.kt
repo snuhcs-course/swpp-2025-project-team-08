@@ -15,8 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.common.components.BaseScreen
+import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.search.components.RecentSearchChip
 import com.example.itda.ui.search.components.SearchInputField
+
 
 @Composable
 fun SearchScreen(
