@@ -33,8 +33,11 @@ class HomeViewModel @Inject constructor(
     val isLastPage: Boolean = false,        // 마지막 페이지 여부
     val totalPages: Int = 0,                // 전체 페이지 수
     val totalElements : Int = 0,             // 전체 정책 수
-
+    val isPaginating : Boolean = false,
     val isLoading: Boolean = false,
+    val loadDataCount : Int = 0,
+    val loadProfileCount : Int = 0,
+    val loadNextCount : Int = 0,
     val isRefreshing: Boolean = false,
     val generalError: String? = null
     )
@@ -44,10 +47,11 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            loadMyProfile()
             loadHomeData()
+            loadMyProfile()
         }
     }
+
 
     fun refreshHomeData() {
         viewModelScope.launch {
@@ -57,10 +61,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadMyProfile() {
+    fun loadMyProfile() {
 
         viewModelScope.launch {
-            _homeUi.update { it.copy(isLoading = true) }
+            _homeUi.update { it.copy() }
 
             val user = authRepository.getProfile()
             user
@@ -69,7 +73,6 @@ class HomeViewModel @Inject constructor(
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
-                            isLoading = false
                         )
                     }
                 }
@@ -79,7 +82,6 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             userId = user.id,
                             username = user.name ?: "사용자",
-                            isLoading = false
                         )
                     }
                 }
@@ -88,9 +90,10 @@ class HomeViewModel @Inject constructor(
 
     // 홈 화면에 필요한 모든 데이터를 로드
     private fun loadHomeData() {
+
+
         viewModelScope.launch {
-            _homeUi.update { it.copy(isLoading = true, currentPage = 0) }
-            // delay(2000L) // TODO - 실제 통신에서는 실제 딜레이가 있을거라 빼도 됨
+            _homeUi.update { it.copy(loadDataCount = homeUi.value.loadDataCount + 1, isLoading = true, currentPage = 0) }
 
             val programs = programRepository.getPrograms(
                 page = 0,
@@ -103,7 +106,7 @@ class HomeViewModel @Inject constructor(
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
-                            isLoading = false
+                            isLoading = false,
                         )
                     }
                 }
@@ -118,7 +121,7 @@ class HomeViewModel @Inject constructor(
                             isLastPage = response.isLast,
                             totalElements = response.totalElements,   // 전체 정책 수 저장
                             generalError = null,
-                            isLoading = false
+                            isLoading = false,
                         )
                     }
                 }
@@ -130,18 +133,22 @@ class HomeViewModel @Inject constructor(
         val isLast = homeUi.value.isLastPage
 
         // 1. 이미 로딩 중이거나 마지막 페이지면 더 이상 호출하지 않음
-        if (homeUi.value.isLoading || isLast) return
+        if (homeUi.value.isPaginating || isLast) return
 
         viewModelScope.launch {
-            _homeUi.update { it.copy(isLoading = true) }
+            _homeUi.update { it.copy(isPaginating = true, loadNextCount = homeUi.value.loadNextCount + 1) }
 
-            programRepository.getPrograms(page = nextPageIndex, size = 20)
+            programRepository.getPrograms(
+                page = nextPageIndex,
+                size = 20,
+                category = _homeUi.value.selectedCategory.category
+            )
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
-                            isLoading = false
+                            isPaginating = false
                         )
                     }
                 }
@@ -153,7 +160,7 @@ class HomeViewModel @Inject constructor(
                             currentPage = response.page,
                             isLastPage = response.isLast,
                             generalError = null,
-                            isLoading = false
+                            isPaginating = false
                         )
                     }
                 }
@@ -161,13 +168,11 @@ class HomeViewModel @Inject constructor(
     }
 
     // 카테고리 필터링 로직
-    fun onCategorySelected(categoryName: String) {
+    fun onCategorySelected(category: Category) {
         _homeUi.update {
             it.copy(
                 // TODO - 현재는 Category.kt 에 저장해둔 dummy list 에서 찾지만 나중에 categories 찾는 api 구현 시 programRepository 통해 api 로 찾아서 저장해둔 category 에서 찾아오기
-                selectedCategory = dummyCategories.find { category ->
-                    category.value == categoryName
-                } ?: Category("", "전체")
+                selectedCategory = category
             )
         }
 

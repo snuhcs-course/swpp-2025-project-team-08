@@ -11,9 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.common.theme.Primary20
 import com.example.itda.ui.common.theme.Primary40
 
@@ -28,7 +28,7 @@ fun LoadingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Neutral100),
+            .background(Color.Transparent),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

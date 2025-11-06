@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.data.model.Category
 
 @Composable
 fun ProgramFilterRow(
-    categories: List<String>,
-    selectedCategory: String,
-    onCategorySelected: (String) -> Unit
+    categories: List<Category>,
+    selectedCategory: Category,
+    onCategorySelected: (Category) -> Unit
 ) {
     LazyRow(
         modifier = Modifier
@@ -30,7 +31,7 @@ fun ProgramFilterRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(categories) { category ->
-            val isSelected = category == selectedCategory
+            val isSelected = category.category == selectedCategory.category
 
             Surface(
                 onClick = { onCategorySelected(category) },
@@ -45,7 +46,7 @@ fun ProgramFilterRow(
                     MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Text(
-                    text = category,
+                    text = category.value,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
