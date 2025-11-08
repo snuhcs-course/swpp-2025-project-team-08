@@ -50,7 +50,7 @@ class ProgramEntity(
     var eligibilityMinAge: Int? = null,
     @Column(name = "eligibility_max_age")
     var eligibilityMaxAge: Int? = null,
-    @Column(name = "eligibility_region", length = 100)
+    @Column(name = "eligibility_region", columnDefinition = "TEXT")
     var eligibilityRegion: String? = null,
     @Column(name = "eligibility_min_household")
     var eligibilityMinHousehold: Int? = null,
