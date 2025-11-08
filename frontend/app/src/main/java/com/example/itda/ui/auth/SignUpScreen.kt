@@ -28,7 +28,7 @@ fun SignUpScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Neutral100),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -37,18 +37,18 @@ fun SignUpScreen(
         ) {
             Text(
                 text = "잇다",
-                fontSize = 60.scaledSp,
+                fontSize = 60.sp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(32.dp))
 
             // Login 타이틀
             Text(
                 text = "Sign Up",
-                fontSize = 24.scaledSp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .padding(start = 10.dp)
@@ -62,12 +62,12 @@ fun SignUpScreen(
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Neutral100
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 0.dp
                 ),
-                border = BorderStroke(1.dp, Neutral90)
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Column(
                     modifier = Modifier
@@ -106,7 +106,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // 약관 동의 (껍데기)
+                    // 약관 동의 (껏데기)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -118,13 +118,14 @@ fun SignUpScreen(
                         Column {
                             Text(
                                 text = "개인정보 취급 동의",
-                                fontSize = 12.scaledSp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = "자세한 설명",
-                                fontSize = 10.scaledSp,
-                                color = Neutral40
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -135,7 +136,7 @@ fun SignUpScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = ui.generalError,
-                            fontSize = 12.scaledSp,
+                            fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -153,19 +154,22 @@ fun SignUpScreen(
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isFormValid)
-                                Primary60
+                                MaterialTheme.colorScheme.primary
                             else
-                                Neutral90,
-                            disabledContainerColor = Neutral80
+                                MaterialTheme.colorScheme.surfaceVariant,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         shape = RoundedCornerShape(8.dp),
                         enabled = isFormValid
                     ) {
                         Text(
                             "회원가입",
-                            fontSize = 16.scaledSp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            color = if (isFormValid) Neutral100 else Neutral40
+                            color = if (isFormValid)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -177,13 +181,13 @@ fun SignUpScreen(
                     ) {
                         Text(
                             text = "이미 계정이 있으신가요? ",
-                            fontSize = 14.scaledSp,
-                            color = Neutral40
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "로그인하기",
-                            fontSize = 14.scaledSp,
-                            color = Neutral10,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {
                                 onLoginClick()
