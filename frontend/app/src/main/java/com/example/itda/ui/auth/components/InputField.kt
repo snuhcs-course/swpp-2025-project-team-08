@@ -33,7 +33,7 @@ fun InputField(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Neutral10,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -42,7 +42,7 @@ fun InputField(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
-                Text(placeholder, color = Neutral60)
+                Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)
             },
             visualTransformation = if (isPassword)
                 PasswordVisualTransformation()
@@ -50,10 +50,10 @@ fun InputField(
                 VisualTransformation.None,
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary60,
-                unfocusedBorderColor = Neutral90,
-                focusedTextColor = Neutral10,
-                unfocusedTextColor = Neutral10
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
             shape = RoundedCornerShape(8.dp),
             singleLine = true,
