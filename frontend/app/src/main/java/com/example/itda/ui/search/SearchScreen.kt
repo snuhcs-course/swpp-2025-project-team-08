@@ -156,7 +156,7 @@ fun SearchScreen(
                             RecommendedSearchChip(
                                 keyword = keyword,
                                 onClick = {
-                                    onRecentSearchClick(keyword)
+                                    onRecentSearchClick(keyword) // 같은 함수 재활용!
                                 }
                             )
                         }
