@@ -190,7 +190,7 @@ fun LoginScreen(
 //                        Text(
 //                            text = "비밀번호 찾기",
 //                            fontSize = 14.sp,
-//                            color = Neutral40,
+//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
 //                            modifier = Modifier
 //                                .clickable { }
 //                                .padding(8.dp)
