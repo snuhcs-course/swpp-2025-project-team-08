@@ -32,6 +32,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import com.example.itda.ui.auth.components.isValidBirthDate
 
 // 생년월일 VisualTransformation (20010101 -> 2001-01-01)
 class BirthDateVisualTransformation : VisualTransformation {
@@ -101,6 +104,19 @@ fun PersonalInfoScreen(
     // 선택된 주소 정보
     var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
 
+    // 스크롤 상태
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
+    // 각 필드의 Y 위치를 저장
+    var nameFieldY by remember { mutableFloatStateOf(0f) }
+    var birthDateFieldY by remember { mutableFloatStateOf(0f) }
+    var genderFieldY by remember { mutableFloatStateOf(0f) }
+    var addressFieldY by remember { mutableFloatStateOf(0f) }
+
+    // Snackbar 호스트
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // 🔧 서버에서 불러온 주소가 있으면 selectedAddress 초기화
     LaunchedEffect(ui.address, ui.postcode) {
         if (ui.address.isNotBlank() && ui.postcode.isNotBlank() && selectedAddress == null) {
@@ -108,6 +124,48 @@ fun PersonalInfoScreen(
                 address = ui.address,
                 zonecode = ui.postcode
             )
+        }
+    }
+
+    // ✨ 에러 발생 시 자동 스크롤 및 Snackbar 표시
+    LaunchedEffect(
+        ui.nameError,
+        ui.birthDateError,
+        ui.genderError,
+        ui.addressError,
+        ui.generalError
+    ) {
+        // 첫 번째 에러 필드로 스크롤
+        val targetY = when {
+            ui.nameError != null -> nameFieldY
+            ui.birthDateError != null -> birthDateFieldY
+            ui.genderError != null -> genderFieldY
+            ui.addressError != null -> addressFieldY
+            else -> null
+        }
+
+        if (targetY != null) {
+            // 약간 위쪽 여백을 두고 스크롤 (100dp)
+            val scrollToY = (targetY - 100.dp.value).coerceAtLeast(0f)
+            coroutineScope.launch {
+                scrollState.animateScrollTo(scrollToY.toInt())
+            }
+        }
+
+        // Snackbar로 에러 메시지 표시
+        val errorMessage = ui.nameError
+            ?: ui.birthDateError
+            ?: ui.genderError
+            ?: ui.addressError
+            ?: ui.generalError
+
+        if (errorMessage != null) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = errorMessage,
+                    duration = SnackbarDuration.Short
+                )
+            }
         }
     }
 
@@ -135,13 +193,26 @@ fun PersonalInfoScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        actionColor = MaterialTheme.colorScheme.error
+                    )
+                }
+            )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .background(MaterialTheme.colorScheme.background)
                 .padding(20.dp)
         ) {
@@ -164,12 +235,16 @@ fun PersonalInfoScreen(
                 Column(
                     modifier = Modifier.padding(24.dp)
                 ) {
+                    // ✨ 위치 추적이 추가된 필드들
                     PersonalInfoFieldSimple(
                         label = "성함",
                         value = ui.name,
                         onValueChange = onNameChange,
                         placeholder = "성함을 입력해주세요",
-                        errorMessage = ui.nameError
+                        errorMessage = ui.nameError,
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            nameFieldY = coordinates.positionInParent().y
+                        }
                     )
 
                     BirthDateField(
@@ -177,7 +252,10 @@ fun PersonalInfoScreen(
                         value = ui.birthDate,
                         onValueChange = onBirthDateChange,
                         placeholder = "YYYY-MM-DD",
-                        errorMessage = ui.birthDateError
+                        errorMessage = ui.birthDateError,
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            birthDateFieldY = coordinates.positionInParent().y
+                        }
                     )
 
                     // 성별 드롭다운
@@ -186,7 +264,10 @@ fun PersonalInfoScreen(
                         value = ui.gender,
                         options = listOf("남성", "여성"),
                         onValueChange = onGenderChange,
-                        errorMessage = ui.genderError
+                        errorMessage = ui.genderError,
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            genderFieldY = coordinates.positionInParent().y
+                        }
                     )
 
                     // 주소 검색 영역
@@ -194,6 +275,9 @@ fun PersonalInfoScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 24.dp)
+                            .onGloballyPositioned { coordinates ->
+                                addressFieldY = coordinates.positionInParent().y
+                            }
                     ) {
                         Text(
                             text = "주소",
@@ -207,18 +291,20 @@ fun PersonalInfoScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { showAddressDialog = true },
+                                .clickable { showAddressDialog = true }
+                                .border(
+                                    width = 1.dp,
+                                    color = if (ui.addressError != null)
+                                        MaterialTheme.colorScheme.error
+                                    else
+                                        MaterialTheme.colorScheme.outline,
+                                    shape = RoundedCornerShape(8.dp)
+                                ),
                             shape = RoundedCornerShape(8.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = MaterialTheme.colorScheme.surface
                             ),
-                            border = BorderStroke(
-                                1.dp,
-                                if (ui.postcodeError != null)
-                                    MaterialTheme.colorScheme.error
-                                else
-                                    MaterialTheme.colorScheme.outline
-                            )
+                            elevation = CardDefaults.cardElevation(0.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -226,12 +312,11 @@ fun PersonalInfoScreen(
                                     .padding(16.dp)
                             ) {
                                 if (selectedAddress != null) {
-                                    // 주소가 선택된 경우
                                     Text(
                                         text = "[${selectedAddress!!.zonecode}]",
                                         fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.primary
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
@@ -240,39 +325,19 @@ fun PersonalInfoScreen(
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                 } else {
-                                    // 주소가 선택되지 않은 경우
                                     Text(
                                         text = "주소를 검색해주세요",
                                         fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.alpha(0.6f)
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
                         }
 
-                        // 우편번호 찾기 버튼
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedButton(
-                            onClick = { showAddressDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            ),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                "우편번호 찾기",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        if (ui.postcodeError != null) {
+                        if (ui.addressError != null) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = ui.postcodeError ?: "",
+                                text = ui.addressError,
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(start = 4.dp)
@@ -280,19 +345,20 @@ fun PersonalInfoScreen(
                         }
                     }
 
-                    // 결혼 여부
                     PersonalInfoDropdown(
-                        label = "결혼 여부",
+                        label = "결혼여부",
                         value = ui.maritalStatus,
                         options = listOf("미혼", "기혼", "이혼/사별"),
                         onValueChange = onMaritalStatusChange
                     )
 
-                    // 학력
                     PersonalInfoDropdown(
                         label = "학력",
                         value = ui.education,
-                        options = listOf("초등학생", "중학생", "고등학생", "대학생", "초졸", "중졸", "고졸", "전문대졸", "대졸"),
+                        options = listOf(
+                            "초등학생", "중학생", "고등학생", "대학생",
+                            "초졸", "중졸", "고졸", "전문대졸", "대졸"
+                        ),
                         onValueChange = onEducationChange
                     )
 
@@ -300,80 +366,66 @@ fun PersonalInfoScreen(
                         label = "가구원 수",
                         value = ui.householdSize,
                         onValueChange = onHouseholdSizeChange,
-                        placeholder = "숫자만 입력"
+                        placeholder = "예: 4"
                     )
 
                     PersonalInfoFieldSimple(
-                        label = "가구원 소득 (만원)",
+                        label = "가구소득 (만원)",
                         value = ui.householdIncome,
                         onValueChange = onHouseholdIncomeChange,
-                        placeholder = "숫자만 입력"
+                        placeholder = "예: 500"
                     )
 
-                    // 취업 상태
                     PersonalInfoDropdown(
-                        label = "취업 상태",
+                        label = "취업상태",
                         value = ui.employmentStatus,
-                        options = listOf("재직자", "미취업자", "자영업자"),
+                        options = listOf("재직자", "미취업자", "자의업자"),
                         onValueChange = onEmploymentStatusChange,
                         isLast = true
                     )
+                }
+            }
 
-                    if (ui.generalError != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = ui.generalError ?: "",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
+            Spacer(modifier = Modifier.height(32.dp))
 
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    Button(
-                        onClick = {
-                            onAddressChange(selectedAddress!!.address)
-                            onPostCodeChange(selectedAddress!!.zonecode)
-                            onSubmit()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        enabled = !ui.isLoading
-                    ) {
-                        if (ui.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(
-                                "완료",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
+            Button(
+                onClick = onSubmit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                enabled = !ui.isLoading,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                if (ui.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        "저장하기",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
+
     // 주소 검색 다이얼로그
     if (showAddressDialog) {
         KakaoAddressSearchDialog(
             onDismiss = { showAddressDialog = false },
             onAddressSelected = { result ->
                 selectedAddress = result
+                onAddressChange(result.address)
+                onPostCodeChange(result.zonecode)
                 showAddressDialog = false
             }
         )
@@ -386,10 +438,25 @@ fun BirthDateField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    modifier: Modifier = Modifier
 ) {
+    // ✨ 실시간 유효성 검사
+    var localError by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(value) {
+        localError = when {
+            value.isEmpty() -> null
+            value.length < 8 -> null
+            value.length == 8 && !isValidBirthDate(value) -> "올바른 생년월일을 입력해주세요 (예: 19990101)"
+            else -> null
+        }
+    }
+
+    val displayError = errorMessage ?: localError
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 24.dp)
     ) {
@@ -400,6 +467,7 @@ fun BirthDateField(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
+
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -413,7 +481,7 @@ fun BirthDateField(
             },
             visualTransformation = BirthDateVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            isError = errorMessage != null,
+            isError = displayError != null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
@@ -423,13 +491,22 @@ fun BirthDateField(
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            supportingText = if (value.isNotEmpty() && value.length < 8) {
+                {
+                    Text(
+                        text = "${value.length}/8",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else null
         )
 
-        if (errorMessage != null) {
+        if (displayError != null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = errorMessage,
+                text = displayError,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
@@ -446,10 +523,11 @@ fun PersonalInfoFieldSimple(
     placeholder: String,
     errorMessage: String? = null,
     enabled: Boolean = true,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    modifier: Modifier = Modifier  // ✨ modifier 추가
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = if (isLast) 0.dp else 24.dp)
     ) {
@@ -508,12 +586,13 @@ fun PersonalInfoDropdown(
     options: List<String>,
     onValueChange: (String) -> Unit,
     errorMessage: String? = null,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    modifier: Modifier = Modifier  // ✨ modifier 추가
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = if (isLast) 0.dp else 24.dp)
     ) {
