@@ -77,14 +77,14 @@ fun SearchScreen(
                     ) {
                         Text(
                             text = "최근 검색어",
-                            fontSize = 16.sp,
+                            fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
                             color = Neutral20
                         )
 
                         Text(
                             text = "전체 삭제",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = Neutral50,
                             modifier = Modifier.clickable {
                                 viewModel.onClearAllRecentSearches()
@@ -179,14 +179,14 @@ fun SearchScreen(
                         ) {
                             Text(
                                 text = "검색 결과가 없습니다",
-                                fontSize = 18.sp,
+                                fontSize = 18.scaledSp,
                                 fontWeight = FontWeight.Medium,
                                 color = Neutral40
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "다른 검색어로 다시 시도해보세요",
-                                fontSize = 14.sp,
+                                fontSize = 14.scaledSp,
                                 color = Neutral50
                             )
                         }
@@ -200,7 +200,7 @@ fun SearchScreen(
                     ) {
                         Text(
                             text = errorText,
-                            fontSize = 16.sp,
+                            fontSize = 16.scaledSp,
                             color = MaterialTheme.colorScheme.error
                         )
                     }

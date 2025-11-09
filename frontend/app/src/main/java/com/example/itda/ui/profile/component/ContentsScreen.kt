@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +29,7 @@ fun ContentsScreen(
                     Text(
                         title,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
+                        fontSize = 18.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -56,8 +57,8 @@ fun ContentsScreen(
         ) {
             Text(
                 text = content,
-                fontSize = 14.sp,
-                lineHeight = 22.sp,
+                fontSize = 14.scaledSp,
+                lineHeight = 22.scaledSp,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }

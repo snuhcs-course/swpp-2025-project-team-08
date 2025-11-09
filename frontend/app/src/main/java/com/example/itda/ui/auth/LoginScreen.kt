@@ -28,7 +28,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(Neutral100),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -37,9 +37,9 @@ fun LoginScreen(
         ) {
             Text(
                 text = "잇다",
-                fontSize = 60.sp,
+                fontSize = 60.scaledSp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+                color = Neutral0
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -47,9 +47,9 @@ fun LoginScreen(
             // Login 타이틀
             Text(
                 text = "Login",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Neutral0,
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .padding(start = 10.dp)
@@ -64,12 +64,12 @@ fun LoginScreen(
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = Neutral100
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 0.dp
                 ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                border = BorderStroke(1.dp, Neutral90)
             ) {
                 Column(
                     modifier = Modifier
@@ -109,7 +109,7 @@ fun LoginScreen(
                         ) {
                             Text(
                                 text = ui.generalError,
-                                fontSize = 14.sp,
+                                fontSize = 14.scaledSp,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -128,10 +128,10 @@ fun LoginScreen(
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isFormValid)
-                                MaterialTheme.colorScheme.primary
+                                Primary60
                             else
-                                MaterialTheme.colorScheme.surfaceVariant,
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                                Neutral90,
+                            disabledContainerColor = Neutral80
                         ),
                         shape = RoundedCornerShape(8.dp),
                         enabled = isFormValid && !ui.isLoading
@@ -139,18 +139,15 @@ fun LoginScreen(
                         if (ui.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Neutral100,
                                 strokeWidth = 2.dp
                             )
                         } else {
                             Text(
                                 "로그인",
-                                fontSize = 16.sp,
+                                fontSize = 16.scaledSp,
                                 fontWeight = FontWeight.Medium,
-                                color = if (isFormValid)
-                                    MaterialTheme.colorScheme.onPrimary
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isFormValid) Neutral100 else Neutral40
                             )
                         }
                     }
@@ -164,13 +161,13 @@ fun LoginScreen(
                     ) {
                         Text(
                             text = "계정이 없으신가요? ",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontSize = 14.scaledSp,
+                            color = Neutral40
                         )
                         Text(
                             text = "회원가입하기",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 14.scaledSp,
+                            color = Neutral10,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {
                                 onSignUpClick()
@@ -188,7 +185,7 @@ fun LoginScreen(
 //                        Text(
 //                            text = "비밀번호 찾기",
 //                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            color = Neutral40,
 //                            modifier = Modifier
 //                                .clickable { }
 //                                .padding(8.dp)

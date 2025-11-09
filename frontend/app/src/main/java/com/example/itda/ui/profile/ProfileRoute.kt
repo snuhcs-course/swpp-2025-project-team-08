@@ -57,7 +57,7 @@ fun SettingsRoute(
                     onClick = {
                         showLogoutDialog = false
                         settingsVm.logout()
-                        onLogoutSuccess()  // 여기서 화면 이동!
+                        onLogoutSuccess()
                     }
                 ) {
                     Text("확인", color = Primary60)
@@ -76,7 +76,7 @@ fun SettingsRoute(
         onBack = onBack,
         onNavigateToDestination = onNavigateToDestination,
         toggleDarkMode = settingsVm::toggleDarkMode,
-        toggleAlarm = settingsVm::toggleAlarm,
+        onFontSizeChange = settingsVm::setFontSize,
         onLogout = { showLogoutDialog = true }
     )
 }

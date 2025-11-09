@@ -118,7 +118,7 @@ fun PersonalInfoScreen(
                     Text(
                         "개인정보 수정",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
+                        fontSize = 18.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -197,7 +197,7 @@ fun PersonalInfoScreen(
                     ) {
                         Text(
                             text = "주소",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -229,21 +229,21 @@ fun PersonalInfoScreen(
                                     // 주소가 선택된 경우
                                     Text(
                                         text = "[${selectedAddress!!.zonecode}]",
-                                        fontSize = 14.sp,
+                                        fontSize = 14.scaledSp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = selectedAddress!!.address,
-                                        fontSize = 14.sp,
+                                        fontSize = 14.scaledSp,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                 } else {
                                     // 주소가 선택되지 않은 경우
                                     Text(
                                         text = "주소를 검색해주세요",
-                                        fontSize = 14.sp,
+                                        fontSize = 14.scaledSp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.alpha(0.6f)
                                     )
@@ -264,7 +264,7 @@ fun PersonalInfoScreen(
                         ) {
                             Text(
                                 "우편번호 찾기",
-                                fontSize = 14.sp,
+                                fontSize = 14.scaledSp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -273,7 +273,7 @@ fun PersonalInfoScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = ui.postcodeError ?: "",
-                                fontSize = 12.sp,
+                                fontSize = 12.scaledSp,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
@@ -323,7 +323,7 @@ fun PersonalInfoScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = ui.generalError ?: "",
-                            fontSize = 12.sp,
+                            fontSize = 12.scaledSp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -357,7 +357,7 @@ fun PersonalInfoScreen(
                             Text(
                                 "완료",
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 16.sp,
+                                fontSize = 16.scaledSp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -395,7 +395,7 @@ fun BirthDateField(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -408,7 +408,7 @@ fun BirthDateField(
                 Text(
                     placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    fontSize = 14.scaledSp
                 )
             },
             visualTransformation = BirthDateVisualTransformation(),
@@ -430,7 +430,7 @@ fun BirthDateField(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -455,7 +455,7 @@ fun PersonalInfoFieldSimple(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -468,7 +468,7 @@ fun PersonalInfoFieldSimple(
                 Text(
                     placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    fontSize = 14.scaledSp
                 )
             },
             enabled = enabled,
@@ -492,7 +492,7 @@ fun PersonalInfoFieldSimple(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -519,7 +519,7 @@ fun PersonalInfoDropdown(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -540,7 +540,7 @@ fun PersonalInfoDropdown(
                     Text(
                         "선택해주세요",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp
+                        fontSize = 14.scaledSp
                     )
                 },
                 trailingIcon = {
@@ -584,7 +584,7 @@ fun PersonalInfoDropdown(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )

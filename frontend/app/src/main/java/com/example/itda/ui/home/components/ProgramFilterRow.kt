@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun ProgramFilterRow(
@@ -48,7 +49,7 @@ fun ProgramFilterRow(
                 Text(
                     text = category.value,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
+                    fontSize = 14.scaledSp,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
