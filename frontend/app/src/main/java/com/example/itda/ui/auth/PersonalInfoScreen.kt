@@ -28,10 +28,7 @@ fun PersonalInfoScreen(
     onPostCodeChange: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
-    // 주소 검색 다이얼로그 표시 여부
     var showAddressDialog by remember { mutableStateOf(false) }
-
-    // 선택된 주소 정보
     var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
 
     Box(
@@ -105,13 +102,12 @@ fun PersonalInfoScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                    // 생년월일
-                    BirthDateInput(
-                        label = "생년월일",
-                        value = ui.birthDate,
-                        onValueChange = onBirthDateChange,
-                        errorMessage = ui.birthDateError
-                    )
+                        BirthDateInput(
+                            label = "생년월일",
+                            value = ui.birthDate,
+                            onValueChange = onBirthDateChange,
+                            errorMessage = ui.birthDateError
+                        )
 
                         Text(
                             text = "성별",
@@ -297,7 +293,6 @@ fun PersonalInfoScreen(
         }
     }
 
-    // 주소 검색 다이얼로그
     if (showAddressDialog) {
         KakaoAddressSearchDialog(
             onDismiss = { showAddressDialog = false },
