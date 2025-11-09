@@ -111,7 +111,7 @@ fun KakaoAddressSearchDialog(
                     title = {
                         Text(
                             text = "주소 검색",
-                            fontSize = 18.sp,
+                            fontSize = 18.scaledSp,
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -188,7 +188,7 @@ fun KakaoAddressSearchDialog(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("검색", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text("검색", fontSize = 16.scaledSp, fontWeight = FontWeight.Medium)
                     }
                 }
 
@@ -214,12 +214,12 @@ fun KakaoAddressSearchDialog(
                             ) {
                                 Text(
                                     text = "💡",
-                                    fontSize = 16.sp,
+                                    fontSize = 16.scaledSp,
                                     modifier = Modifier.padding(end = 6.dp)
                                 )
                                 Text(
                                     text = "검색 Tip",
-                                    fontSize = 14.sp,
+                                    fontSize = 14.scaledSp,
                                     fontWeight = FontWeight.Bold,
                                     color = Neutral10
                                 )
@@ -227,7 +227,7 @@ fun KakaoAddressSearchDialog(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "정확한 검색을 위해 아래 형식으로 입력해주세요",
-                                fontSize = 13.sp,
+                                fontSize = 13.scaledSp,
                                 color = Neutral40
                             )
                             Spacer(modifier = Modifier.height(12.dp))
@@ -258,7 +258,7 @@ fun KakaoAddressSearchDialog(
                         Text(
                             text = errorMessage!!,
                             color = MaterialTheme.colorScheme.onErrorContainer,
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             modifier = Modifier.padding(12.dp)
                         )
                     }
@@ -287,14 +287,14 @@ fun KakaoAddressSearchDialog(
                         ) {
                             Text(
                                 text = "⚠️ 우편번호를 찾을 수 없습니다",
-                                fontSize = 13.sp,
+                                fontSize = 13.scaledSp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "건물번호까지 입력해주세요 (예: 동일로 216길 49)",
-                                fontSize = 12.sp,
+                                fontSize = 12.scaledSp,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }
@@ -305,7 +305,7 @@ fun KakaoAddressSearchDialog(
                 if (searchResults.isNotEmpty()) {
                     Text(
                         text = "검색 결과 (${searchResults.size}개)",
-                        fontSize = 14.sp,
+                        fontSize = 14.scaledSp,
                         fontWeight = FontWeight.Medium,
                         color = Neutral40,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -378,7 +378,7 @@ private fun AddressItem(
         document.roadAddress?.let { roadAddress ->
             Text(
                 text = "[도로명] ${roadAddress.addressName}",
-                fontSize = 15.sp,
+                fontSize = 15.scaledSp,
                 fontWeight = FontWeight.Medium,
                 color = Neutral10
             )
@@ -386,14 +386,14 @@ private fun AddressItem(
             if (roadAddress.zoneNo.isNotBlank()) {
                 Text(
                     text = "우편번호: ${roadAddress.zoneNo}",
-                    fontSize = 13.sp,
+                    fontSize = 13.scaledSp,
                     color = Primary60,
                     fontWeight = FontWeight.SemiBold
                 )
             } else {
                 Text(
                     text = "⚠️ 우편번호 없음 (건물번호까지 입력하세요)",
-                    fontSize = 12.sp,
+                    fontSize = 12.scaledSp,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -404,7 +404,7 @@ private fun AddressItem(
             document.address?.let { address ->
                 Text(
                     text = "[지번] ${address.addressName}",
-                    fontSize = 15.sp,
+                    fontSize = 15.scaledSp,
                     fontWeight = FontWeight.Medium,
                     color = Neutral10
                 )
@@ -412,14 +412,14 @@ private fun AddressItem(
                 if (!address.zipCode.isNullOrBlank()) {
                     Text(
                         text = "우편번호: ${address.zipCode}",
-                        fontSize = 13.sp,
+                        fontSize = 13.scaledSp,
                         color = Primary60,
                         fontWeight = FontWeight.SemiBold
                     )
                 } else {
                     Text(
                         text = "⚠️ 우편번호 없음",
-                        fontSize = 12.sp,
+                        fontSize = 12.scaledSp,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -442,19 +442,19 @@ private fun TipExample(
     ) {
         Text(
             text = "•",
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             color = Neutral30,
             modifier = Modifier.padding(end = 8.dp)
         )
         Column {
             Text(
                 text = title,
-                fontSize = 11.sp,
+                fontSize = 11.scaledSp,
                 color = Neutral50
             )
             Text(
                 text = "예) $example",
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 fontWeight = FontWeight.Medium,
                 color = Neutral40
             )

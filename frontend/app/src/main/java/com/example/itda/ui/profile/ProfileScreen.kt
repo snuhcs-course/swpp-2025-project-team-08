@@ -71,7 +71,7 @@ fun ProfileScreen(
                     Text(
                         "Profile",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = 20.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -144,14 +144,14 @@ fun ProfileScreen(
                     Column {
                         Text(
                             text = ui.user.name ?: "사용자",
-                            fontSize = 18.sp,
+                            fontSize = 18.scaledSp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 //                        Text(
 //                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",
-//                            fontSize = 13.sp,
+//                            fontSize = 13.scaledSp,
 //                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
 //                        )
                     }
@@ -171,15 +171,15 @@ fun ProfileScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "맞춤 정보",
-                        fontSize = 16.sp,
+                        fontSize = 16.scaledSp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         text = "아래 정보를 이용하여 개인에게 알맞은 정책을 추천해드립니다.",
-                        fontSize = 11.sp,
+                        fontSize = 11.scaledSp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 14.sp
+                        lineHeight = 14.scaledSp
                     )
                 }
                 Button(
@@ -194,7 +194,7 @@ fun ProfileScreen(
                         vertical = 8.dp
                     )
                 ) {
-                    Text("수정", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                    Text("수정", fontSize = 13.scaledSp, fontWeight = FontWeight.Medium)
                 }
             }
 
@@ -244,7 +244,7 @@ fun ProfileInfoItem(
     ) {
         Text(
             text = label,
-            fontSize = 15.sp,
+            fontSize = 15.scaledSp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Normal
         )
@@ -261,7 +261,7 @@ fun ProfileInfoItem(
             ) {
                 Text(
                     text = value.ifEmpty { "-" },
-                    fontSize = 15.sp,
+                    fontSize = 15.scaledSp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -269,7 +269,7 @@ fun ProfileInfoItem(
         } else {
             Text(
                 text = value.ifEmpty { "-" },
-                fontSize = 15.sp,
+                fontSize = 15.scaledSp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )

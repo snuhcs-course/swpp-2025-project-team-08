@@ -37,7 +37,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = "잇다",
-                fontSize = 60.sp,
+                fontSize = 60.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = Neutral0
             )
@@ -47,7 +47,7 @@ fun LoginScreen(
             // Login 타이틀
             Text(
                 text = "Login",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = Neutral0,
                 modifier = Modifier
@@ -109,7 +109,7 @@ fun LoginScreen(
                         ) {
                             Text(
                                 text = ui.generalError,
-                                fontSize = 14.sp,
+                                fontSize = 14.scaledSp,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -145,7 +145,7 @@ fun LoginScreen(
                         } else {
                             Text(
                                 "로그인",
-                                fontSize = 16.sp,
+                                fontSize = 16.scaledSp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (isFormValid) Neutral100 else Neutral40
                             )
@@ -161,12 +161,12 @@ fun LoginScreen(
                     ) {
                         Text(
                             text = "계정이 없으신가요? ",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = Neutral40
                         )
                         Text(
                             text = "회원가입하기",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = Neutral10,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {

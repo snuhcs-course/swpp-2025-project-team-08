@@ -28,6 +28,7 @@ import com.example.itda.ui.common.components.ScreenContract
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
+import com.example.itda.ui.common.theme.*
 
 object HomeContract : ScreenContract {
     override val route = "home"
@@ -136,7 +137,7 @@ fun HomeScreen(
                         ) {
                             Text(
                                 text = ui.generalError ?: "추천 정책이 없어요 :(",
-                                fontSize = 18.sp,
+                                fontSize = 18.scaledSp,
                                 color = MaterialTheme.colorScheme.tertiary,
                             )
                         }

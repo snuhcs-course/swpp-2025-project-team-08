@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.jeziellago.compose.markdowntext.MarkdownText
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun FeedDetailCard(
@@ -68,8 +69,8 @@ fun FeedDetailCard(
                     markdown = details,
                     style = TextStyle(
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.sp,
-                        lineHeight = 20.sp,
+                        fontSize = 16.scaledSp,
+                        lineHeight = 20.scaledSp,
                         textAlign = TextAlign.Left,
                     ),
                 )

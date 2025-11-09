@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.Neutral0
 import com.example.itda.ui.common.theme.Neutral60
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun HomeHeader(
@@ -35,13 +36,13 @@ fun HomeHeader(
         ) {
             Text(
                 text = "${username}님의 맞춤 정책",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = "${programCount}개",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -49,7 +50,7 @@ fun HomeHeader(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "위로 드래그하여 더 많은 정보를 로드해보세요!",
-            fontSize = 12.sp,
+            fontSize = 12.scaledSp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
