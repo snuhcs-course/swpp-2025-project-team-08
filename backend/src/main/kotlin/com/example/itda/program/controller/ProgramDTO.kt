@@ -17,7 +17,7 @@ data class ProgramSummaryResponse(
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
             ProgramSummaryResponse(
-                id = entity.id,
+                id = entity.id!!,
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
@@ -28,7 +28,7 @@ data class ProgramSummaryResponse(
 
         fun fromEntity(entity: ProgramExampleEntity): ProgramSummaryResponse =
             ProgramSummaryResponse(
-                id = entity.id,
+                id = entity.id!!,
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
@@ -71,7 +71,7 @@ data class ProgramResponse(
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramResponse =
             ProgramResponse(
-                id = entity.id,
+                id = entity.id!!,
                 uuid = entity.uuid,
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
@@ -102,7 +102,7 @@ data class ProgramResponse(
 
         fun fromEntity(entity: ProgramExampleEntity): ProgramResponse =
             ProgramResponse(
-                id = entity.id,
+                id = entity.id!!,
                 uuid = entity.uuid,
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
