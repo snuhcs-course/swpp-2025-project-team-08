@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.*
 
 /**
  * 최근 검색어 칩
@@ -39,7 +40,7 @@ fun RecentSearchChip(
             // 검색어 텍스트
             Text(
                 text = searchQuery,
-                fontSize = 14.sp,
+                fontSize = 14.scaledSp,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

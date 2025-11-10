@@ -176,7 +176,7 @@ fun PersonalInfoScreen(
                     Text(
                         "개인정보 수정",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
+                        fontSize = 18.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -281,7 +281,7 @@ fun PersonalInfoScreen(
                     ) {
                         Text(
                             text = "주소",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -314,31 +314,69 @@ fun PersonalInfoScreen(
                                 if (selectedAddress != null) {
                                     Text(
                                         text = "[${selectedAddress!!.zonecode}]",
+<<<<<<< HEAD
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = MaterialTheme.colorScheme.onSurface
+=======
+                                        fontSize = 14.scaledSp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+>>>>>>> e17001b (feat(fe) #122: implement fontsize variant)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = selectedAddress!!.address,
-                                        fontSize = 14.sp,
+                                        fontSize = 14.scaledSp,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                 } else {
                                     Text(
                                         text = "주소를 검색해주세요",
+<<<<<<< HEAD
                                         fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
+=======
+                                        fontSize = 14.scaledSp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.alpha(0.6f)
+>>>>>>> e17001b (feat(fe) #122: implement fontsize variant)
                                     )
                                 }
                             }
                         }
 
+<<<<<<< HEAD
                         if (ui.addressError != null) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = ui.addressError,
                                 fontSize = 12.sp,
+=======
+                        // 우편번호 찾기 버튼
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showAddressDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "우편번호 찾기",
+                                fontSize = 14.scaledSp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        if (ui.postcodeError != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = ui.postcodeError ?: "",
+                                fontSize = 12.scaledSp,
+>>>>>>> e17001b (feat(fe) #122: implement fontsize variant)
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
@@ -386,6 +424,7 @@ fun PersonalInfoScreen(
                 }
             }
 
+<<<<<<< HEAD
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
@@ -411,6 +450,51 @@ fun PersonalInfoScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
+=======
+                    if (ui.generalError != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = ui.generalError ?: "",
+                            fontSize = 12.scaledSp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = {
+                            onAddressChange(selectedAddress!!.address)
+                            onPostCodeChange(selectedAddress!!.zonecode)
+                            onSubmit()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = !ui.isLoading
+                    ) {
+                        if (ui.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                "완료",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 16.scaledSp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+>>>>>>> e17001b (feat(fe) #122: implement fontsize variant)
                 }
             }
 
@@ -462,7 +546,7 @@ fun BirthDateField(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -476,7 +560,7 @@ fun BirthDateField(
                 Text(
                     placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    fontSize = 14.scaledSp
                 )
             },
             visualTransformation = BirthDateVisualTransformation(),
@@ -506,8 +590,13 @@ fun BirthDateField(
         if (displayError != null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
+<<<<<<< HEAD
                 text = displayError,
                 fontSize = 12.sp,
+=======
+                text = errorMessage,
+                fontSize = 12.scaledSp,
+>>>>>>> e17001b (feat(fe) #122: implement fontsize variant)
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -533,7 +622,7 @@ fun PersonalInfoFieldSimple(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -546,7 +635,7 @@ fun PersonalInfoFieldSimple(
                 Text(
                     placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+                    fontSize = 14.scaledSp
                 )
             },
             enabled = enabled,
@@ -570,7 +659,7 @@ fun PersonalInfoFieldSimple(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -598,7 +687,7 @@ fun PersonalInfoDropdown(
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -619,7 +708,7 @@ fun PersonalInfoDropdown(
                     Text(
                         "선택해주세요",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp
+                        fontSize = 14.scaledSp
                     )
                 },
                 trailingIcon = {
@@ -663,7 +752,7 @@ fun PersonalInfoDropdown(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                fontSize = 12.sp,
+                fontSize = 12.scaledSp,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp)
             )

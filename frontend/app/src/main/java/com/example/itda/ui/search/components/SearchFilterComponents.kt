@@ -66,7 +66,7 @@ private fun SortChip(
     ) {
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
             color = if (isSelected) Neutral100 else Neutral40
         )

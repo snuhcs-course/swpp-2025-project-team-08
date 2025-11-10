@@ -1,6 +1,7 @@
 package com.example.itda.ui.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -49,7 +51,7 @@ fun SettingScreen(
     onBack: () -> Unit,
     onNavigateToDestination: (SettingDestination) -> Unit,
     toggleDarkMode: () -> Unit,
-    toggleAlarm: () -> Unit,
+    onFontSizeChange: (SettingsViewModel.FontSize) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -60,7 +62,7 @@ fun SettingScreen(
                     Text(
                         "Setting",
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
+                        fontSize = 18.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -98,10 +100,9 @@ fun SettingScreen(
                     onCheckedChange = { toggleDarkMode() }
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-                SettingToggleItemSimple(
-                    title = "알림 설정",
-                    checked = ui.alarmEnabled,
-                    onCheckedChange = { toggleAlarm() }
+                SettingFontSizeItem(
+                    currentFontSize = ui.fontSize,
+                    onFontSizeChange = onFontSizeChange
                 )
             }
 
@@ -178,7 +179,7 @@ fun SettingSectionTitleSimple(title: String) {
     ) {
         Text(
             text = title,
-            fontSize = 20.sp,
+            fontSize = 20.scaledSp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Center
@@ -202,7 +203,7 @@ fun SettingToggleItemSimple(
     ) {
         Text(
             text = title,
-            fontSize = 15.sp,
+            fontSize = 15.scaledSp,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Normal
         )
@@ -220,6 +221,86 @@ fun SettingToggleItemSimple(
 }
 
 @Composable
+fun SettingFontSizeItem(
+    currentFontSize: SettingsViewModel.FontSize,
+    onFontSizeChange: (SettingsViewModel.FontSize) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "글자 크기",
+            fontSize = 15.scaledSp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Normal
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SettingsViewModel.FontSize.values().forEach { fontSize ->
+                FontSizeOption(
+                    fontSize = fontSize,
+                    isSelected = currentFontSize == fontSize,
+                    onClick = { onFontSizeChange(fontSize) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FontSizeOption(
+    fontSize: SettingsViewModel.FontSize,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .background(
+                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = fontSize.displayName,
+            fontSize = (14 * fontSize.scale).scaledSp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+
+        if (isSelected) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "선택됨",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
@@ -232,7 +313,7 @@ fun SettingMenuItemSimple(title: String, onClick: () -> Unit) {
     ) {
         Text(
             text = title,
-            fontSize = 15.sp,
+            fontSize = 15.scaledSp,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.weight(1f)

@@ -39,7 +39,7 @@ fun GenderOption(
     ) {
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -62,7 +62,7 @@ fun BirthDateInput(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Medium,
             color = Neutral10,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -78,7 +78,7 @@ fun BirthDateInput(
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
-                Text("(예: 20001205)", color = Neutral60, fontSize = 14.sp)
+                Text("(예: 20001205)", color = Neutral60, fontSize = 14.scaledSp)
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number  // 숫자 키패드

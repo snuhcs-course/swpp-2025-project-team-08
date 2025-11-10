@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +26,7 @@ fun DefaultScreen(
                     Text(
                         title,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
+                        fontSize = 18.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -56,14 +57,14 @@ fun DefaultScreen(
             ) {
                 Text(
                     "준비 중입니다",
-                    fontSize = 18.sp,
+                    fontSize = 18.scaledSp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "빠른 시일 내에 서비스 예정입니다",
-                    fontSize = 14.sp,
+                    fontSize = 14.scaledSp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
