@@ -45,7 +45,7 @@ fun PersonalInfoScreen(
         ) {
             Text(
                 text = "당신을 알려주세요!",
-                fontSize = 36.sp,
+                fontSize = 36.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -56,7 +56,7 @@ fun PersonalInfoScreen(
                 text = "잇다에서는 사용자분들의 맞춤 정보를 \n" +
                         "입력받아 여러분이 찾고 계실 정책,\n" +
                         "지원 사업등을 추천해드리고 있습니다!",
-                fontSize = 14.sp,
+                fontSize = 14.scaledSp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -106,7 +106,7 @@ fun PersonalInfoScreen(
                     // 성별
                     Text(
                         text = "성별",
-                        fontSize = 14.sp,
+                        fontSize = 14.scaledSp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -136,7 +136,7 @@ fun PersonalInfoScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = ui.genderError,
-                            fontSize = 12.sp,
+                            fontSize = 12.scaledSp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -147,7 +147,7 @@ fun PersonalInfoScreen(
                     // 주소 섹션
                     Text(
                         text = "주소",
-                        fontSize = 14.sp,
+                        fontSize = 14.scaledSp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -176,21 +176,21 @@ fun PersonalInfoScreen(
                                 // 주소가 선택된 경우
                                 Text(
                                     text = "[${selectedAddress!!.zonecode}]",
-                                    fontSize = 14.sp,
+                                    fontSize = 14.scaledSp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = selectedAddress!!.address,
-                                    fontSize = 14.sp,
+                                    fontSize = 14.scaledSp,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             } else {
                                 // 주소가 선택되지 않은 경우
                                 Text(
                                     text = "주소를 검색해주세요",
-                                    fontSize = 14.sp,
+                                    fontSize = 14.scaledSp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.alpha(0.6f)
                                 )
@@ -211,7 +211,7 @@ fun PersonalInfoScreen(
                     ) {
                         Text(
                             "우편번호 찾기",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -220,7 +220,7 @@ fun PersonalInfoScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = ui.addressError,
-                            fontSize = 12.sp,
+                            fontSize = 12.scaledSp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -232,7 +232,7 @@ fun PersonalInfoScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = ui.generalError,
-                            fontSize = 12.sp,
+                            fontSize = 12.scaledSp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -274,7 +274,7 @@ fun PersonalInfoScreen(
                         } else {
                             Text(
                                 "제출하기",
-                                fontSize = 16.sp,
+                                fontSize = 16.scaledSp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (isFormValid)
                                     MaterialTheme.colorScheme.onPrimary

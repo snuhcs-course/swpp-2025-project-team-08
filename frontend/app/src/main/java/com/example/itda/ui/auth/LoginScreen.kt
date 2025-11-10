@@ -39,7 +39,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = "잇다",
-                fontSize = 60.sp,
+                fontSize = 60.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -49,7 +49,7 @@ fun LoginScreen(
             // Login 타이틀
             Text(
                 text = "Login",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
@@ -111,7 +111,7 @@ fun LoginScreen(
                         ) {
                             Text(
                                 text = ui.generalError,
-                                fontSize = 14.sp,
+                                fontSize = 14.scaledSp,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(12.dp)
                             )
@@ -147,7 +147,7 @@ fun LoginScreen(
                         } else {
                             Text(
                                 "로그인",
-                                fontSize = 16.sp,
+                                fontSize = 16.scaledSp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (isFormValid)
                                     MaterialTheme.colorScheme.onPrimary
@@ -166,12 +166,12 @@ fun LoginScreen(
                     ) {
                         Text(
                             text = "계정이 없으신가요? ",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "회원가입하기",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {
@@ -189,7 +189,7 @@ fun LoginScreen(
 //                    ) {
 //                        Text(
 //                            text = "비밀번호 찾기",
-//                            fontSize = 14.sp,
+//                            fontSize = 14.scaledSp,
 //                            color = MaterialTheme.colorScheme.onSurfaceVariant,
 //                            modifier = Modifier
 //                                .clickable { }
