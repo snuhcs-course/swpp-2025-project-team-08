@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.itda.ui.common.theme.*
-import com.example.itda.ui.common.utils.scaledSp
 
 /**
  * 숫자 입력 필드 (가구원 수, 소득 등)
@@ -27,8 +26,7 @@ fun NumberInputField(
     Column(modifier = modifier) {
         Text(
             text = label,
-            fontSize = 14.scaledSp(),
-            fontWeight = FontWeight.Medium,
+            fontSize = 14.scaledSp,
             color = Neutral10,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -50,7 +48,6 @@ fun NumberInputField(
                 TextField(
                     value = value,
                     onValueChange = { newValue ->
-                        // 숫자만 입력 가능
                         if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                             onValueChange(newValue)
                         }
@@ -58,7 +55,7 @@ fun NumberInputField(
                     placeholder = {
                         Text(
                             text = placeholder,
-                            fontSize = 14.scaledSp(),
+                            fontSize = 14.scaledSp,
                             color = Neutral60
                         )
                     },
@@ -72,14 +69,14 @@ fun NumberInputField(
                     ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     textStyle = LocalTextStyle.current.copy(
-                        fontSize = 14.scaledSp()
+                        fontSize = 14.scaledSp
                     ),
                     singleLine = true
                 )
 
                 Text(
                     text = suffix,
-                    fontSize = 14.scaledSp(),
+                    fontSize = 14.scaledSp,
                     color = Neutral40,
                     modifier = Modifier.padding(top = 16.dp, start = 8.dp)
                 )

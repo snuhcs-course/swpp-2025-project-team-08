@@ -9,14 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.itda.ui.common.theme.*
-import com.example.itda.ui.common.utils.scaledSp
 
 /**
  * 선택 버튼 행 (혼인상태, 고용상태 등)
  */
 @Composable
 fun SelectionButtonRow(
-    options: List<Pair<String, String>>, // (value, label) 쌍
+    options: List<Pair<String, String>>,
     selectedValue: String?,
     onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -44,7 +43,7 @@ fun SelectionButtonRow(
             ) {
                 Text(
                     text = label,
-                    fontSize = 14.scaledSp(),
+                    fontSize = 14.scaledSp,
                     fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
                 )
             }

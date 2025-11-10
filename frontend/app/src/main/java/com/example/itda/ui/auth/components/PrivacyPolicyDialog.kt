@@ -11,10 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.itda.ui.common.theme.Neutral0
-import com.example.itda.ui.common.theme.Neutral20
-import com.example.itda.ui.common.theme.Neutral100
-import com.example.itda.ui.common.theme.Primary60
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun PrivacyPolicyDialog(
@@ -25,7 +22,7 @@ fun PrivacyPolicyDialog(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.8f), // 화면의 80% 높이
+                .fillMaxHeight(0.8f),
             shape = RoundedCornerShape(16.dp),
             color = Neutral100
         ) {
@@ -34,17 +31,15 @@ fun PrivacyPolicyDialog(
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
-                // 제목
                 Text(
                     text = "개인정보 수집 및 이용 동의",
-                    fontSize = 20.sp,
+                    fontSize = 20.scaledSp,
                     fontWeight = FontWeight.Bold,
                     color = Neutral0
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 내용 (스크롤 가능)
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -52,20 +47,18 @@ fun PrivacyPolicyDialog(
                 ) {
                     Text(
                         text = buildPrivacyPolicyText(),
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
+                        fontSize = 14.scaledSp,
+                        lineHeight = 24.scaledSp,
                         color = Neutral20
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 버튼들
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // 취소 버튼
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier
@@ -80,7 +73,6 @@ fun PrivacyPolicyDialog(
                         )
                     }
 
-                    // 동의하기 버튼
                     Button(
                         onClick = {
                             onAgree()
@@ -96,7 +88,7 @@ fun PrivacyPolicyDialog(
                     ) {
                         Text(
                             text = "동의하기",
-                            fontSize = 16.sp,
+                            fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
                             color = Neutral100
                         )

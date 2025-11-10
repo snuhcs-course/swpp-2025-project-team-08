@@ -1,6 +1,7 @@
 package com.example.itda.ui.auth.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.itda.ui.common.theme.*
-import com.example.itda.ui.common.utils.scaledSp
 
 /**
  * 학력 선택 드롭다운
@@ -26,7 +26,6 @@ fun EducationLevelDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    // (API 값, 표시 텍스트) 쌍
     val educationOptions = listOf(
         "ELEMENTARY_SCHOOL_STUDENT" to "초등학생",
         "MIDDLE_SCHOOL_STUDENT" to "중학생",
@@ -61,7 +60,7 @@ fun EducationLevelDropdown(
             ) {
                 Text(
                     text = selectedLabel,
-                    fontSize = 14.scaledSp(),
+                    fontSize = 14.scaledSp,
                     color = if (selectedValue != null) Neutral10 else Neutral60,
                     fontWeight = if (selectedValue != null) FontWeight.Normal else FontWeight.Normal
                 )
@@ -76,21 +75,23 @@ fun EducationLevelDropdown(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(Neutral100)
         ) {
             educationOptions.forEach { (value, label) ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             text = label,
-                            fontSize = 14.scaledSp(),
+                            fontSize = 14.scaledSp,
                             color = if (selectedValue == value) Primary60 else Neutral10
                         )
                     },
                     onClick = {
                         onValueSelected(value)
                         expanded = false
-                    }
+                    },
                 )
             }
         }

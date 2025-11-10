@@ -245,11 +245,20 @@ class AuthViewModel @Inject constructor(
 
     // 기본 개인 정보 입력 상태
     data class PersonalInfoUiState(
+        // 필수
         val name: String = "",
         val birthDate: String = "",
         val gender: String = "",
         val address: String = "",
         val postcode: String = "",
+
+        // 선택
+        val maritalStatus: String? = null,
+        val educationLevel: String? = null,
+        val householdSize: String = "",
+        val householdIncome: String = "",
+        val employmentStatus: String? = null,
+
         val isLoading: Boolean = false,
         val nameError: String? = null,
         val birthDateError: String? = null,
@@ -281,6 +290,26 @@ class AuthViewModel @Inject constructor(
 
     fun onPostCodeChange(v: String) {
         _personalInfoUi.update { it.copy(postcode = v, postcodeError = null, generalError = null) }
+    }
+
+    fun onMaritalStatusChange(v: String?) {
+        _personalInfoUi.update { it.copy(maritalStatus = v, generalError = null) }
+    }
+
+    fun onEducationLevelChange(v: String?) {
+        _personalInfoUi.update { it.copy(educationLevel = v, generalError = null) }
+    }
+
+    fun onHouseholdSizeChange(v: String) {
+        _personalInfoUi.update { it.copy(householdSize = v, generalError = null) }
+    }
+
+    fun onHouseholdIncomeChange(v: String) {
+        _personalInfoUi.update { it.copy(householdIncome = v, generalError = null) }
+    }
+
+    fun onEmploymentStatusChange(v: String?) {
+        _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
     }
 
     suspend fun submitPersonalInfo(): Boolean {
@@ -329,13 +358,20 @@ class AuthViewModel @Inject constructor(
         }
 
         val formattedBirthDate = formatBirthDate(ui.birthDate)
+        val householdSizeInt = ui.householdSize.toIntOrNull()
+        val householdIncomeInt = ui.householdIncome.toIntOrNull()
 
         val result = authRepository.updateProfile(
             name = ui.name,
             birthDate = formattedBirthDate,
             gender = ui.gender,
             address = ui.address,
-            postcode = ui.postcode
+            postcode = ui.postcode,
+            maritalStatus = ui.maritalStatus,
+            educationLevel = ui.educationLevel,
+            householdSize = householdSizeInt,
+            householdIncome = householdIncomeInt,
+            employmentStatus = ui.employmentStatus
         )
 
         result.onFailure { exception ->
