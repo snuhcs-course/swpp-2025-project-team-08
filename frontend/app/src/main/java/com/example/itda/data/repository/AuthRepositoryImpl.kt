@@ -90,4 +90,16 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<Unit> = runCatching {
         api.updatePreferences(satisfactionScores)
     }
+
+    override suspend fun saveEmail(email: String) {
+        pref.saveEmail(email)
+    }
+
+    override suspend fun getSavedEmail(): String? {
+        return pref.getSavedEmail()
+    }
+
+    override suspend fun clearSavedEmail() {
+        pref.clearSavedEmail()
+    }
 }

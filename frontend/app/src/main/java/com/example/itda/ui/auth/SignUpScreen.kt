@@ -7,12 +7,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.auth.components.InputField
+import com.example.itda.ui.auth.components.PrivacyPolicyDialog
 import com.example.itda.ui.common.theme.*
 
 @Composable
@@ -25,6 +30,8 @@ fun SignUpScreen(
     onAgreeTermsChange: (Boolean) -> Unit,
     onSubmit: () -> Unit,
 ) {
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -115,7 +122,11 @@ fun SignUpScreen(
                             checked = ui.agreeTerms,
                             onCheckedChange = onAgreeTermsChange,
                         )
-                        Column {
+                        Column(
+                            modifier = Modifier.clickable {
+                                showPrivacyDialog = true
+                            }
+                        ) {
                             Text(
                                 text = "개인정보 취급 동의",
                                 fontSize = 12.scaledSp,
@@ -196,6 +207,11 @@ fun SignUpScreen(
                 }
             }
         }
+        if(showPrivacyDialog) {
+            PrivacyPolicyDialog(
+                onDismiss = { showPrivacyDialog = false },
+                onAgree = { onAgreeTermsChange(true) }
+            )
+        }
     }
-
 }

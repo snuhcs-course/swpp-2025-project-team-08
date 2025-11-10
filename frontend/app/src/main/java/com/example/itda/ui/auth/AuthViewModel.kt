@@ -31,22 +31,11 @@ class AuthViewModel @Inject constructor(
     private val _isLoadingInitial = MutableStateFlow(true)
     val isLoadingInitial: StateFlow<Boolean> = _isLoadingInitial.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            _isLoadingInitial.value = true
-
-            val hasToken = authRepository.isLoggedInFlow.first()
-            _isLoggedIn.value = hasToken
-
-             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
-            _isLoadingInitial.value = false
-        }
-    }
-
     // 로그인 상태
     data class LoginUiState(
         val email: String = "",
         val password: String = "",
+        val rememberEmail: Boolean = false,
         val isLoading: Boolean = false,
         val emailError: String? = null,
         val passwordError: String? = null,
@@ -56,12 +45,33 @@ class AuthViewModel @Inject constructor(
     private val _loginUi = MutableStateFlow(LoginUiState())
     val loginUi: StateFlow<LoginUiState> = _loginUi.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            _isLoadingInitial.value = true
+
+            val hasToken = authRepository.isLoggedInFlow.first()
+            _isLoggedIn.value = hasToken
+
+            val savedEmail = authRepository.getSavedEmail()
+            if (!savedEmail.isNullOrBlank()) {
+                _loginUi.update { it.copy(email = savedEmail, rememberEmail = true) }
+            }
+
+             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
+            _isLoadingInitial.value = false
+        }
+    }
+
     fun onLoginEmailChange(v: String) {
         _loginUi.update { it.copy(email = v, emailError = null, generalError = null) }
     }
 
     fun onLoginPasswordChange(v: String) {
         _loginUi.update { it.copy(password = v, passwordError = null, generalError = null) }
+    }
+
+    fun onRememberEmailChange(v: Boolean) {
+        _loginUi.update { it.copy(rememberEmail = v) }
     }
 
     suspend fun submitLogin(): Boolean {
@@ -103,6 +113,12 @@ class AuthViewModel @Inject constructor(
 
         if (result.isSuccess) {
             _isLoggedIn.value = true
+
+            if (ui.rememberEmail) {
+                authRepository.saveEmail(ui.email)
+            } else {
+                authRepository.clearSavedEmail()
+            }
         }
 
         return result.isSuccess

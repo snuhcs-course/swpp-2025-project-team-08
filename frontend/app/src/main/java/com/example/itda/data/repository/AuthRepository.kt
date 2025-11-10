@@ -34,4 +34,10 @@ interface AuthRepository {
     suspend fun updatePreference(
         satisfactionScores: PreferenceRequestList
     ): Result<Unit>
+
+    suspend fun saveEmail(email: String)
+
+    suspend fun getSavedEmail(): String?
+
+    suspend fun clearSavedEmail()
 }

@@ -20,6 +20,7 @@ fun LoginRoute(
         ui = ui,
         onLoginEmailChange = vm::onLoginEmailChange,
         onLoginPasswordChange = vm::onLoginPasswordChange,
+        onRememberEmailChange = vm::onRememberEmailChange,
         onSubmit = {
             scope.launch {
                 if (vm.submitLogin()) onLoginSuccess()
