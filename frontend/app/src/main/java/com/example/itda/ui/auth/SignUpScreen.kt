@@ -106,7 +106,7 @@ fun SignUpScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // 약관 동의 (껏데기)
+                    // 약관 동의 (껍데기)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -119,8 +119,7 @@ fun SignUpScreen(
                             Text(
                                 text = "개인정보 취급 동의",
                                 fontSize = 12.scaledSp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "자세한 설명",

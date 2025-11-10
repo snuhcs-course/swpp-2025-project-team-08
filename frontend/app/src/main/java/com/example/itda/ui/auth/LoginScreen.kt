@@ -1,7 +1,5 @@
 package com.example.itda.ui.auth
 
-import android.R.attr.data
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -189,8 +187,8 @@ fun LoginScreen(
 //                    ) {
 //                        Text(
 //                            text = "비밀번호 찾기",
-//                            fontSize = 14.scaledSp,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            fontSize = 14.sp,
+//                            color = Neutral40,
 //                            modifier = Modifier
 //                                .clickable { }
 //                                .padding(8.dp)
