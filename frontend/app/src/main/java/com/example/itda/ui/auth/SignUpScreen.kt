@@ -37,7 +37,7 @@ fun SignUpScreen(
         ) {
             Text(
                 text = "잇다",
-                fontSize = 60.sp,
+                fontSize = 60.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = Neutral0
             )
@@ -46,7 +46,7 @@ fun SignUpScreen(
             // Login 타이틀
             Text(
                 text = "Sign Up",
-                fontSize = 24.sp,
+                fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
                 color = Neutral0,
                 modifier = Modifier
@@ -118,12 +118,12 @@ fun SignUpScreen(
                         Column {
                             Text(
                                 text = "개인정보 취급 동의",
-                                fontSize = 12.sp,
+                                fontSize = 12.scaledSp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "자세한 설명",
-                                fontSize = 10.sp,
+                                fontSize = 10.scaledSp,
                                 color = Neutral40
                             )
                         }
@@ -135,7 +135,7 @@ fun SignUpScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = ui.generalError,
-                            fontSize = 12.sp,
+                            fontSize = 12.scaledSp,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 4.dp)
                         )
@@ -163,7 +163,7 @@ fun SignUpScreen(
                     ) {
                         Text(
                             "회원가입",
-                            fontSize = 16.sp,
+                            fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
                             color = if (isFormValid) Neutral100 else Neutral40
                         )
@@ -177,12 +177,12 @@ fun SignUpScreen(
                     ) {
                         Text(
                             text = "이미 계정이 있으신가요? ",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = Neutral40
                         )
                         Text(
                             text = "로그인하기",
-                            fontSize = 14.sp,
+                            fontSize = 14.scaledSp,
                             color = Neutral10,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {

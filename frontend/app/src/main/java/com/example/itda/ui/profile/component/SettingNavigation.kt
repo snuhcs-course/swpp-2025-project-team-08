@@ -25,7 +25,7 @@ fun NavGraphBuilder.settingNavGraph(
                 navController.navigate(destination.route)
             },
             toggleDarkMode = viewModel::toggleDarkMode,
-            toggleAlarm = viewModel::toggleAlarm,
+            onFontSizeChange = viewModel::setFontSize,
             onLogout = {
                 viewModel.logout()
                 // 로그아웃 후 로그인 화면으로 이동

@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.Neutral20
 import com.example.itda.ui.common.theme.Primary60
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun SearchResultHeader(
@@ -23,14 +24,14 @@ fun SearchResultHeader(
     ) {
         Text(
             text = "'$searchQuery'",
-            fontSize = 18.sp,
+            fontSize = 18.scaledSp,
             fontWeight = FontWeight.Bold,
             color = Primary60
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "검색 결과 ${totalResults}개",
-            fontSize = 18.sp,
+            fontSize = 18.scaledSp,
             fontWeight = FontWeight.Medium,
             color = Neutral20
         )

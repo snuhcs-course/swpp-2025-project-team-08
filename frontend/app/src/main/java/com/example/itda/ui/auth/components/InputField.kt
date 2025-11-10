@@ -31,7 +31,7 @@ fun InputField(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 14.scaledSp,
             fontWeight = FontWeight.Medium,
             color = Neutral10,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -61,7 +61,7 @@ fun InputField(
                 {
                     Text(
                         text = errorMessage,
-                        fontSize = 12.sp,
+                        fontSize = 12.scaledSp,
                         color = MaterialTheme.colorScheme.error
                     )
                 }

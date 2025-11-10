@@ -18,20 +18,27 @@ import kotlinx.coroutines.flow.combine
 class SettingsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val settingsDataStore: SettingsDataStore  // 👈 추가
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
 
     data class SettingsUiState(
         val darkMode: Boolean = false,
-        val alarmEnabled: Boolean = true,
+        val fontSize: FontSize = FontSize.MEDIUM,
         val isLoading: Boolean = false,
     )
+
+    enum class FontSize(val displayName: String, val scale: Float) {
+        SMALL("작게", 0.9f),
+        MEDIUM("보통", 1.0f),
+        LARGE("크게", 1.1f),
+        EXTRA_LARGE("매우 크게", 1.2f)
+    }
 
     private val _settingsUi = MutableStateFlow(SettingsUiState())
     val settingsUi: StateFlow<SettingsUiState> = _settingsUi.asStateFlow()
 
     init {
-        loadSettings()  // 👈 초기 로드
+        loadSettings()
     }
 
     private fun loadSettings() {
@@ -39,11 +46,11 @@ class SettingsViewModel @Inject constructor(
             // 두 Flow를 combine해서 UI State 업데이트
             combine(
                 settingsDataStore.darkModeFlow,
-                settingsDataStore.alarmEnabledFlow
-            ) { darkMode, alarmEnabled ->
+                settingsDataStore.fontSizeFlow
+            ) { darkMode, fontSize ->
                 SettingsUiState(
                     darkMode = darkMode,
-                    alarmEnabled = alarmEnabled,
+                    fontSize = fontSize,
                     isLoading = false
                 )
             }.collect { state ->
@@ -55,15 +62,14 @@ class SettingsViewModel @Inject constructor(
     fun toggleDarkMode() {
         viewModelScope.launch {
             val newValue = !_settingsUi.value.darkMode
-            settingsDataStore.setDarkMode(newValue)  // 👈 저장
+            settingsDataStore.setDarkMode(newValue)
             // Flow가 자동으로 UI 업데이트
         }
     }
 
-    fun toggleAlarm() {
+    fun setFontSize(fontSize: FontSize) {
         viewModelScope.launch {
-            val newValue = !_settingsUi.value.alarmEnabled
-            settingsDataStore.setAlarmEnabled(newValue)  // 👈 저장
+            settingsDataStore.setFontSize(fontSize)
         }
     }
 

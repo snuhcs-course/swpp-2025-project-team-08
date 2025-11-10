@@ -5,7 +5,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.itda.ui.profile.SettingsViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,14 +22,21 @@ class SettingsDataStore @Inject constructor(
 ) {
     private object PreferencesKeys {
         val DARK_MODE = booleanPreferencesKey("dark_mode")
-        val ALARM_ENABLED = booleanPreferencesKey("alarm_enabled")
+        val FONT_SIZE = stringPreferencesKey("font_size")
     }
 
-    val darkModeFlow: Flow<Boolean> = context.dataStore.data
-        .map { preferences -> preferences[PreferencesKeys.DARK_MODE] ?: false }
+    val darkModeFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.DARK_MODE] ?: false
+    }
 
-    val alarmEnabledFlow: Flow<Boolean> = context.dataStore.data
-        .map { preferences -> preferences[PreferencesKeys.ALARM_ENABLED] ?: true }
+    val fontSizeFlow: Flow<SettingsViewModel.FontSize> = context.dataStore.data.map { preferences ->
+        val fontSizeString = preferences[PreferencesKeys.FONT_SIZE] ?: SettingsViewModel.FontSize.MEDIUM.name
+        try {
+            SettingsViewModel.FontSize.valueOf(fontSizeString)
+        } catch (e: IllegalArgumentException) {
+            SettingsViewModel.FontSize.MEDIUM
+        }
+    }
 
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { preferences ->
@@ -35,9 +44,9 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
-    suspend fun setAlarmEnabled(enabled: Boolean) {
+    suspend fun setFontSize(fontSize: SettingsViewModel.FontSize) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.ALARM_ENABLED] = enabled
+            preferences[PreferencesKeys.FONT_SIZE] = fontSize.name
         }
     }
 }

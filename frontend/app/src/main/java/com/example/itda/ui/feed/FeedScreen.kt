@@ -31,6 +31,7 @@ import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
 import com.example.itda.ui.feed.components.FeedSummaryCard
 import com.example.itda.ui.navigation.LoadingScreen
+import com.example.itda.ui.common.theme.*
 
 
 @SuppressLint("QueryPermissionsNeeded")
@@ -81,7 +82,7 @@ fun FeedScreen(
                     Text(
                         text = "신청하러가기",
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 16.sp
+                        fontSize = 16.scaledSp
                     )
                 }
             }
