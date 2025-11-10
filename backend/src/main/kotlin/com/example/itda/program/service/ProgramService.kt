@@ -1,5 +1,6 @@
 package com.example.itda.program.service
 
+import com.example.itda.program.ProgramNotFoundException
 import com.example.itda.program.controller.ProgramCategoryResponse
 import com.example.itda.program.controller.ProgramResponse
 import com.example.itda.program.controller.ProgramSummaryResponse
@@ -12,10 +13,8 @@ import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class ProgramService(
@@ -35,9 +34,7 @@ class ProgramService(
 
     @Transactional(readOnly = true)
     fun getProgram(id: Long): ProgramResponse {
-        val program =
-            programRepository.findByIdOrNull(id)
-                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found: $id")
+        val program = programRepository.findByIdOrNull(id) ?: throw ProgramNotFoundException()
 
         return ProgramResponse.fromEntity(program)
     }
@@ -52,9 +49,7 @@ class ProgramService(
 
     fun getProgramExample(id: Long): ProgramResponse {
         val program =
-            programExampleRepository.findByIdOrNull(id)
-                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found: $id")
-
+            programExampleRepository.findByIdOrNull(id) ?: throw ProgramNotFoundException()
         return ProgramResponse.fromEntity(program)
     }
 
