@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.ui.auth.components.*
 import com.example.itda.ui.common.theme.*
 
@@ -26,6 +25,11 @@ fun PersonalInfoScreen(
     onGenderChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onPostCodeChange: (String) -> Unit,
+    onMaritalStatusChange: (String?) -> Unit,
+    onEducationLevelChange: (String?) -> Unit,
+    onHouseholdSizeChange: (String) -> Unit,
+    onHouseholdIncomeChange: (String) -> Unit,
+    onEmploymentStatusChange: (String?) -> Unit,
     onSubmit: () -> Unit
 ) {
     var showAddressDialog by remember { mutableStateOf(false) }
@@ -40,8 +44,7 @@ fun PersonalInfoScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(top = 56.dp, bottom = 16.dp) // 상하 여백 추가
-
+            contentPadding = PaddingValues(top = 56.dp, bottom = 16.dp)
         ) {
             item {
                 Text(
@@ -72,6 +75,7 @@ fun PersonalInfoScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
+            // ========== 첫 번째 카드: 필수 입력 항목 ==========
             item {
                 Card(
                     modifier = Modifier
@@ -91,7 +95,6 @@ fun PersonalInfoScreen(
                             .fillMaxWidth()
                             .padding(24.dp)
                     ) {
-                        // 기존 폼 내용들 (성함, 생년월일, 성별, 주소)
                         InputField(
                             label = "성함",
                             value = ui.name,
@@ -108,6 +111,8 @@ fun PersonalInfoScreen(
                             onValueChange = onBirthDateChange,
                             errorMessage = ui.birthDateError
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = "성별",
@@ -145,7 +150,7 @@ fun PersonalInfoScreen(
                         )
                     }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = "주소",
@@ -224,6 +229,139 @@ fun PersonalInfoScreen(
                                 modifier = Modifier.padding(start = 4.dp)
                             )
                         }
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(horizontal = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "💡딱 맞는 복지 프로그램을 찾아드릴 수 있어요!",
+                        fontSize = 16.scaledSp,
+                        fontWeight = FontWeight.Bold,
+                        color = Neutral10,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "아래 정보를 알려주시면\n" +
+                                "회원님께 꼭 맞는 복지 프로그램을 추천해드려요.\n\n" +
+                                "지금 입력하지 않아도 괜찮아요.\n" +
+                                "나중에 언제든 추가하거나 바꿀 수 있어요!",
+                        fontSize = 14.scaledSp,
+                        color = Neutral40,
+                        lineHeight = 20.scaledSp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Neutral100
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 0.dp
+                    ),
+                    border = BorderStroke(1.dp, Neutral90)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp)
+                    ) {
+                        Text(
+                            text = "혼인 상태",
+                            fontSize = 14.scaledSp,
+                            fontWeight = FontWeight.Medium,
+                            color = Neutral10,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        SelectionButtonRow(
+                            options = listOf(
+                                "SINGLE" to "미혼",
+                                "MARRIED" to "기혼",
+                                "DIVORCED_OR_BEREAVED" to "이혼/사별"
+                            ),
+                            selectedValue = ui.maritalStatus,
+                            onOptionSelected = onMaritalStatusChange
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "최종 학력",
+                            fontSize = 14.scaledSp,
+                            fontWeight = FontWeight.Medium,
+                            color = Neutral10,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        EducationLevelDropdown(
+                            selectedValue = ui.educationLevel,
+                            onValueSelected = onEducationLevelChange
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        NumberInputField(
+                            label = "가구원 수",
+                            value = ui.householdSize,
+                            onValueChange = onHouseholdSizeChange,
+                            placeholder = "예: 4",
+                            suffix = "명"
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        NumberInputField(
+                            label = "연간 가구 소득",
+                            value = ui.householdIncome,
+                            onValueChange = onHouseholdIncomeChange,
+                            placeholder = "예: 5000",
+                            suffix = "만원"
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "고용 상태",
+                            fontSize = 14.scaledSp,
+                            fontWeight = FontWeight.Medium,
+                            color = Neutral10,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        SelectionButtonRow(
+                            options = listOf(
+                                "EMPLOYED" to "재직자",
+                                "UNEMPLOYED" to "미취업자",
+                                "SELF_EMPLOYED" to "자영업자"
+                            ),
+                            selectedValue = ui.employmentStatus,
+                            onOptionSelected = onEmploymentStatusChange
+                        )
 
                         if (ui.generalError != null) {
                             Spacer(modifier = Modifier.height(8.dp))
@@ -281,8 +419,6 @@ fun PersonalInfoScreen(
                                 )
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(24.dp)) // 하단 여백 추가
                     }
                 }
             }

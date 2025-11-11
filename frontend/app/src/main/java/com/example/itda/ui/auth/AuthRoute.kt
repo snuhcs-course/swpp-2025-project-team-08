@@ -20,6 +20,7 @@ fun LoginRoute(
         ui = ui,
         onLoginEmailChange = vm::onLoginEmailChange,
         onLoginPasswordChange = vm::onLoginPasswordChange,
+        onRememberEmailChange = vm::onRememberEmailChange,
         onSubmit = {
             scope.launch {
                 if (vm.submitLogin()) onLoginSuccess()
@@ -72,6 +73,11 @@ fun PersonalInfoRoute(
         onGenderChange = vm::onGenderChange,
         onAddressChange = vm::onAddressChange,
         onPostCodeChange = vm::onPostCodeChange,
+        onMaritalStatusChange = vm::onMaritalStatusChange,
+        onEducationLevelChange = vm::onEducationLevelChange,
+        onHouseholdSizeChange = vm::onHouseholdSizeChange,
+        onHouseholdIncomeChange = vm::onHouseholdIncomeChange,
+        onEmploymentStatusChange = vm::onEmploymentStatusChange,
 
         onSubmit = {
             scope.launch {

@@ -37,7 +37,6 @@ fun RecentSearchChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // 검색어 텍스트
             Text(
                 text = searchQuery,
                 fontSize = 14.scaledSp,
@@ -45,7 +44,6 @@ fun RecentSearchChip(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // 삭제 아이콘
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "삭제",

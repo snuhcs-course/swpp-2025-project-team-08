@@ -27,6 +27,7 @@ class PrefDataSource @Inject constructor(
         val TOKEN_TYPE = stringPreferencesKey("token_type")
         val EXPIRES_IN = intPreferencesKey("expires_in")
         val USER_CACHE = stringPreferencesKey("user_cache")
+        val SAVED_EMAIL = stringPreferencesKey("saved_email")
     }
 
     // 토큰 Flow
@@ -41,6 +42,11 @@ class PrefDataSource @Inject constructor(
     // 👇 User 캐시 Flow 추가
     val userCacheFlow: Flow<String?> = context.dataStore.data.map {
         it[Keys.USER_CACHE]
+    }
+
+    // 저장된 이메일 Flow
+    val savedEmailFlow: Flow<String?> = context.dataStore.data.map {
+        it[Keys.SAVED_EMAIL]
     }
 
     // 토큰 저장
@@ -106,6 +112,31 @@ class PrefDataSource @Inject constructor(
         try {
             context.dataStore.edit { prefs ->
                 prefs.remove(Keys.USER_CACHE)
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    // 이메일 저장
+    suspend fun saveEmail(email: String) {
+        try {
+            context.dataStore.edit { prefs ->
+                prefs[Keys.SAVED_EMAIL] = email.trim()
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    // 저장된 이메일 가져오기
+    suspend fun getSavedEmail(): String? = savedEmailFlow.firstOrNull()
+
+    // 저장된 이메일 삭제
+    suspend fun clearSavedEmail() {
+        try {
+            context.dataStore.edit { prefs ->
+                prefs.remove(Keys.SAVED_EMAIL)
             }
         } catch (e: Exception) {
             throw e

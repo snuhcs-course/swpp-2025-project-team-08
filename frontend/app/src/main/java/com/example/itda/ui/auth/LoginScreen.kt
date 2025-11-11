@@ -24,6 +24,7 @@ fun LoginScreen(
     ui: AuthViewModel.LoginUiState,
     onLoginEmailChange: (String) -> Unit,
     onLoginPasswordChange: (String) -> Unit,
+    onRememberEmailChange: (Boolean) -> Unit,
     onSubmit: () -> Unit,
     onSignUpClick: () -> Unit
 ) {
@@ -97,7 +98,33 @@ fun LoginScreen(
                         errorMessage = ui.passwordError
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 아이디 저장 체크박스
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onRememberEmailChange(!ui.rememberEmail) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = ui.rememberEmail,
+                            onCheckedChange = onRememberEmailChange,
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Primary60,
+                                uncheckedColor = Neutral60
+                            )
+                        )
+                        Text(
+                            text = "아이디 저장",
+                            fontSize = 14.sp,
+                            color = Neutral20,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     if (ui.generalError != null) {
                         Card(

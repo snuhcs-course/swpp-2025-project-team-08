@@ -31,22 +31,11 @@ class AuthViewModel @Inject constructor(
     private val _isLoadingInitial = MutableStateFlow(true)
     val isLoadingInitial: StateFlow<Boolean> = _isLoadingInitial.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            _isLoadingInitial.value = true
-
-            val hasToken = authRepository.isLoggedInFlow.first()
-            _isLoggedIn.value = hasToken
-
-             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
-            _isLoadingInitial.value = false
-        }
-    }
-
     // 로그인 상태
     data class LoginUiState(
         val email: String = "",
         val password: String = "",
+        val rememberEmail: Boolean = false,
         val isLoading: Boolean = false,
         val emailError: String? = null,
         val passwordError: String? = null,
@@ -56,12 +45,33 @@ class AuthViewModel @Inject constructor(
     private val _loginUi = MutableStateFlow(LoginUiState())
     val loginUi: StateFlow<LoginUiState> = _loginUi.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            _isLoadingInitial.value = true
+
+            val hasToken = authRepository.isLoggedInFlow.first()
+            _isLoggedIn.value = hasToken
+
+            val savedEmail = authRepository.getSavedEmail()
+            if (!savedEmail.isNullOrBlank()) {
+                _loginUi.update { it.copy(email = savedEmail, rememberEmail = true) }
+            }
+
+             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
+            _isLoadingInitial.value = false
+        }
+    }
+
     fun onLoginEmailChange(v: String) {
         _loginUi.update { it.copy(email = v, emailError = null, generalError = null) }
     }
 
     fun onLoginPasswordChange(v: String) {
         _loginUi.update { it.copy(password = v, passwordError = null, generalError = null) }
+    }
+
+    fun onRememberEmailChange(v: Boolean) {
+        _loginUi.update { it.copy(rememberEmail = v) }
     }
 
     suspend fun submitLogin(): Boolean {
@@ -103,6 +113,12 @@ class AuthViewModel @Inject constructor(
 
         if (result.isSuccess) {
             _isLoggedIn.value = true
+
+            if (ui.rememberEmail) {
+                authRepository.saveEmail(ui.email)
+            } else {
+                authRepository.clearSavedEmail()
+            }
         }
 
         return result.isSuccess
@@ -229,11 +245,20 @@ class AuthViewModel @Inject constructor(
 
     // 기본 개인 정보 입력 상태
     data class PersonalInfoUiState(
+        // 필수
         val name: String = "",
         val birthDate: String = "",
         val gender: String = "",
         val address: String = "",
         val postcode: String = "",
+
+        // 선택
+        val maritalStatus: String? = null,
+        val educationLevel: String? = null,
+        val householdSize: String = "",
+        val householdIncome: String = "",
+        val employmentStatus: String? = null,
+
         val isLoading: Boolean = false,
         val nameError: String? = null,
         val birthDateError: String? = null,
@@ -267,6 +292,26 @@ class AuthViewModel @Inject constructor(
         _personalInfoUi.update { it.copy(postcode = v, postcodeError = null, generalError = null) }
     }
 
+    fun onMaritalStatusChange(v: String?) {
+        _personalInfoUi.update { it.copy(maritalStatus = v, generalError = null) }
+    }
+
+    fun onEducationLevelChange(v: String?) {
+        _personalInfoUi.update { it.copy(educationLevel = v, generalError = null) }
+    }
+
+    fun onHouseholdSizeChange(v: String) {
+        _personalInfoUi.update { it.copy(householdSize = v, generalError = null) }
+    }
+
+    fun onHouseholdIncomeChange(v: String) {
+        _personalInfoUi.update { it.copy(householdIncome = v, generalError = null) }
+    }
+
+    fun onEmploymentStatusChange(v: String?) {
+        _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
+    }
+
     suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
@@ -298,6 +343,11 @@ class AuthViewModel @Inject constructor(
             hasError = true
         }
 
+        if (ui.postcode.isBlank()) {
+            _personalInfoUi.update { it.copy(postcodeError = "우편번호를 입력해주세요") }
+            hasError = true
+        }
+
         if (hasError) return false
 
         _personalInfoUi.update {
@@ -313,13 +363,20 @@ class AuthViewModel @Inject constructor(
         }
 
         val formattedBirthDate = formatBirthDate(ui.birthDate)
+        val householdSizeInt = ui.householdSize.toIntOrNull()
+        val householdIncomeInt = ui.householdIncome.toIntOrNull()
 
         val result = authRepository.updateProfile(
             name = ui.name,
             birthDate = formattedBirthDate,
             gender = ui.gender,
             address = ui.address,
-            postcode = ui.postcode
+            postcode = ui.postcode,
+            maritalStatus = ui.maritalStatus,
+            educationLevel = ui.educationLevel,
+            householdSize = householdSizeInt,
+            householdIncome = householdIncomeInt,
+            employmentStatus = ui.employmentStatus
         )
 
         result.onFailure { exception ->
@@ -404,10 +461,7 @@ class AuthViewModel @Inject constructor(
             _preferenceUi.update { it.copy(isLoading = false) }
             return true
         }
-
         return false
-
-
     }
 
 }
