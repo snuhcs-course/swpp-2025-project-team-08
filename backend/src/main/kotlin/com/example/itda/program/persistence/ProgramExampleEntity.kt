@@ -26,7 +26,7 @@ class ProgramExampleEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Long,
+    var id: Long? = null,
     @Column(name = "uuid", nullable = false, unique = true, length = 255)
     var uuid: String,
     @Enumerated(EnumType.STRING)

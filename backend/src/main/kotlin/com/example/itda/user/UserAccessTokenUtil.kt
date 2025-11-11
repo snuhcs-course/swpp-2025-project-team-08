@@ -54,33 +54,7 @@ object UserAccessTokenUtil {
         }
     }
 
-    fun getRefreshTokenExpirationSeconds(): Long {
-        return REFRESH_TOKEN_EXPIRATION_TIME / 1000L
-    }
-
     fun getAccessTokenExpirationSeconds(): Long {
         return ACCESS_TOKEN_EXPIRATION_TIME / 1000L
-    }
-
-    fun getUserIdFromToken(token: String): String {
-        val claims =
-            Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-        return claims.body.subject
-    }
-
-    fun validateToken(token: String): Boolean {
-        return try {
-            val claims =
-                Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
-                    .build()
-                    .parseClaimsJws(token)
-            !claims.body.expiration.before(Date())
-        } catch (e: Exception) {
-            false
-        }
     }
 }

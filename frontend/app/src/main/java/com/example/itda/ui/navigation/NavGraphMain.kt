@@ -23,7 +23,7 @@ import com.example.itda.ui.profile.PersonalInfoScreen
 import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
 import com.example.itda.ui.profile.component.settingNavGraph
-import com.example.itda.ui.search.SearchScreen
+import com.example.itda.ui.search.SearchRoute
 
 // Bottom Navigation 탭의 경로 목록을 정의합니다.
 private val MainTabRoutes = listOf(
@@ -48,7 +48,7 @@ fun NavGraphBuilder.mainGraph(
                             onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)
                         )
-                        "search" -> SearchScreen(
+                        "search" -> SearchRoute(
                             onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)
                          )

@@ -10,25 +10,38 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
 import com.example.itda.ui.search.components.*
-import com.example.itda.data.model.dummyCategories
-import com.example.itda.ui.home.components.ProgramFilterRow
 
 @Composable
 fun SearchScreen(
+    uiState: SearchViewModel.SearchUiState,
     onFeedClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = hiltViewModel()
+    onSearchQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    onLoadNext: () -> Unit,
+    onRecentSearchClick: (String) -> Unit,
+    onDeleteRecentSearch: (String) -> Unit,
+    onClearAllRecentSearches: () -> Unit,
+    onSortTypeChange: (SearchViewModel.SortType) -> Unit,
+    onCategorySelected: (Category) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+
+    LaunchedEffect(uiState.searchResults.firstOrNull()?.id, uiState.sortType) {
+        if (uiState.searchResults.isNotEmpty()) {
+            listState.scrollToItem(0)
+        }
+    }
 
     LaunchedEffect(listState) {
         val threshold = 4
@@ -41,7 +54,7 @@ fun SearchScreen(
                 val shouldLoadMore = lastVisibleItemIndex >= (totalItemCount - threshold)
 
                 if (shouldLoadMore && totalItemCount > 0 && uiState.hasSearched) {
-                    viewModel.onLoadNext()
+                    onLoadNext()
                 }
             }
     }
@@ -59,8 +72,8 @@ fun SearchScreen(
 
             SearchInputField(
                 query = uiState.searchQuery,
-                onQueryChange = { viewModel.onSearchQueryChange(it) },
-                onSearch = { viewModel.onSearch() },
+                onQueryChange = onSearchQueryChange,
+                onSearch = onSearch,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -87,7 +100,7 @@ fun SearchScreen(
                             fontSize = 14.scaledSp,
                             color = Neutral50,
                             modifier = Modifier.clickable {
-                                viewModel.onClearAllRecentSearches()
+                                onClearAllRecentSearches()
                             }
                         )
                     }
@@ -106,10 +119,44 @@ fun SearchScreen(
                             RecentSearchChip(
                                 searchQuery = searchQuery,
                                 onItemClick = {
-                                    viewModel.onRecentSearchClick(searchQuery)
+                                    onRecentSearchClick(searchQuery)
                                 },
                                 onDeleteClick = {
-                                    viewModel.onDeleteRecentSearch(searchQuery)
+                                    onDeleteRecentSearch(searchQuery)
+                                }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "💡 이런 키워드로 검색해보세요 !",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Neutral20,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(
+                            items = uiState.recommendedKeywords,
+                            key = { it }
+                        ) { keyword ->
+                            RecommendedSearchChip(
+                                keyword = keyword,
+                                onClick = {
+                                    onRecentSearchClick(keyword)
                                 }
                             )
                         }
@@ -136,15 +183,15 @@ fun SearchScreen(
 
                             SearchFilterRow(
                                 sortType = uiState.sortType,
-                                onSortTypeChange = { viewModel.onSortTypeChange(it) }
+                                onSortTypeChange = onSortTypeChange
                             )
                         }
 
-//                        ProgramFilterRow(
-//                            categories = dummyCategories,
-//                            selectedCategory = uiState.selectedCategory,
-//                            onCategorySelected = { viewModel.onCategorySelected(uiState.selectedCategory) }
-//                        )
+                        ProgramFilterRow(
+                            categories = uiState.categories,
+                            selectedCategory = uiState.selectedCategory,
+                            onCategorySelected = onCategorySelected
+                        )
 
                         FeedList(
                             items = uiState.searchResults,
