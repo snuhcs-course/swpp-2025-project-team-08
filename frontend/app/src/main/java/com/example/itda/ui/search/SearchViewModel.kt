@@ -28,7 +28,7 @@ class SearchViewModel @Inject constructor(
         val searchQuery: String = "",
         val recentSearches: List<String> = emptyList(),
         val recommendedKeywords: List<String> = listOf(
-            "건강", "돌봄", "치매 예방", "일자리", "복지관", "주거"
+            "건강", "돌봄", "치매", "일자리", "복지관", "주거"
         ),
         val isSearching: Boolean = false,
         val hasSearched: Boolean = false,

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.*
 
 /**
- * 추천 검색어 칩 (아웃라인 스타일)
+ * 추천 검색어 칩
  */
 @Composable
 fun RecommendedSearchChip(
