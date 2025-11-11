@@ -11,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +27,9 @@ class SearchViewModel @Inject constructor(
     data class SearchUiState(
         val searchQuery: String = "",
         val recentSearches: List<String> = emptyList(),
+        val recommendedKeywords: List<String> = listOf(
+            "건강", "돌봄", "치매 예방", "일자리", "복지관", "주거"
+        ),
         val isSearching: Boolean = false,
         val hasSearched: Boolean = false,
         val searchResults: List<ProgramResponse> = emptyList(),
@@ -47,7 +49,8 @@ class SearchViewModel @Inject constructor(
 
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(
-            searchQuery = query
+            searchQuery = query,
+            hasSearched = if (query.trim().isEmpty()) false else _uiState.value.hasSearched
         )
     }
 
