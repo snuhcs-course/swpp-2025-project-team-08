@@ -28,7 +28,7 @@ fun SignUpScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Neutral100),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -39,7 +39,7 @@ fun SignUpScreen(
                 text = "잇다",
                 fontSize = 60.scaledSp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -48,7 +48,7 @@ fun SignUpScreen(
                 text = "Sign Up",
                 fontSize = 24.scaledSp,
                 fontWeight = FontWeight.Bold,
-                color = Neutral0,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .padding(start = 10.dp)
@@ -62,12 +62,12 @@ fun SignUpScreen(
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Neutral100
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 0.dp
                 ),
-                border = BorderStroke(1.dp, Neutral90)
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Column(
                     modifier = Modifier
@@ -124,7 +124,7 @@ fun SignUpScreen(
                             Text(
                                 text = "자세한 설명",
                                 fontSize = 10.scaledSp,
-                                color = Neutral40
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -153,10 +153,10 @@ fun SignUpScreen(
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isFormValid)
-                                Primary60
+                                MaterialTheme.colorScheme.primary
                             else
-                                Neutral90,
-                            disabledContainerColor = Neutral80
+                                MaterialTheme.colorScheme.surfaceVariant,
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         shape = RoundedCornerShape(8.dp),
                         enabled = isFormValid
@@ -165,7 +165,10 @@ fun SignUpScreen(
                             "회원가입",
                             fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = if (isFormValid) Neutral100 else Neutral40
+                            color = if (isFormValid)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -178,12 +181,12 @@ fun SignUpScreen(
                         Text(
                             text = "이미 계정이 있으신가요? ",
                             fontSize = 14.scaledSp,
-                            color = Neutral40
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "로그인하기",
                             fontSize = 14.scaledSp,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable {
                                 onLoginClick()

@@ -34,7 +34,8 @@ fun PersonalInfoScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Neutral100)
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -47,7 +48,7 @@ fun PersonalInfoScreen(
                     text = "당신을 알려주세요!",
                     fontSize = 32.scaledSp,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral0
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -61,7 +62,7 @@ fun PersonalInfoScreen(
                             "입력받아 여러분이 찾고 계실 정책,\n" +
                             "지원 사업등을 추천해드리고 있습니다!",
                     fontSize = 14.scaledSp,
-                    color = Neutral40,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 32.dp)
                 )
@@ -78,12 +79,12 @@ fun PersonalInfoScreen(
                         .wrapContentHeight(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Neutral100
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 0.dp
                     ),
-                    border = BorderStroke(1.dp, Neutral90)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Column(
                         modifier = Modifier
@@ -112,7 +113,7 @@ fun PersonalInfoScreen(
                             text = "성별",
                             fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -134,15 +135,15 @@ fun PersonalInfoScreen(
                             )
                         }
 
-                        if (ui.genderError != null) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = ui.genderError,
-                                fontSize = 12.scaledSp,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(start = 4.dp)
-                            )
-                        }
+                    if (ui.genderError != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = ui.genderError,
+                            fontSize = 12.scaledSp,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -150,7 +151,7 @@ fun PersonalInfoScreen(
                             text = "주소",
                             fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -160,11 +161,11 @@ fun PersonalInfoScreen(
                                 .clickable { showAddressDialog = true },
                             shape = RoundedCornerShape(8.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = Neutral95
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
                             border = BorderStroke(
                                 1.dp,
-                                if (ui.addressError != null) MaterialTheme.colorScheme.error else Neutral80
+                                if (ui.addressError != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
                             )
                         ) {
                             Column(
@@ -177,19 +178,19 @@ fun PersonalInfoScreen(
                                         text = "[${selectedAddress!!.zonecode}]",
                                         fontSize = 14.scaledSp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = Primary60
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = selectedAddress!!.address,
                                         fontSize = 14.scaledSp,
-                                        color = Neutral10
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 } else {
                                     Text(
                                         text = "주소를 검색해주세요",
                                         fontSize = 14.scaledSp,
-                                        color = Neutral60,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.alpha(0.6f)
                                     )
                                 }
@@ -202,9 +203,9 @@ fun PersonalInfoScreen(
                             onClick = { showAddressDialog = true },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Primary60
+                                contentColor = MaterialTheme.colorScheme.primary
                             ),
-                            border = BorderStroke(1.dp, Primary60),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
@@ -253,8 +254,11 @@ fun PersonalInfoScreen(
                                 .fillMaxWidth()
                                 .height(56.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isFormValid) Primary60 else Neutral90,
-                                disabledContainerColor = Neutral80
+                                containerColor = if (isFormValid)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
                             shape = RoundedCornerShape(8.dp),
                             enabled = isFormValid && !ui.isLoading
@@ -262,7 +266,7 @@ fun PersonalInfoScreen(
                             if (ui.isLoading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
-                                    color = Neutral100,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     strokeWidth = 2.dp
                                 )
                             } else {
@@ -270,7 +274,10 @@ fun PersonalInfoScreen(
                                     "제출하기",
                                     fontSize = 16.scaledSp,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (isFormValid) Neutral100 else Neutral40
+                                    color = if (isFormValid)
+                                        MaterialTheme.colorScheme.onPrimary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

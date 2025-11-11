@@ -256,3 +256,4 @@ fun SearchScreen(
         }
     }
 }
+
