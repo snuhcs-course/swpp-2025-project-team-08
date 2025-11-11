@@ -343,6 +343,11 @@ class AuthViewModel @Inject constructor(
             hasError = true
         }
 
+        if (ui.postcode.isBlank()) {
+            _personalInfoUi.update { it.copy(postcodeError = "우편번호를 입력해주세요") }
+            hasError = true
+        }
+
         if (hasError) return false
 
         _personalInfoUi.update {
@@ -456,10 +461,7 @@ class AuthViewModel @Inject constructor(
             _preferenceUi.update { it.copy(isLoading = false) }
             return true
         }
-
         return false
-
-
     }
 
 }
