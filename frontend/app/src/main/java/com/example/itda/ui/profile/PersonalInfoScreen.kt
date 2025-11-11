@@ -3,38 +3,36 @@ package com.example.itda.ui.profile
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.components.AddressResult
 import com.example.itda.ui.auth.components.KakaoAddressSearchDialog
-import com.example.itda.ui.common.theme.*
-import com.example.itda.ui.common.theme.Neutral30
-import kotlinx.coroutines.launch
-import com.example.itda.ui.profile.PersonalInfoViewModel
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import com.example.itda.ui.auth.components.isValidBirthDate
+import com.example.itda.ui.common.theme.scaledSp
+import com.example.itda.ui.profile.PersonalInfoViewModel
+import kotlinx.coroutines.launch
 
 // 생년월일 VisualTransformation (20010101 -> 2001-01-01)
 class BirthDateVisualTransformation : VisualTransformation {
@@ -99,25 +97,20 @@ fun PersonalInfoScreen(
     onEmploymentStatusChange: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
-    // 주소 검색 다이얼로그 표시 여부
     var showAddressDialog by remember { mutableStateOf(false) }
-    // 선택된 주소 정보
     var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
 
-    // 스크롤 상태
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
-    // 각 필드의 Y 위치를 저장
     var nameFieldY by remember { mutableFloatStateOf(0f) }
     var birthDateFieldY by remember { mutableFloatStateOf(0f) }
     var genderFieldY by remember { mutableFloatStateOf(0f) }
     var addressFieldY by remember { mutableFloatStateOf(0f) }
 
-    // Snackbar 호스트
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // 🔧 서버에서 불러온 주소가 있으면 selectedAddress 초기화
+    // 서버에서 불러온 주소 초기화
     LaunchedEffect(ui.address, ui.postcode) {
         if (ui.address.isNotBlank() && ui.postcode.isNotBlank() && selectedAddress == null) {
             selectedAddress = AddressResult(
@@ -127,7 +120,7 @@ fun PersonalInfoScreen(
         }
     }
 
-    // ✨ 에러 발생 시 자동 스크롤 및 Snackbar 표시
+    // 에러 발생 시 스크롤 + Snackbar
     LaunchedEffect(
         ui.nameError,
         ui.birthDateError,
@@ -135,7 +128,6 @@ fun PersonalInfoScreen(
         ui.addressError,
         ui.generalError
     ) {
-        // 첫 번째 에러 필드로 스크롤
         val targetY = when {
             ui.nameError != null -> nameFieldY
             ui.birthDateError != null -> birthDateFieldY
@@ -145,14 +137,12 @@ fun PersonalInfoScreen(
         }
 
         if (targetY != null) {
-            // 약간 위쪽 여백을 두고 스크롤 (100dp)
             val scrollToY = (targetY - 100.dp.value).coerceAtLeast(0f)
             coroutineScope.launch {
                 scrollState.animateScrollTo(scrollToY.toInt())
             }
         }
 
-        // Snackbar로 에러 메시지 표시
         val errorMessage = ui.nameError
             ?: ui.birthDateError
             ?: ui.genderError
@@ -235,7 +225,6 @@ fun PersonalInfoScreen(
                 Column(
                     modifier = Modifier.padding(24.dp)
                 ) {
-                    // ✨ 위치 추적이 추가된 필드들
                     PersonalInfoFieldSimple(
                         label = "성함",
                         value = ui.name,
@@ -258,7 +247,6 @@ fun PersonalInfoScreen(
                         }
                     )
 
-                    // 성별 드롭다운
                     PersonalInfoDropdown(
                         label = "성별",
                         value = ui.gender,
@@ -270,7 +258,7 @@ fun PersonalInfoScreen(
                         }
                     )
 
-                    // 주소 검색 영역
+                    // 주소 영역
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -287,7 +275,6 @@ fun PersonalInfoScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        // 주소 표시 카드
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -328,7 +315,8 @@ fun PersonalInfoScreen(
                                     Text(
                                         text = "주소를 검색해주세요",
                                         fontSize = 14.scaledSp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.alpha(0.6f)
                                     )
                                 }
                             }
@@ -338,6 +326,34 @@ fun PersonalInfoScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = ui.addressError,
+                                fontSize = 12.scaledSp,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        OutlinedButton(
+                            onClick = { showAddressDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "우편번호 찾기",
+                                fontSize = 14.scaledSp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        if (ui.postcodeError != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = ui.postcodeError ?: "",
                                 fontSize = 12.scaledSp,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(start = 4.dp)
@@ -386,6 +402,16 @@ fun PersonalInfoScreen(
                 }
             }
 
+            if (ui.generalError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = ui.generalError,
+                    fontSize = 12.scaledSp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
@@ -418,7 +444,6 @@ fun PersonalInfoScreen(
         }
     }
 
-    // 주소 검색 다이얼로그
     if (showAddressDialog) {
         KakaoAddressSearchDialog(
             onDismiss = { showAddressDialog = false },
@@ -441,7 +466,6 @@ fun BirthDateField(
     errorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
-    // ✨ 실시간 유효성 검사
     var localError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(value) {
@@ -524,7 +548,7 @@ fun PersonalInfoFieldSimple(
     errorMessage: String? = null,
     enabled: Boolean = true,
     isLast: Boolean = false,
-    modifier: Modifier = Modifier  // ✨ modifier 추가
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -587,7 +611,7 @@ fun PersonalInfoDropdown(
     onValueChange: (String) -> Unit,
     errorMessage: String? = null,
     isLast: Boolean = false,
-    modifier: Modifier = Modifier  // ✨ modifier 추가
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
 
