@@ -1,0 +1,41 @@
+package com.example.itda.program.persistence
+
+import com.example.itda.user.persistence.UserEntity
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+
+interface BookmarkRepository : JpaRepository<BookmarkEntity, Long> {
+    @Query(
+        """
+        SELECT b 
+        FROM BookmarkEntity b 
+        JOIN FETCH b.program p 
+        WHERE b.user = :user
+        """,
+        countQuery = "SELECT COUNT(b) FROM BookmarkEntity b WHERE b.user = :user",
+    )
+    fun findByUserWithProgram(
+        @Param("user") user: UserEntity,
+        pageable: Pageable,
+    ): Page<BookmarkEntity>
+
+    @Query(
+        """
+        SELECT b 
+        FROM BookmarkEntity b 
+        JOIN FETCH b.program p 
+        WHERE b.user = :user
+        ORDER BY 
+            p.applyEndAt ASC NULLS LAST, 
+            b.createdAt DESC
+        """,
+        countQuery = "SELECT COUNT(b) FROM BookmarkEntity b WHERE b.user = :user",
+    )
+    fun findByUserWithProgramOrderByDeadline(
+        @Param("user") user: UserEntity,
+        pageable: Pageable,
+    ): Page<BookmarkEntity>
+}

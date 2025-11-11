@@ -1,17 +1,22 @@
 package com.example.itda.user.controller
 
+import com.example.itda.program.controller.ProgramSummaryResponse
+import com.example.itda.program.persistence.enums.BookmarkSortType
 import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.user.AuthUser
 import com.example.itda.user.service.UserService
+import com.example.itda.utils.PageResponse
+import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -63,6 +68,15 @@ class UserController(
         userService.updateUserPreferences(user.id, request)
 
         return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("/users/me/bookmarks")
+    fun getBookmarkedPrograms(
+        @AuthUser user: User,
+        @RequestParam(required = true, defaultValue = "LATEST") sort: BookmarkSortType,
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        return userService.getBookmarkedPrograms(user, sort, pageable)
     }
 }
 

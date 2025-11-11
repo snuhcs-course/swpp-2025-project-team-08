@@ -2,7 +2,10 @@ package com.example.itda.user.service
 
 import com.example.itda.program.ProgramNotFoundException
 import com.example.itda.program.config.AppConstants
+import com.example.itda.program.controller.ProgramSummaryResponse
+import com.example.itda.program.persistence.BookmarkRepository
 import com.example.itda.program.persistence.ProgramExampleRepository
+import com.example.itda.program.persistence.enums.BookmarkSortType
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
 import com.example.itda.user.LogInInvalidPasswordException
@@ -17,7 +20,11 @@ import com.example.itda.user.controller.ProfileRequest
 import com.example.itda.user.controller.User
 import com.example.itda.user.persistence.UserEntity
 import com.example.itda.user.persistence.UserRepository
+import com.example.itda.utils.PageResponse
 import org.mindrot.jbcrypt.BCrypt
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +36,7 @@ import java.time.format.DateTimeParseException
 class UserService(
     private val userRepository: UserRepository,
     private val programExampleRepository: ProgramExampleRepository,
+    private val bookmarkRepository: BookmarkRepository,
 ) {
     @Transactional
     fun authenticate(accessToken: String): User {
@@ -146,5 +154,31 @@ class UserService(
         val userEntity: UserEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
         userEntity.preferenceEmbedding = preferenceEmbedding
         userRepository.save(userEntity)
+    }
+
+    @Transactional
+    fun getBookmarkedPrograms(
+        user: User,
+        sortType: BookmarkSortType,
+        pageable: Pageable,
+    ): PageResponse<ProgramSummaryResponse> {
+        val userEntity = userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
+
+        val bookmarkPage =
+            when (sortType) {
+                BookmarkSortType.LATEST -> {
+                    val sort = Sort.by(Sort.Direction.DESC, "createdAt")
+                    val customPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize, sort)
+                    bookmarkRepository.findByUserWithProgram(userEntity, customPageable)
+                }
+                BookmarkSortType.DEADLINE -> {
+                    val basePageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+                    bookmarkRepository.findByUserWithProgramOrderByDeadline(userEntity, basePageable)
+                }
+            }
+
+        return PageResponse.from(bookmarkPage) { bookmarkEntity ->
+            ProgramSummaryResponse.fromEntity(bookmarkEntity.program)
+        }
     }
 }

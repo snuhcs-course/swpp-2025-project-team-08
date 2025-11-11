@@ -1,6 +1,7 @@
 package com.example.itda.user.persistence
 
 import com.example.itda.program.config.AppConstants
+import com.example.itda.program.persistence.BookmarkEntity
 import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
@@ -12,6 +13,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.annotations.Array
 import org.hibernate.annotations.JdbcTypeCode
@@ -56,4 +58,6 @@ class UserEntity(
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var preferenceEmbedding: FloatArray? = null,
+    @OneToMany(mappedBy = "user")
+    var bookmarks: MutableSet<BookmarkEntity> = mutableSetOf(),
 )

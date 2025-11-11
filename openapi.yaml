@@ -137,6 +137,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  
+  /users/me/bookmarks:
+    get:
+      tags:
+        - My Profile
+      summary: 북마크된 프로그램 목록 조회
+      description: 현재 사용자가 북마크한 프로그램 목록을 지정된 정렬 기준으로 페이지네이션하여 조회합니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            $ref: '#/components/schemas/BookmarkSortType'
+          required: false
+          description: 정렬 기준 (LATEST:-> 북마크 최신순(default), DEADLINE -> 마감 임박순)
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: 요청할 페이지 번호 (0부터 시작).
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: 한 페이지에 포함될 항목 수.
+      responses:
+        '200':
+          description: 북마크된 프로그램 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramSummaryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /programs:
     get:
@@ -346,6 +387,57 @@ paths:
                 $ref: '#/components/schemas/ProgramSummaryResponse'
         default:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /programs/{id}/bookmark:
+    post:
+      tags:
+        - Programs
+      summary: 프로그램 북마크 추가
+      description: 현재 인증된 사용자의 특정 프로그램에 대한 북마크를 추가합니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 북마크할 프로그램의 ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 북마크 추가 성공 (No Content)
+        default:
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /programs/{id}/unbookmark:
+    post:
+      tags:
+        - Programs
+      summary: 프로그램 북마크 제거
+      description: 현재 인증된 사용자의 특정 프로그램에 대한 북마크를 제거합니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 북마크를 제거할 프로그램의 ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 북마크 제거 성공 (No Content)
+        default:
+          description: Unexpected server error
           content:
             application/json:
               schema:
@@ -743,6 +835,12 @@ components:
           type: number
         score:
           type: number
+    BookmarkSortType:
+      type: string
+      description: 북마크 목록 정렬 기준
+      enum:
+        - LATEST
+        - DEADLINE
     Error:
       type: object
       properties:
