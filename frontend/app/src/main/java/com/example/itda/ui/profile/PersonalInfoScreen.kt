@@ -395,7 +395,7 @@ fun PersonalInfoScreen(
                     PersonalInfoDropdown(
                         label = "취업상태",
                         value = ui.employmentStatus,
-                        options = listOf("재직자", "미취업자", "자의업자"),
+                        options = listOf("재직자", "미취업자", "자엉업자"),
                         onValueChange = onEmploymentStatusChange,
                         isLast = true
                     )
