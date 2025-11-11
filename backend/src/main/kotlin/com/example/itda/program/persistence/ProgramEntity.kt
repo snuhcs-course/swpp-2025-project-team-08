@@ -14,6 +14,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.annotations.Array
 import org.hibernate.annotations.JdbcTypeCode
@@ -92,4 +93,6 @@ class ProgramEntity(
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var embedding: FloatArray,
+    @OneToMany(mappedBy = "program")
+    var bookmarks: MutableSet<BookmarkEntity> = mutableSetOf(),
 )

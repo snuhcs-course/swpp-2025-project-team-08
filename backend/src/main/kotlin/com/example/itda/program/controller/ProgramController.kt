@@ -6,8 +6,10 @@ import com.example.itda.user.AuthUser
 import com.example.itda.user.controller.User
 import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Pageable
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -64,5 +66,23 @@ class ProgramController(
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
         return programService.searchProgramsByRank(searchTerm, pageable)
+    }
+
+    @PostMapping("/programs/{programId}/bookmark")
+    fun bookmark(
+        @PathVariable programId: Long,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.bookmarkProgram(user.id, programId)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/programs/{programId}/unbookmark")
+    fun unbookmark(
+        @PathVariable programId: Long,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.unbookmarkProgram(user.id, programId)
+        return ResponseEntity.noContent().build()
     }
 }

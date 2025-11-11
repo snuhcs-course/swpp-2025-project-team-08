@@ -4,22 +4,29 @@ import com.example.itda.program.ProgramNotFoundException
 import com.example.itda.program.controller.ProgramCategoryResponse
 import com.example.itda.program.controller.ProgramResponse
 import com.example.itda.program.controller.ProgramSummaryResponse
+import com.example.itda.program.persistence.BookmarkEntity
+import com.example.itda.program.persistence.BookmarkRepository
 import com.example.itda.program.persistence.ProgramEntity
 import com.example.itda.program.persistence.ProgramExampleRepository
 import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.program.persistence.enums.ProgramCategory
+import com.example.itda.user.UserNotFoundException
 import com.example.itda.user.controller.User
+import com.example.itda.user.persistence.UserRepository
 import com.example.itda.utils.PageResponse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.OffsetDateTime
 
 @Service
 class ProgramService(
     val programRepository: ProgramRepository,
     val programExampleRepository: ProgramExampleRepository,
+    val bookmarkRepository: BookmarkRepository,
+    val userRepository: UserRepository,
 ) {
     @Transactional(readOnly = true)
     fun getPrograms(
@@ -94,5 +101,36 @@ class ProgramService(
             )
 
         return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
+    }
+
+    @Transactional
+    fun bookmarkProgram(
+        userId: String,
+        programId: Long,
+    ) {
+        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        if (programEntity.bookmarks.any { it.user.id == userEntity.id }) {
+            return
+        }
+        val bookmarkEntity =
+            bookmarkRepository.save(
+                BookmarkEntity(program = programEntity, user = userEntity, createdAt = OffsetDateTime.now()),
+            )
+        programEntity.bookmarks.add(bookmarkEntity)
+        userEntity.bookmarks.add(bookmarkEntity)
+    }
+
+    @Transactional
+    fun unbookmarkProgram(
+        userId: String,
+        programId: Long,
+    ) {
+        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        val bookmarkToDelete = programEntity.bookmarks.find { it.user.id == userEntity.id } ?: return
+        programEntity.bookmarks.remove(bookmarkToDelete)
+        userEntity.bookmarks.remove(bookmarkToDelete)
+        bookmarkRepository.delete(bookmarkToDelete)
     }
 }
