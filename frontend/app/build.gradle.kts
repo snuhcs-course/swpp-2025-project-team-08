@@ -132,4 +132,5 @@ dependencies {
     androidTestImplementation("com.google.truth:truth:1.4.4")
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
     implementation(libs.compose.markdown)
+    implementation("androidx.compose.material3:material3")
 }
