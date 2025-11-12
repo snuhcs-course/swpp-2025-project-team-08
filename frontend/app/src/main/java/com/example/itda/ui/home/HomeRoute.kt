@@ -19,6 +19,7 @@ fun HomeRoute(
         ui = ui, // HomeScreen에 UI 상태를 통째로 전달
         onCategorySelected = vm::onCategorySelected,
         onFeedClick = onFeedClick,
+        onFeedBookmarkClick = vm::onFeedBookmarkClicked,
         onRefresh = vm::refreshHomeData,
         onLoadNext = vm::loadNextPage,
         onRefreshProfile = vm::loadMyProfile,

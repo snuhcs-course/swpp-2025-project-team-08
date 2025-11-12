@@ -16,9 +16,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,11 +31,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.itda.ui.navigation.LoadingScreen
 import kotlinx.coroutines.delay
 
@@ -110,7 +113,7 @@ fun FeedSummaryCard(
     }
 
 
-    OutlinedCard(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .border(
@@ -120,15 +123,20 @@ fun FeedSummaryCard(
             ),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
 
     ) {
         Column(
             Modifier
                 .padding(12.dp)
         ) {
-            Text("AI 요약", fontWeight = FontWeight.Bold)
+            Text(
+                text = "AI 요약",
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(Modifier.height(10.dp))
             if(isLoading) {
                 LoadingScreen(
@@ -141,15 +149,38 @@ fun FeedSummaryCard(
                     visible = !isLoading,
                     enter = fadeIn(animationSpec = tween(durationMillis = 1500)) // 1초 동안 페이드인
                 ) {
-                    // 텍스트에 그라데이션 애니메이션 적용
                     Text(
                         modifier = Modifier.padding(12.dp),
                         text = buildAnnotatedString {
                             withStyle(style = currentStyle) {
-                                append(content)
+                                append(content) // 👈 인자로 받은 content를 여기에 넣습니다.
                             }
-                        }
+                        },
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 20.sp,
+                            textAlign = TextAlign.Left,
+                        )
                     )
+//                    if (!isSweepFinished) {
+//                        // Markdown 텍스트를 AnnotatedString으로 변환하여 Sweep 적용
+//
+//                    }
+                    // 2. Sweep 애니메이션이 끝났을 때 (MarkdownText 사용)
+//                    else {
+//                        MarkdownText(
+//                            modifier = Modifier.padding(12.dp),
+//                            markdown = content, // 👈 인자로 받은 content를 markdown 인자에 넣습니다.
+//                            style = TextStyle(
+//                                color = MaterialTheme.colorScheme.onSurface,
+//                                fontSize = 16.sp,
+//                                lineHeight = 20.sp,
+//                                textAlign = TextAlign.Left,
+//                            ),
+//                            // text = buildAnnotatedString { ... } 부분을 제거합니다.
+//                        )
+//                    }
+
                 }
             }
         }

@@ -4,7 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,17 +15,16 @@ import com.example.itda.ui.common.theme.Neutral80
 import com.example.itda.ui.common.theme.YellowPrimary
 
 @Composable
-fun StarButton(
-    isStarred: Boolean,
+fun BookmarkButton(
+    isBookmarked: Boolean,
     onClick : () -> Unit
 ) {
     Icon(
-        imageVector = Icons.Default.Star,
+        imageVector = if(isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
         contentDescription = "즐겨찾기",
-        tint = if (isStarred) YellowPrimary else Neutral80,
+        tint = if (isBookmarked) YellowPrimary else Neutral80,
         modifier = Modifier
             .size(24.dp)
-            .clip(CircleShape)
             .clickable(onClick = onClick)
     )
 }

@@ -1,15 +1,18 @@
 package com.example.itda.ui.search.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.Neutral20
 import com.example.itda.ui.common.theme.Primary60
-import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.common.theme.scaledSp
 
 @Composable
 fun SearchResultHeader(

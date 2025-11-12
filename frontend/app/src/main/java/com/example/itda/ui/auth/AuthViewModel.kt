@@ -2,6 +2,7 @@ package com.example.itda.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramResponse
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.repository.ProgramRepository
@@ -397,6 +398,7 @@ class AuthViewModel @Inject constructor(
     data class PreferenceUIState(
         val examplePrograms : List<ProgramResponse> = emptyList<ProgramResponse>(),
         val preferenceRequestList : PreferenceRequestList = emptyList<PreferenceRequest>(),
+        val exampleProgramDetail : ProgramDetailResponse? = null,
         val isLoading: Boolean = false,
         val generalError: String? = null
     )
@@ -461,7 +463,37 @@ class AuthViewModel @Inject constructor(
             _preferenceUi.update { it.copy(isLoading = false) }
             return true
         }
+
         return false
+    }
+
+    suspend fun onFeedExampleClick(exampleId : Int) {
+        _preferenceUi.update { it.copy(isLoading = true) }
+
+        val result = programRepository.getExampleDetails(exampleId = exampleId)
+
+        result
+            .onFailure { exception ->
+                val apiError = ApiErrorParser.parseError(exception)
+                _preferenceUi.update {
+                    it.copy(
+                        generalError = apiError.message,
+                        isLoading = false,
+                        exampleProgramDetail = null
+                    )
+                }
+            }
+            .onSuccess { detail ->
+                _preferenceUi.update {
+                    it.copy(
+                        isLoading = false,
+                        exampleProgramDetail = detail
+                    )
+                }
+            }
+    }
+    fun onDismissExampleDetail() {
+        _preferenceUi.update { it.copy(exampleProgramDetail = null) }
     }
 
 }

@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -14,12 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.itda.ui.auth.AuthViewModel
-import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.feed.FeedRoute
 import com.example.itda.ui.home.HomeRoute
 import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.PersonalInfoRoute
-import com.example.itda.ui.profile.PersonalInfoScreen
 import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
 import com.example.itda.ui.profile.component.settingNavGraph
@@ -72,7 +69,6 @@ fun NavGraphBuilder.mainGraph(
         ) { backStackEntry ->
             val feedId = backStackEntry.arguments?.getInt("feedId")
             if (feedId != null) {
-                // 이 화면은 Wrapper로 감싸지 않아 BottomBar가 보이지 않습니다.
                 FeedRoute(
                     feedId = feedId,
                     onBack = { navController.popBackStack() }

@@ -40,6 +40,7 @@ object HomeContract : ScreenContract {
 fun HomeScreen(
     ui: HomeViewModel.HomeUiState, // UiState를 인자로 받음
     onFeedClick: (Int) -> Unit,
+    onFeedBookmarkClick : (Int) -> Unit,
     onCategorySelected: (Category) -> Unit,
     onRefresh: () -> Unit,
     onLoadNext: () -> Unit,
@@ -99,14 +100,11 @@ fun HomeScreen(
             Spacer(Modifier.height(20.dp).fillMaxWidth())
             HomeHeader(
                 username = ui.username,
-                programCount = ui.totalElements
             )
-//            Text("loadhomedata : ${ui.loadDataCount} 번 로드됨")
-//            Text("loadProfile : ${ui.loadProfileCount} 번 로드됨")
-//            Text("loadNext : ${ui.loadNextCount} 번 로드됨")
             ProgramFilterRow(
                 categories = ui.categories,
                 selectedCategory = ui.selectedCategory,
+                selectedCategoryCount = ui.totalElements,
                 onCategorySelected = onCategorySelected
             )
             if(ui.isLoading) {
@@ -129,7 +127,7 @@ fun HomeScreen(
                         )
                     }
                 ) {
-                    if(ui.feedItems.size == 0) {
+                    if(ui.feedItems.isEmpty()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize(),
@@ -147,7 +145,8 @@ fun HomeScreen(
                             items = ui.feedItems, // TODO
                             listState = listState,
                             filterCategory = ui.selectedCategory.value,
-                            onItemClick = { feed -> onFeedClick(feed.id) }
+                            onItemClick = { feed -> onFeedClick(feed.id) },
+                            onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) }
                         )
                     }
                 }
@@ -166,6 +165,7 @@ private fun PreviewHomeScreen() {
         onCategorySelected = {},
         onRefresh = {},
         onLoadNext = {},
-        onRefreshProfile = {}
+        onRefreshProfile = {},
+        onFeedBookmarkClick = {}
     )
 }

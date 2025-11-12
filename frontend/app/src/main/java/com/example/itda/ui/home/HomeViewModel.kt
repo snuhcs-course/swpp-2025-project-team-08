@@ -39,7 +39,8 @@ class HomeViewModel @Inject constructor(
     val loadProfileCount : Int = 0,
     val loadNextCount : Int = 0,
     val isRefreshing: Boolean = false,
-    val generalError: String? = null
+    val generalError: String? = null,
+    val bookmarkPrograms : List<Int> = emptyList<Int>()
     )
 
     private val _homeUi = MutableStateFlow(HomeUiState())
@@ -177,5 +178,64 @@ class HomeViewModel @Inject constructor(
         }
 
         loadHomeData()
+    }
+
+    fun getBookmarkPrograms() {
+        /*viewModelScope.launch {
+            _homeUi.update { it.copy(isLoading = true) }
+
+            val programs = programRepository.getBookmarkPrograms()
+            programs
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _homeUi.update {
+                        it.copy(
+                            bookmarkPrograms = response.map { it.id },
+                        )
+                    }
+                }
+        }*/
+    }
+
+    fun onFeedBookmarkClicked(id: Int) {
+        /*viewModelScope.launch {
+            _homeUi.update { it.copy(isLoading = true) }
+
+            //TODO - bookmark list 불러오고 거기에 포함되어 있으면 unbookmark 아니면 bookamrk 호출 하도록 구분
+
+            val programBookmarked =
+                if(id in homeUi.value.bookmarkPrograms)
+                    unBookmarkProgram(id)
+                else
+                    bookmarkProgram(id)
+
+            programBookmarked
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isLoading = false,
+                        )
+                    }
+                }
+            programBookmarked
+                .onSuccess { response ->
+                    _homeUi.update {
+                        it.copy(
+                            generalError = null,
+                            isLoading = false,
+                        )
+                    }
+                    getBookmarkPrograms() // bookmark / unbookmark 반영한 값 새로 로드
+                }
+        }*/
     }
 }
