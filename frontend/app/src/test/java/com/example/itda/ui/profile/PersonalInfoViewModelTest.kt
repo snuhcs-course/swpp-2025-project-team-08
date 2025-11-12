@@ -1,19 +1,20 @@
-// src/test/java/com/example/itda/ui/profile/PersonalInfoViewModelTest.kt
 package com.example.itda.ui.profile
 
+import com.example.itda.data.model.User
+import com.example.itda.data.repository.UserRepository
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.*
+import retrofit2.HttpException
+import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -23,243 +24,296 @@ class PersonalInfoViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Mock
-    lateinit var userRepository: com.example.itda.data.repository.UserRepository
+    lateinit var userRepository: UserRepository
 
-    private lateinit var vm: PersonalInfoViewModel
+    private lateinit var viewModel: PersonalInfoViewModel
 
-    @Before
-    fun setUp() {
-        // init { loadUserData() } 무시
-        runBlocking { whenever(userRepository.getMe()).thenThrow(RuntimeException("skip")) }
-        vm = PersonalInfoViewModel(userRepository)
+    private val testUser = User(
+        id = "test-id",
+        email = "test@example.com",
+        name = "홍길동",
+        birthDate = "1990-01-01",
+        gender = "남성",
+        address = "서울시 강남구",
+        postcode = "12345",
+        maritalStatus = "미혼",
+        educationLevel = "대졸",
+        householdSize = 3,
+        householdIncome = 5000,
+        employmentStatus = "재직자"
+    )
+
+    // @Before 제거 - 각 테스트에서 모킹합니다
+
+    @Test
+    fun init_loadsUserData_successfully() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.name).isEqualTo("홍길동")
+        assertThat(ui.birthDate).isEqualTo("19900101")
+        assertThat(ui.gender).isEqualTo("남성")
+        assertThat(ui.address).isEqualTo("서울시 강남구")
+        assertThat(ui.postcode).isEqualTo("12345")
+        assertThat(ui.maritalStatus).isEqualTo("미혼")
+        assertThat(ui.education).isEqualTo("대졸")
+        assertThat(ui.householdSize).isEqualTo("3")
+        assertThat(ui.householdIncome).isEqualTo("5000")
+        assertThat(ui.employmentStatus).isEqualTo("재직자")
+        assertThat(ui.isLoading).isFalse()
     }
 
     @Test
-    fun returnsFalse_and_doesNotCallRepo_whenRequiredFieldsMissing() = runTest {
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isFalse()
+    fun init_handlesNullValues_correctly() = runTest {
+        val emptyUser = User(
+            id = "test-id",
+            email = "test@example.com",
+            name = null,
+            birthDate = null,
+            gender = null,
+            address = null,
+            postcode = null,
+            maritalStatus = null,
+            educationLevel = null,
+            householdSize = null,
+            householdIncome = null,
+            employmentStatus = null
+        )
+        whenever(userRepository.getMe()).thenReturn(emptyUser)
 
-        // suspend 검증은 verifyBlocking 사용
-        verifyBlocking(userRepository, never()) {
-            updateProfile(
-                name = anyOrNull<String>(),
-                birthDate = anyOrNull<String>(),
-                gender = anyOrNull<String>(),
-                address = anyOrNull<String>(),
-                postcode = anyOrNull<String>(),
-                maritalStatus = anyOrNull<String>(),
-                educationLevel = anyOrNull<String>(),
-                householdSize = anyOrNull<Int>(),
-                householdIncome = anyOrNull<Int>(),
-                employmentStatus = anyOrNull<String>()
-            )
-        }
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.name).isEmpty()
+        assertThat(ui.birthDate).isEmpty()
+        assertThat(ui.gender).isEmpty()
+        assertThat(ui.address).isEmpty()
     }
 
     @Test
-    fun returnsTrue_and_callsRepo_withEnumConversion() = runTest {
-        // 입력
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("남성")
-        vm.onAddressChange("12345")
-        vm.onMaritalStatusChange("기혼")
-        vm.onEducationChange("대졸")
-        vm.onHouseholdSizeChange("4")
-        vm.onHouseholdIncomeChange("6000")
-        vm.onEmploymentStatusChange("재직자")
+    fun init_handlesLoadError_setsGeneralError() = runTest {
+        whenever(userRepository.getMe()).thenThrow(RuntimeException("Network error"))
 
-        // suspend 스텁은 코루틴 안에서 직접 whenever 호출
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        assertThat(viewModel.personalInfoUi.value.generalError).isNotNull()
+        assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
+    }
+
+    @Test
+    fun onNameChange_updatesName_andClearsErrors() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("김철수")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.name).isEqualTo("김철수")
+        assertThat(ui.nameError).isNull()
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onBirthDateChange_filtersNonDigits_andLimitsTo8Digits() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onBirthDateChange("1990-01-01abc")
+        assertThat(viewModel.personalInfoUi.value.birthDate).isEqualTo("19900101")
+
+        viewModel.onBirthDateChange("123456789012")
+        assertThat(viewModel.personalInfoUi.value.birthDate).isEqualTo("12345678")
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_whenNameIsBlank() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("")
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.nameError).isNotNull()
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_whenBirthDateIsBlank() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.birthDateError).isNotNull()
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_whenGenderIsBlank() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.genderError).isNotNull()
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_whenAddressIsBlank() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+        viewModel = PersonalInfoViewModel(userRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.addressError).isNotNull()
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsTrue_withValidRequiredFields() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
         whenever(
             userRepository.updateProfile(
-                name = anyOrNull(),
-                birthDate = anyOrNull(),
-                gender = anyOrNull(),
-                address = anyOrNull(),
-                postcode = anyOrNull(),
-                maritalStatus = anyOrNull(),
-                educationLevel = anyOrNull(),
-                householdSize = anyOrNull(),
-                householdIncome = anyOrNull(),
-                employmentStatus = anyOrNull()
+                any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any()
             )
         ).thenReturn(Result.success(Unit))
 
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isTrue()
+        viewModel = PersonalInfoViewModel(userRepository)
         advanceUntilIdle()
 
-        // suspend 검증
-        verifyBlocking(userRepository) {
-            updateProfile(
-                name = eq("Hong"),
-                birthDate = eq("1990-01-01"),
-                gender = eq("MALE"),
-                address = eq("서울시 관악구 관악로 1"),
-                postcode = eq("12345"),
-                maritalStatus = eq("MARRIED"),
-                educationLevel = eq("BACHELOR"),
-                householdSize = eq(4),
-                householdIncome = eq(6000),
-                employmentStatus = eq("EMPLOYED")
-            )
-        }
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시 강남구")
+        viewModel.onPostCodeChange("12345")
+
+        val result = viewModel.submitPersonalInfo()
+        advanceUntilIdle()
+
+        assertThat(result).isTrue()
+        assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).isNull()
     }
 
     @Test
-    fun returnsTrue_then_setsGeneralError_whenRepoFails() = runTest {
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("남성")
-        vm.onAddressChange("12345")
-
+    fun submitPersonalInfo_convertsKoreanToEnum_correctly() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
         whenever(
             userRepository.updateProfile(
-                name = anyOrNull(),
-                birthDate = anyOrNull(),
-                gender = anyOrNull(),
-                address = anyOrNull(),
-                postcode = anyOrNull(),
-                maritalStatus = anyOrNull(),
-                educationLevel = anyOrNull(),
-                householdSize = anyOrNull(),
-                householdIncome = anyOrNull(),
-                employmentStatus = anyOrNull()
-            )
-        ).thenReturn(Result.failure(IllegalStateException("boom")))
-
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isTrue()
-        advanceUntilIdle()
-        assertThat(vm.personalInfoUi.value.generalError).isNotNull()
-    }
-
-    @Test
-    fun optionalBlanks_becomeNulls_inRepoCall() = runTest {
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("남성")
-        vm.onAddressChange("12345")
-        // 나머지 옵션 공란 유지
-
-        whenever(
-            userRepository.updateProfile(
-                name = anyOrNull(),
-                birthDate = anyOrNull(),
-                gender = anyOrNull(),
-                address = anyOrNull(),
-                postcode = anyOrNull(),
-                maritalStatus = anyOrNull(),
-                educationLevel = anyOrNull(),
-                householdSize = anyOrNull(),
-                householdIncome = anyOrNull(),
-                employmentStatus = anyOrNull()
+                any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any()
             )
         ).thenReturn(Result.success(Unit))
 
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isTrue()
+        viewModel = PersonalInfoViewModel(userRepository)
         advanceUntilIdle()
 
-        verifyBlocking(userRepository) {
-            updateProfile(
-                name = eq("Hong"),
-                birthDate = eq("1990-01-01"),
-                gender = eq("MALE"),
-                address = eq("서울시 관악구 관악로 1"),
-                postcode = eq("12345"),
-                maritalStatus = isNull<String>(),
-                educationLevel = isNull<String>(),
-                householdSize = isNull<Int>(),
-                householdIncome = isNull<Int>(),
-                employmentStatus = isNull<String>()
-            )
-        }
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("여성")
+        viewModel.onAddressChange("서울시 강남구")
+        viewModel.onMaritalStatusChange("기혼")
+        viewModel.onEducationChange("대졸")
+        viewModel.onEmploymentStatusChange("재직자")
+
+        viewModel.submitPersonalInfo()
+        advanceUntilIdle()
+
+        verify(userRepository).updateProfile(
+            name = eq("홍길동"),
+            birthDate = eq("1990-01-01"),
+            gender = eq("FEMALE"),
+            address = eq("서울시 강남구"),
+            postcode = eq("12345"),
+            maritalStatus = eq("MARRIED"),
+            educationLevel = eq("BACHELOR"),
+            householdSize = eq(3),
+            householdIncome = eq(5000),
+            employmentStatus = eq("EMPLOYED")
+        )
     }
 
     @Test
-    fun korean_ANY_maps_to_ENUM_ANY() = runTest {
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("여성")
-        vm.onAddressChange("12345")
-        vm.onMaritalStatusChange("무관")
-        vm.onEducationChange("무관")
-        vm.onEmploymentStatusChange("무관")
-        vm.onHouseholdSizeChange("2")
-        vm.onHouseholdIncomeChange("100")
+    fun submitPersonalInfo_returnsFalse_onHttpException() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
+
+        val mockResponse = mock<Response<*>> {
+            on { code() } doReturn 400
+            on { errorBody() } doReturn null
+        }
+        val httpException = HttpException(mockResponse)
 
         whenever(
             userRepository.updateProfile(
-                name = anyOrNull(),
-                birthDate = anyOrNull(),
-                gender = anyOrNull(),
-                address = anyOrNull(),
-                postcode = anyOrNull(),
-                maritalStatus = anyOrNull(),
-                educationLevel = anyOrNull(),
-                householdSize = anyOrNull(),
-                householdIncome = anyOrNull(),
-                employmentStatus = anyOrNull()
+                any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any()
             )
-        ).thenReturn(Result.success(Unit))
+        ).thenReturn(Result.failure(httpException))
 
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isTrue()
+        viewModel = PersonalInfoViewModel(userRepository)
         advanceUntilIdle()
 
-        verifyBlocking(userRepository) {
-            updateProfile(
-                name = eq("Hong"),
-                birthDate = eq("1990-01-01"),
-                gender = eq("FEMALE"),
-                address = eq("서울시 관악구 관악로 1"),
-                postcode = eq("12345"),
-                maritalStatus = eq("ANY"),
-                educationLevel = eq("ANY"),
-                householdSize = eq(2),
-                householdIncome = eq(100),
-                employmentStatus = eq("ANY")
-            )
-        }
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+        advanceUntilIdle()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("HTTP 400")
+        assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
     }
 
     @Test
-    fun numericFilters_apply_toHouseholdFields() = runTest {
-        vm.onHouseholdSizeChange("a1b2c3")
-        vm.onHouseholdIncomeChange("6,0-0_0")
-        assertThat(vm.personalInfoUi.value.householdSize).isEqualTo("12")
-        assertThat(vm.personalInfoUi.value.householdIncome).isEqualTo("6000")
-    }
-
-    @Test
-    fun loadingFlag_toggles_trueThenFalse_aroundSubmit() = runTest {
-        vm.onNameChange("Hong")
-        vm.onBirthDateChange("1990-01-01")
-        vm.onGenderChange("남성")
-        vm.onAddressChange("12345")
-
+    fun submitPersonalInfo_returnsFalse_onNetworkException() = runTest {
+        whenever(userRepository.getMe()).thenReturn(testUser)
         whenever(
             userRepository.updateProfile(
-                name = anyOrNull(),
-                birthDate = anyOrNull(),
-                gender = anyOrNull(),
-                address = anyOrNull(),
-                postcode = anyOrNull(),
-                maritalStatus = anyOrNull(),
-                educationLevel = anyOrNull(),
-                householdSize = anyOrNull(),
-                householdIncome = anyOrNull(),
-                employmentStatus = anyOrNull()
+                any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any()
             )
-        ).thenReturn(Result.success(Unit))
+        ).thenReturn(Result.failure(RuntimeException("Network timeout")))
 
-        assertThat(vm.personalInfoUi.value.isLoading).isFalse()
-        val ok = vm.submitPersonalInfo()
-        assertThat(ok).isTrue()
-        assertThat(vm.personalInfoUi.value.isLoading).isTrue()
+        viewModel = PersonalInfoViewModel(userRepository)
         advanceUntilIdle()
-        assertThat(vm.personalInfoUi.value.isLoading).isFalse()
-    }
 
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+        advanceUntilIdle()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("네트워크 오류")
+        assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
+    }
 }
