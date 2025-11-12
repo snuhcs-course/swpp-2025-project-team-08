@@ -107,8 +107,9 @@ fun FeedScreen(
                     title = ui.feed.title,
                     endDate = ui.feed.applyEndAt ?: "",
                     tags = listOf(ui.feed.categoryValue),
-                    isEligible = true,
-                    isStarred = false // ui.feed.isStarred
+                    isEligible = false,
+                    isBookmarked = false, // TODO - ui.feed.isStarred
+                    onBookmarkClicked = {}
                 )
 
                 Spacer(Modifier.height(16.dp))

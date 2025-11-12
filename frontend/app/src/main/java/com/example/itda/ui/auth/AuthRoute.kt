@@ -100,6 +100,12 @@ fun PreferenceUpdateRoute(
     PreferenceUpdateScreen(
         ui = ui,
         onPreferenceScoreChange = vm::onPreferenceScoreChange,
+        onFeedExampleClick = { programId ->
+            scope.launch {
+                vm.onFeedExampleClick(programId)
+            }
+        },
+        onDismissExampleDetail = vm::onDismissExampleDetail,
         onSubmit = {
             scope.launch {
                 val success = vm.updatePreference()

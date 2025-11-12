@@ -11,12 +11,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,13 +43,21 @@ fun FeedCard(
     // start_date: String ? = null,     // 시작 날짜 (ISO 포맷 문자열로 전달)
     // end_date: String ? = null,       // 종료 날짜
 
-    isStarred: Boolean,     // 즐겨찾기 여부
+    isBookmarked : Boolean = false,     // 즐겨찾기 여부
     logo: Int = R.drawable.gov_logo,    // 로고 ID?
     // TODO - coil library 를 활용해 url 을 받아와 붙여넣는 방법도 고민중
     // logoUrl : String ? = null
     isEligible: Boolean = true,    // 신청 대상자 여부
     onClick: () -> Unit,
+    onBookmarkClicked : () -> Unit,
+
+    onDismissRequest: () -> Unit, // 관심없음 처리
+    isExample : Boolean = false,
 ) {
+
+
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,6 +68,7 @@ fun FeedCard(
         ),
         elevation = CardDefaults.cardElevation(2.dp),
         onClick = onClick,
+
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // 상단 섹션: 로고, 기관명, 카테고리, 즐겨찾기 아이콘
@@ -93,7 +107,30 @@ fun FeedCard(
                         }
                     }
                 }
-                StarButton(isStarred)
+                if(!isExample) {
+                    Row (
+                        modifier = Modifier.wrapContentWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BookmarkButton (
+                            isBookmarked = isBookmarked,
+                            onClick = onBookmarkClicked
+                        )
+                        /*
+                        Spacer(Modifier.width(8.dp))
+                        Box {
+                            // MoreVertButton 클릭 시 메뉴 노출
+                            MoreVertButton(onClick = { showMenu = true })
+                            CustomDropdownMenu(
+                                expanded = showMenu,
+                                onDropdownDismissRequest = { showMenu = false },
+                                onDismissClicked = onDismissRequest
+                            )
+                        }
+                        */
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -137,10 +174,12 @@ fun PreviewFeedItem() {
                 categories = dummyCategories.map { it -> it.value },
                 department = "행정안전부",
                 content = "25만원 받을 수 있음",
-                isStarred = true, // 즐겨찾기 설정됨
+                isBookmarked = true, // 즐겨찾기 설정됨
                 isEligible = true, // 신청 대상자 O
                 logo = R.drawable.gov_logo,
-                onClick = { }
+                onClick = { },
+                onBookmarkClicked = {},
+                onDismissRequest = {}
             )
         }
     }

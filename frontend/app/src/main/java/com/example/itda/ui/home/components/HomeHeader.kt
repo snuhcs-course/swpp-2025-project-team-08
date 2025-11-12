@@ -3,25 +3,22 @@ package com.example.itda.ui.home.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.ui.common.theme.Neutral0
-import com.example.itda.ui.common.theme.Neutral60
-import com.example.itda.ui.common.theme.*
 
 @Composable
 fun HomeHeader(
-    username: String,
-    programCount: Int
+    username: String
 ) {
     Column(
         modifier = Modifier
@@ -32,26 +29,24 @@ fun HomeHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "${username}님의 맞춤 정책",
-                fontSize = 24.scaledSp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = "${programCount}개",
-                fontSize = 24.scaledSp,
-                fontWeight = FontWeight.Bold,
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
+                        )
+                    ) {
+                        append(username)
+                    }
+                    append("님의 맞춤 정책")
+                },
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = "위로 드래그하여 더 많은 정보를 로드해보세요!",
-            fontSize = 12.scaledSp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

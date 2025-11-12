@@ -1,25 +1,43 @@
 package com.example.itda.ui.search
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
-import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.common.theme.Neutral20
+import com.example.itda.ui.common.theme.Neutral40
+import com.example.itda.ui.common.theme.Neutral50
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
-import com.example.itda.ui.search.components.*
+import com.example.itda.ui.search.components.RecentSearchChip
+import com.example.itda.ui.search.components.RecommendedSearchChip
+import com.example.itda.ui.search.components.SearchFilterRow
+import com.example.itda.ui.search.components.SearchInputField
+import com.example.itda.ui.search.components.SearchResultHeader
 
 @Composable
 fun SearchScreen(
@@ -190,6 +208,7 @@ fun SearchScreen(
                         ProgramFilterRow(
                             categories = uiState.categories,
                             selectedCategory = uiState.selectedCategory,
+                            selectedCategoryCount = uiState.totalElements,
                             onCategorySelected = onCategorySelected
                         )
 
@@ -197,9 +216,13 @@ fun SearchScreen(
                             items = uiState.searchResults,
                             listState = listState,
                             filterCategory = uiState.selectedCategory.value,
-                            onItemClick = { feed -> onFeedClick(feed.id) }
+                            onItemClick = { feed -> onFeedClick(feed.id) },
+                            onItemBookmarkClicked = { id ->
+                                // onFeedBookmarkClicked(id)
+                            }
                         )
 
+                        /* TODO - 무한 로딩이 떠서 임시로 지워둠
                         if (uiState.isLoadingMore) {
                             Box(
                                 modifier = Modifier
@@ -214,6 +237,7 @@ fun SearchScreen(
                                 )
                             }
                         }
+                        */
                     }
                 }
                 else {

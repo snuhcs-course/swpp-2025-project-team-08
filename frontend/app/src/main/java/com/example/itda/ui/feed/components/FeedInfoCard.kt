@@ -1,21 +1,21 @@
 package com.example.itda.ui.feed.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.itda.ui.common.util.formatIsoDateToYmd
 
 @Composable
 fun FeedInfoCard(
@@ -24,14 +24,18 @@ fun FeedInfoCard(
     endDate: String,
     department: String
 ) {
-    OutlinedCard(
+    val ymdStartDate = formatIsoDateToYmd(startDate)
+    val ymdEndDate = formatIsoDateToYmd(endDate)
+
+    Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
+//        val formattedStartDate = DateFormatter
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,7 +61,7 @@ fun FeedInfoCard(
                     Text("상시 신청 가능", color = MaterialTheme.colorScheme.onSurface)
                 }
                 else {
-                    Text("$startDate ~ $endDate", color = MaterialTheme.colorScheme.onSurface)
+                    Text("$ymdStartDate ~ $ymdEndDate", color = MaterialTheme.colorScheme.onSurface)
                 }
                 Text(department, color = MaterialTheme.colorScheme.onSurface)
             }

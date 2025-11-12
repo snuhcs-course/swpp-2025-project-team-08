@@ -2,9 +2,11 @@ package com.example.itda.ui.auth
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,27 +14,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.itda.R
+import com.example.itda.ui.auth.components.PreferenceSelector
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedCard
 import com.example.itda.ui.common.theme.Primary50
+import com.example.itda.ui.feed.components.FeedDetailCard
+import com.example.itda.ui.feed.components.FeedHeaderSection
+import com.example.itda.ui.feed.components.FeedInfoCard
+import com.example.itda.ui.feed.components.FeedSummaryCard
 import kotlinx.coroutines.launch
 
 // TODO: AuthViewModel에 임시 Program List를 추가했다고 가정
@@ -43,6 +59,8 @@ import kotlinx.coroutines.launch
 fun PreferenceUpdateScreen(
     ui : AuthViewModel.PreferenceUIState,
     onPreferenceScoreChange : (Int, Int) -> Unit,
+    onFeedExampleClick : (Int) -> Unit,
+    onDismissExampleDetail : () -> Unit,
     onSubmit: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -57,6 +75,8 @@ fun PreferenceUpdateScreen(
     // 모든 항목이 1 이상 (선택됨)인지 확인
     val isSubmitEnabled = ui.examplePrograms.isNotEmpty() && currentPreferences.all { it.score > 0 }
 
+    var detailExpanded by remember { mutableStateOf(false) }
+
     BaseScreen(
         title = "선호도 설정",
         topBarVisible = false,
@@ -70,7 +90,6 @@ fun PreferenceUpdateScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // 헤더: 현재 몇 번째 정책인지 표시
             Text(
                 text = "선호도 설정 (${pagerState.currentPage + 1} / $pageCount)",
                 fontWeight = FontWeight.Bold,
@@ -100,16 +119,18 @@ fun PreferenceUpdateScreen(
                         categories = listOf(program.categoryValue),
                         department = program.operatingEntity,
                         content = program.preview,
-                        isStarred = false,
+                        isBookmarked = false,
                         logo = if (program.operatingEntityType == "central") R.drawable.gov_logo else R.drawable.local,
                         isEligible = false,
-                        onClick = {} // 클릭 비활성화
+                        onClick = { onFeedExampleClick(program.id) },
+                        onBookmarkClicked = {},
+                        isExample = true,
+                        onDismissRequest = {}
                     )
 
-                    Spacer(Modifier.height(32.dp))
 
-                    // --- 2. 선호도 슬라이더 섹션 ---
-                    PreferenceSlider(
+                    // --- 2. 선호도 선택 섹션 ---
+                    PreferenceSelector(
                         currentScore = currentScore,
                         onScoreChange = { newScore ->
                             // 선호도 상태 업데이트
@@ -153,9 +174,69 @@ fun PreferenceUpdateScreen(
                 }
             )
         }
+        ui.exampleProgramDetail?.let { program ->
+            AlertDialog(
+                onDismissRequest = onDismissExampleDetail,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                text = {
+                    Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        Column() {
+
+                            // 상단 제목 / 태그
+                            FeedHeaderSection(
+                                title = ui.exampleProgramDetail.title,
+                                endDate = ui.exampleProgramDetail.applyEndAt ?: "",
+                                tags = listOf(ui.exampleProgramDetail.categoryValue),
+                                isEligible = false,
+                                isBookmarked = false,
+                                onBookmarkClicked = {}
+                            )
+
+                            Spacer(Modifier.height(16.dp))
+
+                            // 지원혜택 카드
+                            FeedInfoCard(
+                                categories = listOf(ui.exampleProgramDetail.categoryValue),
+                                startDate = ui.exampleProgramDetail.applyStartAt ?: "",
+                                endDate = ui.exampleProgramDetail.applyEndAt ?: "",
+                                department =
+                                    if(ui.exampleProgramDetail.operatingEntity == "central")
+                                        "중앙정부"
+                                    else
+                                        ui.exampleProgramDetail.operatingEntity,
+                            )
+                            Spacer(Modifier.height(12.dp))
+
+                            FeedSummaryCard(content = ui.exampleProgramDetail.summary)
+
+                            Spacer(Modifier.height(12.dp))
+
+
+
+                            FeedDetailCard(
+                                expanded = detailExpanded,
+                                onToggle = { detailExpanded = !detailExpanded },
+                                details = ui.exampleProgramDetail.details
+                            )
+
+                            Spacer(Modifier.height(60.dp)) // 하단 버튼 여유 공간
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = onDismissExampleDetail) { // 닫기 버튼
+                        Text("닫기")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxHeight(0.9f)
+                    .fillMaxWidth()
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferenceSlider(
     currentScore: Int,
@@ -171,9 +252,12 @@ fun PreferenceSlider(
         Slider(
             value = currentScore.toFloat(),
             onValueChange = { onScoreChange(it.toInt()) },
-            steps = 3, // 1, 2, 3, 4, 5
+            steps = 0, // 1, 2, 3, 4, 5
             valueRange = 1f..5f,
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier.fillMaxWidth(0.8f),
+           
+
+
         )
 
         Row(
@@ -227,7 +311,11 @@ fun PagerNavigation(
                 containerColor = Primary50
             )
         ) {
-            Text("선호도 제출 및 완료", fontWeight = FontWeight.Bold)
+            Text(
+                "선호도 제출",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
         }
 
         // 다음 버튼
