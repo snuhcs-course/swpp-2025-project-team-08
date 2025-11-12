@@ -15,9 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.ui.common.theme.Neutral0
-import com.example.itda.ui.common.theme.Neutral60
-import com.example.itda.ui.common.theme.*
 
 @Composable
 fun HomeHeader(

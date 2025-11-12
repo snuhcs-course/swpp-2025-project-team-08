@@ -208,6 +208,7 @@ fun SearchScreen(
                         ProgramFilterRow(
                             categories = uiState.categories,
                             selectedCategory = uiState.selectedCategory,
+                            selectedCategoryCount = uiState.totalElements,
                             onCategorySelected = onCategorySelected
                         )
 
