@@ -77,7 +77,7 @@ jobs:
           username: dev
           key: ${{ secrets.PRIVATE_KEY }}
           source: "backend/docker-compose.yml"
-          target: "."
+          target: "docker-compose.yml"
 
       - name: Deploy to prod
         uses: appleboy/ssh-action@master
