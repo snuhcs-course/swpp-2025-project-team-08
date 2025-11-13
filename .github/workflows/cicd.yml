@@ -70,6 +70,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: dev
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "backend/docker-compose.yml"
+          target: "."
+
       - name: Deploy to prod
         uses: appleboy/ssh-action@master
         with:
@@ -78,12 +87,11 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
-            if [ -f "docker-compose.yml" ]; then
-              sudo docker-compose down
-            fi
+            sudo docker-compose down
             
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
             
+            # Create the .env file
             cat <<EOF > .env
             DB_URL=${{ secrets.DB_URL }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
@@ -94,10 +102,8 @@ jobs:
             EMBEDDING_SERVER_URL=http://gpu-tunnel:8000
             EOF
             
-            cp backend/docker-compose.yml .
-            
             sed -i 's|docker-username/itda:latest|${{ secrets.DOCKER_USERNAME }}/itda:latest|g' docker-compose.yml
             
             sudo docker-compose up -d
             
-            sudo docker system prune -a -f --volumes
+            sudo docker system prune -a -f
