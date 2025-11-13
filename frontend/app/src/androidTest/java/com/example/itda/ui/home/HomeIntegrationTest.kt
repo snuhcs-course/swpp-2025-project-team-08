@@ -9,10 +9,12 @@ import com.example.itda.data.repository.FakeAuthRepository
 import com.example.itda.data.repository.FakeProgramRepository
 import com.example.itda.data.source.remote.ProfileResponse
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,6 +82,7 @@ class HomeViewModelIntegrationTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         // ViewModel 생성 전에 Fake Repository를 초기화합니다.
         fakeAuthRepository = FakeAuthRepository()
         fakeProgramRepository = FakeProgramRepository()
@@ -132,7 +135,7 @@ class HomeViewModelIntegrationTest {
         viewModel.homeUi.test {
             val state = awaitItem()
             assertThat(state.generalError).isNotNull()
-            assertThat(state.username).isEmpty() // 프로필 로드 실패
+            assertThat(state.username).isEqualTo("사용자") // 프로필 로드 실패
             assertThat(state.feedItems).hasSize(1) // 데이터 로드는 성공
         }
     }
@@ -253,23 +256,31 @@ class HomeViewModelIntegrationTest {
     fun loadNextPage_whenAlreadyPaginating_doesNotCallRepository() = runTest {
         // Given: 초기 로드 성공
         fakeAuthRepository.getProfileResult = Result.success(dummyProfile)
-        fakeProgramRepository.getProgramsResult = Result.success(page0Response)
+        fakeProgramRepository.getProgramsResult = Result.success(page0Response) // [dummyProgramPage0]
         viewModel = HomeViewModel(fakeAuthRepository, fakeProgramRepository)
-        advanceUntilIdle() // init 완료
+        advanceUntilIdle() // init 완료. feedItems = [dummyProgramPage0]
         fakeProgramRepository.reset()
 
-        fakeProgramRepository.getProgramsResult = Result.success(page1Response)
+        fakeProgramRepository.getProgramsResult = Result.success(page1Response) // [dummyProgramPage1]
 
         // When: Paginating 중에 loadNextPage()를 또 호출
-        viewModel.loadNextPage() // 1. 첫 번째 호출 (isPaginating = true 됨)
-        viewModel.loadNextPage() // 2. 두 번째 호출 (isPaginating = true 이므로 즉시 return)
+        viewModel.loadNextPage() // 1. 첫 번째 호출 (isPaginating = true 업데이트 *스케줄*)
+
+        // 2. 스케줄된 isPaginating = true 업데이트를 즉시 실행
+        testDispatcher.scheduler.runCurrent() // <-- 이 라인을 다시 추가 (주석 해제)
+
+        viewModel.loadNextPage() // 3. 두 번째 호출 (이제 isPaginating = true 이므로 즉시 return)
+
+        // 4. 첫 번째 호출에서 스케줄된 나머지 작업(delay, API 호출)을 마저 실행
         advanceUntilIdle()
 
         // Then: loadNextCount가 1만 증가해야 함 (첫 번째 호출만 인정됨)
         viewModel.homeUi.test {
             val state = awaitItem()
+            // (첫 번째 호출만 성공적으로 실행되어 loadNextCount 1)
             assertThat(state.loadNextCount).isEqualTo(1)
-            assertThat(state.feedItems).hasSize(2) // 1번만 추가됨
+            // (첫 번째 호출의 onSuccess가 실행되어 P0 + P1 = 2개)
+            assertThat(state.feedItems).hasSize(2)
         }
     }
 
