@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.auth.LoginRoute
+import com.example.itda.ui.auth.OnBoardingRoute
 import com.example.itda.ui.auth.PersonalInfoRoute
 import com.example.itda.ui.auth.PreferenceUpdateRoute
 import com.example.itda.ui.auth.SignUpRoute
@@ -55,6 +56,14 @@ fun NavGraphBuilder.authGraph(
         }
         composable("preference_update") {
             PreferenceUpdateRoute(
+                onComplete = {
+                    navController.navigate("onboarding") {
+                        popUpTo("auth_graph") { inclusive = true }
+                    }
+                })
+        }
+        composable("onboarding") {
+            OnBoardingRoute(
                 onComplete = {
                     navController.navigate("main_graph") {
                         popUpTo("auth_graph") { inclusive = true }
