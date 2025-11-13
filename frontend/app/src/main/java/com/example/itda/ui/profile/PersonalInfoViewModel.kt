@@ -283,16 +283,30 @@ class PersonalInfoViewModel @Inject constructor(
         )
 
         result.onFailure { exception ->
-            if (exception is HttpException) {
-                val body = exception.response()?.errorBody()?.string().orEmpty()
-                val code = exception.code()
-                _personalInfoUi.update {
-                    it.copy(generalError = "HTTP $code: $body")
+            val errorMessage = when {
+                exception is HttpException -> {
+                    when (exception.code()) {
+                        400 -> "입력하신 정보를 다시 확인해주세요"
+                        401 -> "로그인이 만료되었습니다. 다시 로그인해주세요"
+                        403 -> "접근 권한이 없습니다"
+                        404 -> "요청하신 정보를 찾을 수 없습니다"
+                        409 -> "이미 등록된 정보입니다"
+                        422 -> "입력값이 올바르지 않습니다"
+                        500, 502, 503 -> "서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
+                        else -> "정보 저장에 실패했습니다. 다시 시도해주세요"
+                    }
                 }
-            } else {
-                _personalInfoUi.update {
-                    it.copy(generalError = "네트워크 오류: ${exception.message}")
+                exception.message?.contains("timeout", ignoreCase = true) == true -> {
+                    "네트워크 연결이 불안정합니다. 다시 시도해주세요"
                 }
+                exception.message?.contains("unable to resolve host", ignoreCase = true) == true -> {
+                    "인터넷 연결을 확인해주세요"
+                }
+                else -> "정보 저장 중 오류가 발생했습니다. 다시 시도해주세요"
+            }
+
+            _personalInfoUi.update {
+                it.copy(generalError = errorMessage)
             }
         }
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -90,8 +91,8 @@ private fun EmptyNotificationState(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "알림 없음",
+                        imageVector = Icons.Default.Bookmark,
+                        contentDescription = "북마크 없음",
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
@@ -100,7 +101,7 @@ private fun EmptyNotificationState(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "확인하지 않은 알림이 없습니다",
+                    text = "북마크된 정책이 없습니다",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -110,7 +111,7 @@ private fun EmptyNotificationState(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "새로운 알림이 도착하면\n여기에 표시됩니다",
+                    text = "원하는 정책을 북마크하시면\n여기에 표시됩니다.",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
