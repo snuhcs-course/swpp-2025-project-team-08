@@ -40,16 +40,13 @@ jobs:
         run: ./gradlew ktlintCheck
 
       # 빌드
-      - name: Build and run application
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      - name: Test and Build
         working-directory: ./backend
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
-          ./gradlew build -x test
           ./gradlew test
+          ./gradlew build -x test
 
       # Docker 로그인
       - name: Docker login
@@ -94,7 +91,7 @@ jobs:
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             
             EMBEDDING_SERVER_API_KEY=${{ secrets.EMBEDDING_SERVER_API_KEY }}
-            EMBEDDING_SERVER_URL=${{ secrets.EMBEDDING_SERVER_URL }}
+            EMBEDDING_SERVER_URL=http://gpu-tunnel:8000
             EOF
             
             cp backend/docker-compose.yml .
