@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.itda.R
 import com.example.itda.data.model.ProgramResponse
+import com.example.itda.ui.navigation.LoadingScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -57,7 +58,8 @@ fun FeedList(
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (ProgramResponse) -> Unit,
     onItemDismissed : (ProgramResponse) -> Unit = {},
-    onItemBookmarkClicked : (Int) -> Unit
+    onItemBookmarkClicked : (Int) -> Unit,
+    isPaginating : Boolean = false
 ) {
 // TODO - item id 를 보고 user 와의 관계에 대한 정보 가공 in program repository?
     //  ex : isStared, isEligible..
@@ -187,7 +189,17 @@ fun FeedList(
                 }
 
             }
+
         }
+        if(isPaginating) {
+            item {
+                LoadingScreen(
+                    text = ""
+                )
+            }
+        }
+
+
         /*
         itemsIndexed(items, key = { index, item -> "${item.id}_$index" }) { index, item ->
             var isVisible by remember { mutableStateOf(false) }

@@ -74,6 +74,7 @@ class HomeViewModel @Inject constructor(
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
+                            username = "사용자",
                         )
                     }
                 }
@@ -94,12 +95,17 @@ class HomeViewModel @Inject constructor(
 
 
         viewModelScope.launch {
-            _homeUi.update { it.copy(loadDataCount = homeUi.value.loadDataCount + 1, isLoading = true, currentPage = 0) }
+            _homeUi.update { it.copy(
+                loadDataCount = homeUi.value.loadDataCount + 1,
+                isLoading = true,
+                currentPage = 0,
+                feedItems = emptyList()
+            ) }
 
             val programs = programRepository.getPrograms(
                 page = 0,
                 size = 20,
-                category = _homeUi.value.selectedCategory.category
+                category = _homeUi.value.selectedCategory.category,
             )
             programs
                 .onFailure { exception ->
@@ -135,6 +141,7 @@ class HomeViewModel @Inject constructor(
 
         // 1. 이미 로딩 중이거나 마지막 페이지면 더 이상 호출하지 않음
         if (homeUi.value.isPaginating || isLast) return
+
 
         viewModelScope.launch {
             _homeUi.update { it.copy(isPaginating = true, loadNextCount = homeUi.value.loadNextCount + 1) }
