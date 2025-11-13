@@ -7,3 +7,5 @@
 
 /data-pipeline/data/*
 
+**/docker-compose.override.yml
+

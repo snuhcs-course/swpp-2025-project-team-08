@@ -1,0 +1,22 @@
+services:
+  spring-app:
+    image: docker-username/itda:latest
+    restart: always
+    ports:
+      - "80:8080"
+    env_file:
+      - ./.env
+    depends_on:
+      - gpu-tunnel
+
+  gpu-tunnel:
+    image: debian:stable-slim
+    restart: always
+    volumes:
+      - /home/dev/.ssh/gpu_key:/id_rsa:ro
+      - /home/dev/.ssh/known_hosts:/known_hosts:ro
+    command: >
+      bash -c "
+        apt-get update && apt-get install -y openssh-client autossh && \
+        autossh -M 0 -N -o 'UserKnownHostsFile=/known_hosts' -o 'StrictHostKeyChecking=yes' -i /id_rsa -p 2202 -L 0.0.0.0:8000:localhost:8000 team8@147.46.78.16
+      "

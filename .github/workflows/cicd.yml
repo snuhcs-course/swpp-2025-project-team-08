@@ -40,16 +40,13 @@ jobs:
         run: ./gradlew ktlintCheck
 
       # 빌드
-      - name: Build and run application
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      - name: Test and Build
         working-directory: ./backend
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
-          ./gradlew build -x test
           ./gradlew test
+          ./gradlew build -x test
 
       # Docker 로그인
       - name: Docker login
@@ -70,12 +67,9 @@ jobs:
     needs: CI
     if: contains(github.ref, 'main')
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      # 다시 checkout
-      - name: Checkout again
-        uses: actions/checkout@v3
-
-      # GCP에 배포
       - name: Deploy to prod
         uses: appleboy/ssh-action@master
         with:
@@ -84,13 +78,26 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
-            sudo docker stop $(sudo docker ps -q)
-            sudo docker rm $(sudo docker ps -aq)
+            if [ -f "docker-compose.yml" ]; then
+              sudo docker-compose down
+            fi
+            
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
-            sudo docker run -d -p 80:8080 \
-              -e DB_URL="${{ secrets.DB_URL }}" \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-              ${{ secrets.DOCKER_USERNAME }}/itda
+            
+            cat <<EOF > .env
+            DB_URL=${{ secrets.DB_URL }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            
+            EMBEDDING_SERVER_API_KEY=${{ secrets.EMBEDDING_SERVER_API_KEY }}
+            EMBEDDING_SERVER_URL=http://gpu-tunnel:8000
+            EOF
+            
+            cp backend/docker-compose.yml .
+            
+            sed -i 's|docker-username/itda:latest|${{ secrets.DOCKER_USERNAME }}/itda:latest|g' docker-compose.yml
+            
+            sudo docker-compose up -d
+            
             sudo docker system prune -a -f --volumes
