@@ -18,6 +18,8 @@ import com.example.itda.user.controller.AuthResponse
 import com.example.itda.user.controller.PreferenceRequest
 import com.example.itda.user.controller.ProfileRequest
 import com.example.itda.user.controller.User
+import com.example.itda.user.persistence.TagEntity
+import com.example.itda.user.persistence.TagRepository
 import com.example.itda.user.persistence.UserEntity
 import com.example.itda.user.persistence.UserRepository
 import com.example.itda.utils.PageResponse
@@ -31,10 +33,13 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlin.collections.addAll
+import kotlin.text.clear
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val tagRepository: TagRepository,
     private val programExampleRepository: ProgramExampleRepository,
     private val bookmarkRepository: BookmarkRepository,
 ) {
@@ -130,6 +135,21 @@ class UserService(
         request.householdSize?.let { userEntity.householdSize = it }
         request.householdIncome?.let { userEntity.householdIncome = it }
         request.employmentStatus?.let { userEntity.employmentStatus = it }
+
+        request.tags?.let { newTags ->
+            userEntity.tags.clear()
+
+            val tagEntities =
+                newTags.map { tagName ->
+                    TagEntity().apply {
+                        name = tagName
+                        user = userEntity
+                    }
+                }.toMutableSet()
+
+            userEntity.tags.addAll(tagEntities)
+        }
+
         userRepository.save(userEntity)
     }
 
@@ -152,7 +172,7 @@ class UserService(
         }
 
         val userEntity: UserEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        userEntity.preferenceEmbedding = preferenceEmbedding
+        userEntity.embedding = preferenceEmbedding
         userRepository.save(userEntity)
     }
 
@@ -171,6 +191,7 @@ class UserService(
                     val customPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize, sort)
                     bookmarkRepository.findByUserWithProgram(userEntity, customPageable)
                 }
+
                 BookmarkSortType.DEADLINE -> {
                     val basePageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
                     bookmarkRepository.findByUserWithProgramOrderByDeadline(userEntity, basePageable)
