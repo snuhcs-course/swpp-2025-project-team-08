@@ -3,7 +3,9 @@ package com.example.itda.ui.navigation
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,16 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,12 +41,15 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.itda.R
 import com.example.itda.ui.common.theme.Neutral30
+import com.example.itda.ui.common.theme.Neutral80
+import com.example.itda.ui.common.theme.Neutral90
 import com.example.itda.ui.common.theme.scaledSp
-import kotlinx.coroutines.launch
 
 // ⚠️ 실제 프로젝트의 R.raw. ID로 대체해야 합니다.
 private val onboardingVideos = listOf(
-    R.raw.onboarding1_home_feed,
+    R.raw.onboarding1_1_home_feed,
+    R.raw.onboarding1_2_category,
+    R.raw.onboarding1_3_exclusion,
     R.raw.onboarding2_search,
     R.raw.onboarding3_bookmark,
     R.raw.onboarding4_profile_update,
@@ -54,7 +57,9 @@ private val onboardingVideos = listOf(
 )
 
 private val onboardingVideoDescription = listOf(
-    "📄 홈 화면에서 맞춤 정책을 확인하세요.\n🗂️ 카테고리 별로 확인할 수 있습니다.\n❌ 관심없는 정책은 왼쪽으로 밀어 제외하세요.",
+    "📄 홈 화면에서 맞춤 정책을 확인하세요.",
+    "🗂️ 카테고리 별로 확인할 수 있습니다.",
+    "❌ 관심없는 정책은 왼쪽으로 밀어 제외하세요.",
     "🔍 검색 화면에서 원하는 정책을 키워드로 검색해보세요.",
     "🔖 북마크 화면에서 북마크한 정책들을 모아서 확인해보세요.",
     "👤 내 정보 화면에서 내가 입력했던 정보들을 수정할 수 있습니다.",
@@ -73,7 +78,9 @@ fun OnBoardingScreen(
     val currentPage = pagerState.currentPage
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Neutral90)
     ) {
         // 1. HorizontalPager: 스와이프 가능한 영역
         HorizontalPager(
@@ -90,7 +97,6 @@ fun OnBoardingScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 32.dp, end = 12.dp, start = 12.dp)
-                    .shadow(1.dp, RoundedCornerShape(2.dp))
             )
         }
 
@@ -99,16 +105,6 @@ fun OnBoardingScreen(
             pagerState = pagerState,
             pageCount = pageCount,
             onSubmit = onSubmit,
-            onPrev = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(currentPage - 1)
-                }
-            },
-            onNext = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(currentPage + 1)
-                }
-            }
         )
     }
 }
@@ -202,36 +198,19 @@ private fun OnBoardingBottomNavigation(
     pagerState: PagerState,
     pageCount: Int,
     onSubmit: () -> Unit,
-    onPrev: () -> Unit,
-    onNext: () -> Unit
+    // onPrev: () -> Unit, // ⚠️ 제거됨
+    // onNext: () -> Unit // ⚠️ 제거됨
 ) {
     val currentPage = pagerState.currentPage
     val isLastPage = currentPage == pageCount - 1
-
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp, horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center, // 중앙 정렬
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 이전 버튼
-        Button(
-            onClick = onPrev,
-            enabled = currentPage > 0,
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)
-            ),
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "이전"
-            )
-        }
-
-        // 중앙: 페이지 인디케이터 또는 최종 제출 버튼
         if (isLastPage) {
             Button(
                 onClick = onSubmit,
@@ -250,29 +229,25 @@ private fun OnBoardingBottomNavigation(
                 )
             }
         } else {
-            // 페이지 인디케이터
-            Text(
-                text = "${currentPage + 1} / $pageCount",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(1f)
-            )
-        }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(pageCount) { index ->
+                    val color = if (index == currentPage) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        Neutral80
+                    }
 
-        // 다음 버튼
-        Button(
-            onClick = onNext,
-            enabled = currentPage < pageCount - 1,
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary
-            ),
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "다음")
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                    )
+                }
+            }
         }
     }
 }

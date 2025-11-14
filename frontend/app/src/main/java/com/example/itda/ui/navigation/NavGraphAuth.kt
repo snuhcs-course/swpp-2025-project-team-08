@@ -22,7 +22,7 @@ fun NavGraphBuilder.authGraph(
         composable("login") {
             LoginRoute(
                 onSignUpClick = {
-                    navController.navigate("signup")
+                    navController.navigate("preference_update")
                 },
                 onLoginSuccess = {
                     navController.navigate("main_graph") {
