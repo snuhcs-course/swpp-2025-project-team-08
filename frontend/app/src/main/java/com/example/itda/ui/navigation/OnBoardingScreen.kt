@@ -2,6 +2,7 @@ package com.example.itda.ui.navigation
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -233,7 +235,16 @@ private fun OnBoardingBottomNavigation(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 repeat(pageCount) { index ->
+
+                    val isSelected = index == currentPage
+
+                    val dotSize by animateDpAsState(
+                        targetValue = if (isSelected) 12.dp else 8.dp,
+                        label = "Dot Size Animation"
+                    )
+
                     val color = if (index == currentPage) {
                         MaterialTheme.colorScheme.primary
                     } else {
@@ -242,7 +253,7 @@ private fun OnBoardingBottomNavigation(
 
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
+                            .size(dotSize)
                             .clip(CircleShape)
                             .background(color)
                     )
