@@ -44,3 +44,6 @@ out/
 
 ### env ###
 .env
+
+# Docker Compose Overrides
+docker-compose.override.yml

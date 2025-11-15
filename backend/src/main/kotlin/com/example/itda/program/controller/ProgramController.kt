@@ -85,4 +85,23 @@ class ProgramController(
         programService.unbookmarkProgram(user.id, programId)
         return ResponseEntity.noContent().build()
     }
+
+    @PostMapping("/programs/{programId}/like")
+    fun likeProgrma(
+        @PathVariable programId: Long,
+        @RequestParam("type") isLike: Boolean,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.likeProgram(user.id, programId, isLike)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/programs/{programId}/unlike")
+    fun unlikeProgram(
+        @PathVariable programId: Long,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.unLikeProgram(user.id, programId)
+        return ResponseEntity.noContent().build()
+    }
 }
