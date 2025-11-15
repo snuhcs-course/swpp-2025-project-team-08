@@ -5,12 +5,9 @@ import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-
-//TODO - openapi.yaml 에는 이 타입의 repsonse 가 온다고 되어있는데
-    // 아직 수정이 덜 된 것 같아 임의로 getPrograms 의 return type을 List<Program> 으로 둡니다.
-
 
 
 interface ProgramAPI {
@@ -56,5 +53,31 @@ interface ProgramAPI {
         @Query("size") size: Int = 10,
         @Query("category") category: String? = null
     ): PageResponse<ProgramResponse>
+
+    /**
+     * /users/me/bookmarks (GET)
+     * Get lists of bookmarked programs for the user
+     */
+    @GET("users/me/bookmarks")
+    suspend fun getUserBookmarkPrograms(
+        @Query("sort") sort: String, // LATEST (default), DEADLINE
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): ProgramPageResponse
+
+
+    /**
+     * /programs/{id}/bookmark (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/bookmark")
+    suspend fun bookmarkProgram(@Path("id") id: Int): Unit
+
+    /**
+     * /programs/{id}/unbookmark (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/unbookmark")
+    suspend fun unbookmarkProgram(@Path("id") id: Int): Unit
 }
 

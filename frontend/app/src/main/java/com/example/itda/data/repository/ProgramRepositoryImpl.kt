@@ -62,4 +62,45 @@ class ProgramRepositoryImpl @Inject constructor(
             category = category
         )
     }
+
+    override suspend fun getUserBookmarkPrograms(sort: String, page: Int, size: Int): Result<ProgramPageResponse> = runCatching {
+        api.getUserBookmarkPrograms(sort, page, size)
+    }
+
+    override suspend fun bookmarkProgram(programId: Int): Result<Unit> = runCatching {
+        api.bookmarkProgram(programId)
+    }
+
+    override suspend fun unbookmarkProgram(programId: Int): Result<Unit> = runCatching  {
+        api.unbookmarkProgram(programId)
+    }
+
+    override suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>> {
+        return runCatching {
+            val allPrograms = mutableListOf<ProgramResponse>()
+            var currentPage = 0
+            val pageSize = 20 // 적절한 페이지 크기 설정
+
+            while (true) {
+                val pageResult = getUserBookmarkPrograms(sort = "LATEST", page = currentPage, size = pageSize)
+
+                // API 호출 결과에서 ProgramPageResponse를 가져옴 (실패 시 예외 발생)
+                val response = pageResult.getOrThrow()
+
+                // ProgramPageResponse가 content: List<Program>와 last: Boolean 필드를 가진다고 가정
+                allPrograms.addAll(response.content)
+
+                // 마지막 페이지이면 루프 종료
+                if (response.isLast) {
+                    break
+                }
+
+                // 다음 페이지로 이동
+                currentPage++
+            }
+
+            allPrograms
+        }
+    }
+
 }

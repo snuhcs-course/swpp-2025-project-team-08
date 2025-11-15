@@ -23,22 +23,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.example.itda.ui.common.components.BaseScreen
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
 import com.example.itda.ui.feed.components.FeedSummaryCard
 import com.example.itda.ui.navigation.LoadingScreen
-import com.example.itda.ui.common.theme.*
 
 
 @SuppressLint("QueryPermissionsNeeded")
 @Composable
 fun FeedScreen(
     ui: FeedViewModel.FeedUiState, // UiState를 인자로 받음
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onBookmarkClicked: () -> Unit
 ) {
 //    val feedViewModel : FeedViewModel = hiltViewModel()
 
@@ -107,9 +107,9 @@ fun FeedScreen(
                     title = ui.feed.title,
                     endDate = ui.feed.applyEndAt ?: "",
                     tags = listOf(ui.feed.categoryValue),
-                    isEligible = false,
-                    isBookmarked = false, // TODO - ui.feed.isStarred
-                    onBookmarkClicked = {}
+                    isEligible = false, // TODO - ui.isEligible
+                    isBookmarked = ui.isBookmarked,
+                    onBookmarkClicked = onBookmarkClicked
                 )
 
                 Spacer(Modifier.height(16.dp))

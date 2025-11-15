@@ -214,8 +214,8 @@ fun SearchScreen(
 
                         FeedList(
                             items = uiState.searchResults,
+                            bookmarkPrograms = emptyList<Int>(), // TODO - ui 애 bookmarkprograms 추가하고  homeviewmodel 과 동일한 로직으로 불러와서 넣어주기
                             listState = listState,
-                            filterCategory = uiState.selectedCategory.value,
                             onItemClick = { feed -> onFeedClick(feed.id) },
                             onItemBookmarkClicked = { id ->
                                 // onFeedBookmarkClicked(id)

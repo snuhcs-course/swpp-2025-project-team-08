@@ -24,6 +24,7 @@ class FeedViewModel @Inject constructor(
 
     data class FeedUiState(
         val feed: ProgramDetailResponse = DummyData.dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
+        val isBookmarked : Boolean = false,
         val isLoading: Boolean = false,
         val generalError : String? = null,
     )
@@ -57,18 +58,59 @@ class FeedViewModel @Inject constructor(
                         )
                     }
                 }
-
-
         }
+    }
 
-
-
+    fun checkBookmarkStatus(programId: Int) {
+        viewModelScope.launch {
+            programRepository.getAllUserBookmarks()
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _feedUi.update { it.copy(generalError = "북마크 상태 확인 실패: ${apiError.message}") }
+                }
+                .onSuccess { bookmarks ->
+                    val isBookmarked = bookmarks.any { it.id == programId }
+                    _feedUi.update { it.copy(isBookmarked = isBookmarked) }
+                }
+        }
     }
 
 
-    fun toggleBookmark(feedId: Int) {
-        // TODO - Repository 연결해서 toggle bookmark
+    fun onBookmarkClicked() {
+        viewModelScope.launch {
 
+            val isBookmarked = feedUi.value.isBookmarked
+            val updateIsBookmarked = !isBookmarked
+            _feedUi.update {
+                it.copy(
+                    isBookmarked = updateIsBookmarked,
+                )
+            }
+
+
+            val apiCall = if(isBookmarked)
+                programRepository.unbookmarkProgram(programId = feedUi.value.feed.id)
+            else
+                programRepository.bookmarkProgram(feedUi.value.feed.id)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _feedUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isBookmarked = feedUi.value.isBookmarked,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _feedUi.update {
+                        it.copy(
+                            generalError = null,
+                        )
+                    }
+                }
+        }
     }
 
     fun applicationProgram(feedID: Int) {
