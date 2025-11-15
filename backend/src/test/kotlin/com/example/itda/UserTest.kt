@@ -135,6 +135,7 @@ class UserTest(
                 householdSize = 4,
                 householdIncome = 7000,
                 employmentStatus = EmploymentStatus.EMPLOYED,
+                tags = listOf(),
             )
 
         mockMvc.perform(
@@ -182,7 +183,7 @@ class UserTest(
             .andExpect(content().string(""))
 
         val userEntity = userRepository.findByEmail(testEmail) ?: throw RuntimeException("Test User not found in DB")
-        val savedEmbedding = userEntity.preferenceEmbedding ?: throw RuntimeException("User preferenceEmbedding is null")
+        val savedEmbedding = userEntity.embedding ?: throw RuntimeException("User preferenceEmbedding is null")
 
         val expectedEmbedding = FloatArray(TEST_EMBEDDING_DIMENSION)
         expectedEmbedding[0] = 0.7f
@@ -295,6 +296,7 @@ class UserTest(
                 householdSize = 4,
                 householdIncome = 7000,
                 employmentStatus = EmploymentStatus.EMPLOYED,
+                tags = listOf(),
             )
 
         mockMvc.perform(

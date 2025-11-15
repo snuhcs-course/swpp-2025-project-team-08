@@ -547,6 +547,12 @@ components:
             - 미취업자
             - 자영업자
           example: 재직자
+        'tags':
+          type: array
+          description: 태그
+          items:
+            type: string
+          example: [tag1, tag2, tag3]
     ProfileRequest:
       type: object
       properties:
@@ -612,6 +618,13 @@ components:
             - UNEMPLOYED
             - SELF_EMPLOYED
           example: EMPLOYED
+        'tags':
+          type: array
+          description: 태그
+          items:
+            type: string
+          example: [ tag1, tag2, tag3 ]
+
     UserPreferenceUpdateRequest:
       type: object
       properties:

@@ -28,8 +28,8 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
         AND (p.eligibility_min_age IS NULL OR u.birth_date IS NULL OR p.eligibility_min_age <= DATE_PART('year', AGE(CURRENT_DATE, u.birth_date)))
         AND (p.eligibility_max_age IS NULL OR u.birth_date IS NULL OR p.eligibility_max_age >= DATE_PART('year', AGE(CURRENT_DATE, u.birth_date)))
         ORDER BY
-          CASE WHEN u.preference_embedding IS NULL THEN p.created_at END DESC,
-          CASE WHEN u.preference_embedding IS NOT NULL THEN p.embedding <-> u.preference_embedding END ASC
+          CASE WHEN u.embedding IS NULL THEN p.created_at END DESC,
+          CASE WHEN u.embedding IS NOT NULL THEN p.embedding <-> u.embedding END ASC
         """,
         nativeQuery = true,
         countQuery = """
