@@ -1,7 +1,5 @@
 package com.example.itda.ui.auth
 
-import android.R.attr.data
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -209,20 +207,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 비밀번호 찾기
-//                    Box(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = "비밀번호 찾기",
-//                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                            modifier = Modifier
-//                                .clickable { }
-//                                .padding(8.dp)
-//                        )
-//                    }
                 }
             }
         }

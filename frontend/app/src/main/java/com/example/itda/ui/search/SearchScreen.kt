@@ -27,9 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
-import com.example.itda.ui.common.theme.Neutral20
-import com.example.itda.ui.common.theme.Neutral40
-import com.example.itda.ui.common.theme.Neutral50
+import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
@@ -62,7 +60,7 @@ fun SearchScreen(
     }
 
     LaunchedEffect(listState) {
-        val threshold = 4
+        val threshold = 1
 
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .collect { visibleItems ->
@@ -71,7 +69,7 @@ fun SearchScreen(
 
                 val shouldLoadMore = lastVisibleItemIndex >= (totalItemCount - threshold)
 
-                if (shouldLoadMore && totalItemCount > 0 && uiState.hasSearched) {
+                if (shouldLoadMore && totalItemCount > 0 && !uiState.isPaginating) {
                     onLoadNext()
                 }
             }
@@ -182,36 +180,36 @@ fun SearchScreen(
                 }
             }
             else {
-                if (uiState.isSearching) {
-                    LoadingScreen(text = "검색 중...")
-                }
-                else if (uiState.searchResults.isNotEmpty()) {
-                    Column {
-                        Row (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            SearchResultHeader(
-                                modifier = Modifier.weight(1f),
-                                searchQuery = uiState.recentSearches.firstOrNull() ?: "",
-                                totalResults = uiState.totalElements
-                            )
-
-                            SearchFilterRow(
-                                sortType = uiState.sortType,
-                                onSortTypeChange = onSortTypeChange
-                            )
-                        }
-
-                        ProgramFilterRow(
-                            categories = uiState.categories,
-                            selectedCategory = uiState.selectedCategory,
-                            selectedCategoryCount = uiState.totalElements,
-                            onCategorySelected = onCategorySelected
+                Column {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        SearchResultHeader(
+                            modifier = Modifier.weight(1f),
+                            searchQuery = uiState.recentSearches.firstOrNull() ?: "",
+                            totalResults = uiState.totalElements
                         )
 
+                        SearchFilterRow(
+                            sortType = uiState.sortType,
+                            onSortTypeChange = onSortTypeChange
+                        )
+                    }
+
+                    ProgramFilterRow(
+                        categories = uiState.categories,
+                        selectedCategory = uiState.selectedCategory,
+                        selectedCategoryCount = uiState.totalElements,
+                        onCategorySelected = onCategorySelected
+                    )
+
+                    if (uiState.isSearching) {
+                        LoadingScreen(text = "검색 중...")
+                    }
+                    else if (uiState.searchResults.isNotEmpty()) {
                         FeedList(
                             items = uiState.searchResults,
                             listState = listState,
@@ -219,65 +217,47 @@ fun SearchScreen(
                             onItemClick = { feed -> onFeedClick(feed.id) },
                             onItemBookmarkClicked = { id ->
                                 // onFeedBookmarkClicked(id)
-                            }
+                            },
+                            isPaginating = uiState.isPaginating
                         )
-
-                        /* TODO - 무한 로딩이 떠서 임시로 지워둠
-                        if (uiState.isLoadingMore) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                    }
+                    else if (uiState.generalError != null) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = uiState.generalError,
+                                fontSize = 16.scaledSp,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                    else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(32.dp),
-                                    color = Primary40,
-                                    strokeWidth = 3.dp
+                                Text(
+                                    text = "검색 결과가 없습니다",
+                                    fontSize = 18.scaledSp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Neutral40
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "다른 검색어로 다시 시도해보세요",
+                                    fontSize = 14.scaledSp,
+                                    color = Neutral50
                                 )
                             }
                         }
-                        */
-                    }
-                }
-                else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "검색 결과가 없습니다",
-                                fontSize = 18.scaledSp,
-                                fontWeight = FontWeight.Medium,
-                                color = Neutral40
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "다른 검색어로 다시 시도해보세요",
-                                fontSize = 14.scaledSp,
-                                color = Neutral50
-                            )
-                        }
-                    }
-                }
-
-                uiState.generalError?.let { errorText ->
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = errorText,
-                            fontSize = 16.scaledSp,
-                            color = MaterialTheme.colorScheme.error
-                        )
                     }
                 }
             }
         }
     }
 }
-
