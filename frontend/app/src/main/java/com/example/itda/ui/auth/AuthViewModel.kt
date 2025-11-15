@@ -259,6 +259,8 @@ class AuthViewModel @Inject constructor(
         val householdSize: String = "",
         val householdIncome: String = "",
         val employmentStatus: String? = null,
+        val selectedTags: List<String> = emptyList(),
+        val tagInput: String = "",
 
         val isLoading: Boolean = false,
         val nameError: String? = null,
@@ -311,6 +313,31 @@ class AuthViewModel @Inject constructor(
 
     fun onEmploymentStatusChange(v: String?) {
         _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
+    }
+
+    fun onTagInputChange(input: String) {
+        _personalInfoUi.update {
+            it.copy(tagInput = input)
+        }
+    }
+    fun addTag(tag: String) {
+        val trimmedTag = tag.trim()
+
+        if (trimmedTag.isEmpty()) return
+        if (trimmedTag in _personalInfoUi.value.selectedTags) return
+
+        _personalInfoUi.update {
+            it.copy(
+                selectedTags = it.selectedTags + trimmedTag,
+                tagInput = ""
+            )
+        }
+    }
+
+    fun removeTag(tag: String) {
+        _personalInfoUi.update {
+            it.copy(selectedTags = it.selectedTags - tag)
+        }
     }
 
     suspend fun submitPersonalInfo(): Boolean {
@@ -377,7 +404,8 @@ class AuthViewModel @Inject constructor(
             educationLevel = ui.educationLevel,
             householdSize = householdSizeInt,
             householdIncome = householdIncomeInt,
-            employmentStatus = ui.employmentStatus
+            employmentStatus = ui.employmentStatus,
+            tags = ui.selectedTags.ifEmpty { null }
         )
 
         result.onFailure { exception ->

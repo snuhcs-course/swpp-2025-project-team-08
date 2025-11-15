@@ -67,7 +67,8 @@ class AuthRepositoryImpl @Inject constructor(
         educationLevel: String?,
         householdSize: Int?,
         householdIncome: Int?,
-        employmentStatus: String?
+        employmentStatus: String?,
+        tags: List<String>?
     ): Result<Unit> = runCatching {
         val request = ProfileRequest(
             name = name,
@@ -79,7 +80,8 @@ class AuthRepositoryImpl @Inject constructor(
             educationLevel = educationLevel,
             householdSize = householdSize,
             householdIncome = householdIncome,
-            employmentStatus = employmentStatus
+            employmentStatus = employmentStatus,
+            tags = tags
         )
         api.updateProfile(request)
     }

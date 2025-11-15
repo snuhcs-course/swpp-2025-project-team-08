@@ -27,7 +27,8 @@ data class ProfileRequest(
     val educationLevel: String?,
     val householdSize: Int?,
     val householdIncome: Int?,
-    val employmentStatus: String?
+    val employmentStatus: String?,
+    val tags: List<String>?
 )
 
 data class ProfileResponse(
@@ -42,7 +43,8 @@ data class ProfileResponse(
     val educationLevel: String?,
     val householdSize: Int?,
     val householdIncome: Int?,
-    val employmentStatus: String?
+    val employmentStatus: String?,
+    val tags: List<String>?
 )
 
 typealias PreferenceRequestList = List<PreferenceRequest>

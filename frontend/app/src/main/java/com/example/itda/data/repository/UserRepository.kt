@@ -104,7 +104,8 @@ class UserRepository @Inject constructor(
             educationLevel = educationLevel,
             householdSize = householdSize,
             householdIncome = householdIncome,
-            employmentStatus = employmentStatus
+            employmentStatus = employmentStatus,
+            tags = null
         )
 
         api.updateProfile(request)

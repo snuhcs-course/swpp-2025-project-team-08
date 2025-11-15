@@ -79,6 +79,9 @@ fun PersonalInfoRoute(
         onHouseholdSizeChange = vm::onHouseholdSizeChange,
         onHouseholdIncomeChange = vm::onHouseholdIncomeChange,
         onEmploymentStatusChange = vm::onEmploymentStatusChange,
+        onTagInputChange = vm::onTagInputChange,
+        onAddTag = vm::addTag,
+        onRemoveTag = vm::removeTag,
 
         onSubmit = {
             scope.launch {
