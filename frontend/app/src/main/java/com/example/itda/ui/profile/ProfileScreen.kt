@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -69,9 +70,9 @@ fun ProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Profile",
+                        "내 정보",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.scaledSp,
+                        fontSize = 25.scaledSp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -93,139 +94,97 @@ fun ProfileScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 사용자 프로필 카드
-            Card(
+        if (ui.isLoading) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                elevation = CardDefaults.cardElevation(0.dp)
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 맞춤 정보 헤더 카드
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                    ),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column {
                         Text(
-                            text = ui.user.name ?: "사용자",
-                            fontSize = 18.scaledSp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            text = "개인에게 알맞은\n정책을 추천해드립니다",
+                            fontSize = 16.scaledSp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 22.scaledSp,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-//                        Text(
-//                            text = ui.user.email.takeIf { it.isNotEmpty() } ?: "user_id",
-//                            fontSize = 13.scaledSp,
-//                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-//                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Button(
+                            onClick = onPersonalInfoClick,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                horizontal = 20.dp,
+                                vertical = 12.dp
+                            )
+                        ) {
+                            Text("수정", fontSize = 16.scaledSp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // 맞춤 정보 헤더
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "맞춤 정보",
-                        fontSize = 16.scaledSp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        text = "아래 정보를 이용하여 개인에게 알맞은 정책을 추천해드립니다.",
-                        fontSize = 11.scaledSp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 14.scaledSp
-                    )
-                }
-                Button(
-                    onClick = onPersonalInfoClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                // 정보 카드
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    )
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
-                    Text("수정", fontSize = 13.scaledSp, fontWeight = FontWeight.Medium)
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        val user = ui.user
+
+                        ProfileInfoItem("이름", user?.name ?: "")
+                        ProfileInfoItem("생년월일", user?.birthDate ?: "")
+                        ProfileInfoItem("성별", user?.gender ?: "")
+                        ProfileInfoItem("주소", user?.address ?: "")
+                        ProfileInfoItem("우편번호", user?.postcode ?: "")
+                        ProfileInfoItem("결혼 여부", user?.maritalStatus ?: "")
+                        ProfileInfoItem("학력", user?.educationLevel ?: "")
+                        ProfileInfoItem("가구원 수", user?.householdSize?.toString() ?: "")
+                        ProfileInfoItem("가구원 소득", user?.householdIncome?.let { "${it}만원" } ?: "")
+                        ProfileInfoItem("취업 상태", user?.employmentStatus ?: "", isLast = true)
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(80.dp))
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 정보 카드
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                elevation = CardDefaults.cardElevation(0.dp)
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    val user = ui.user
-
-                    ProfileInfoItem("이름", user.name ?: "")
-                    ProfileInfoItem("생년월일", user.birthDate ?: "")
-                    ProfileInfoItem("성별", user.gender ?: "")
-                    ProfileInfoItem("주소", user.address ?: "")
-                    ProfileInfoItem("우편번호", user.postcode ?: "")
-                    ProfileInfoItem("결혼 여부", user.maritalStatus ?: "")
-                    ProfileInfoItem("학력", user.educationLevel ?: "")
-                    ProfileInfoItem("가구원 수", user.householdSize?.toString() ?: "")
-                    ProfileInfoItem("가구원 소득", user.householdIncome?.let { "${it}만원" } ?: "")
-                    ProfileInfoItem("취업 상태", user.employmentStatus ?: "", isLast = true)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -278,5 +237,35 @@ fun ProfileInfoItem(
         if (!isLast) {
             Spacer(modifier = Modifier.height(10.dp))
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    MaterialTheme {
+        ProfileScreen(
+            ui = ProfileViewModel.ProfileUiState(
+                user = com.example.itda.data.source.remote.ProfileResponse(
+                    id = "1",
+                    email = "test@example.com",
+                    name = "백일",
+                    birthDate = "1949-01-01",
+                    gender = "남성",
+                    address = "서울 노원구 동일로216길 92",
+                    postcode = "01754",
+                    maritalStatus = "미혼",
+                    educationLevel = "대졸",
+                    householdSize = 4,
+                    householdIncome = 500,
+                    employmentStatus = "재직자"
+                ),
+                isLoading = false,
+                generalError = null
+            ),
+            onSettingClick = {},
+            onPersonalInfoClick = {},
+            onRefresh = {}
+        )
     }
 }

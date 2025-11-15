@@ -2,8 +2,9 @@ package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.itda.data.model.User
-import com.example.itda.data.repository.UserRepository
+import com.example.itda.data.repository.AuthRepository
+import com.example.itda.data.source.remote.ApiErrorParser
+import com.example.itda.data.source.remote.ProfileResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,24 +15,12 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     data class ProfileUiState(
-        val user: User = User(  // DummyData 제거, 빈 User로 초기화
-            id = "",
-            email = "",
-            name = null,
-            birthDate = null,
-            gender = null,
-            address = null,
-            postcode = null,
-            maritalStatus = null,
-            educationLevel = null,
-            householdSize = null,
-            householdIncome = null,
-            employmentStatus = null
-        ),
-        val isLoading: Boolean = false
+        val user: ProfileResponse? = null,
+        val isLoading: Boolean = false,
+        val generalError: String? = null
     )
 
     private val _profileUi = MutableStateFlow(ProfileUiState())
@@ -45,19 +34,25 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _profileUi.update { it.copy(isLoading = true) }
 
-            try {
-                val user = userRepository.getMe()
-
-                _profileUi.update {
-                    it.copy(
-                        user = user,
-                        isLoading = false
-                    )
+            authRepository.getProfile()
+                .onSuccess { profile ->
+                    _profileUi.update {
+                        it.copy(
+                            user = profile,
+                            isLoading = false,
+                            generalError = null
+                        )
+                    }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _profileUi.update { it.copy(isLoading = false) }
-            }
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _profileUi.update {
+                        it.copy(
+                            isLoading = false,
+                            generalError = apiError.message
+                        )
+                    }
+                }
         }
     }
 }

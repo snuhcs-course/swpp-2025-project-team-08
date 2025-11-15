@@ -3,7 +3,6 @@ package com.example.itda.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
-import com.example.itda.data.repository.UserRepository
 import com.example.itda.data.source.local.SettingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
@@ -31,7 +29,7 @@ class SettingsViewModel @Inject constructor(
         SMALL("작게", 0.9f),
         MEDIUM("보통", 1.0f),
         LARGE("크게", 1.1f),
-        EXTRA_LARGE("매우 크게", 1.2f)
+        EXTRA_LARGE("매우\n크게", 1.2f)
     }
 
     private val _settingsUi = MutableStateFlow(SettingsUiState())
@@ -63,7 +61,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val newValue = !_settingsUi.value.darkMode
             settingsDataStore.setDarkMode(newValue)
-            // Flow가 자동으로 UI 업데이트
         }
     }
 
@@ -76,7 +73,6 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
-            userRepository.clearUser()
         }
     }
 }
