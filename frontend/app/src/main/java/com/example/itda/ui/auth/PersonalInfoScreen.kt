@@ -30,6 +30,9 @@ fun PersonalInfoScreen(
     onHouseholdSizeChange: (String) -> Unit,
     onHouseholdIncomeChange: (String) -> Unit,
     onEmploymentStatusChange: (String?) -> Unit,
+    onTagInputChange: (String) -> Unit,
+    onAddTag: (String) -> Unit,
+    onRemoveTag: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
     var showAddressDialog by remember { mutableStateOf(false) }
@@ -361,6 +364,16 @@ fun PersonalInfoScreen(
                             ),
                             selectedValue = ui.employmentStatus,
                             onOptionSelected = onEmploymentStatusChange
+                        )
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        TagSelectionSection(
+                            selectedTags = ui.selectedTags,
+                            tagInput = ui.tagInput,
+                            onTagInputChange = onTagInputChange,
+                            onAddTag = onAddTag,
+                            onRemoveTag = onRemoveTag
                         )
 
                         if (ui.generalError != null) {

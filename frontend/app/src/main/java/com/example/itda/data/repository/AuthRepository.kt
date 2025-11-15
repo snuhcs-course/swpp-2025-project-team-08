@@ -28,7 +28,8 @@ interface AuthRepository {
         educationLevel: String? = null,
         householdSize: Int? = null,
         householdIncome: Int? = null,
-        employmentStatus: String? = null
+        employmentStatus: String? = null,
+        tags: List<String>? = null
     ): Result<Unit>
 
     suspend fun updatePreference(
