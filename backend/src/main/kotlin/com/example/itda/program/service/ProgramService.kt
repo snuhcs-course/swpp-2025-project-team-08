@@ -8,6 +8,8 @@ import com.example.itda.program.persistence.BookmarkEntity
 import com.example.itda.program.persistence.BookmarkRepository
 import com.example.itda.program.persistence.ProgramEntity
 import com.example.itda.program.persistence.ProgramExampleRepository
+import com.example.itda.program.persistence.ProgramLikeEntity
+import com.example.itda.program.persistence.ProgramLikeRepository
 import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.program.persistence.enums.ProgramCategory
 import com.example.itda.user.UserNotFoundException
@@ -27,6 +29,7 @@ class ProgramService(
     val programExampleRepository: ProgramExampleRepository,
     val bookmarkRepository: BookmarkRepository,
     val userRepository: UserRepository,
+    val programLikeRepository: ProgramLikeRepository,
 ) {
     @Transactional(readOnly = true)
     fun getPrograms(
@@ -63,11 +66,11 @@ class ProgramService(
     @Transactional(readOnly = true)
     fun searchLatestPrograms(
         searchTerm: String,
+        category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
         val programs: Page<ProgramEntity> =
-            programRepository.searchWithCategoryFilter(
+            programRepository.searchLatest(
                 query = searchTerm,
                 category = category,
                 pageable = pageable,
@@ -76,25 +79,24 @@ class ProgramService(
         return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
     }
 
-    private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
-        val matchedByName =
-            ProgramCategory.entries
-                .find { it.name.equals(searchTerm, ignoreCase = true) }
-        if (matchedByName != null) return matchedByName
-
-        return ProgramCategory.entries
-            .find { it.value.contains(searchTerm) }
-    }
+//    private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
+//        val matchedByName =
+//            ProgramCategory.entries
+//                .find { it.name.equals(searchTerm, ignoreCase = true) }
+//        if (matchedByName != null) return matchedByName
+//
+//        return ProgramCategory.entries
+//            .find { it.value.contains(searchTerm) }
+//    }
 
     @Transactional
     fun searchProgramsByRank(
         searchTerm: String,
+        category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
-
         val programs: Page<ProgramEntity> =
-            programRepository.searchAndRankPrograms(
+            programRepository.searchByRank(
                 query = searchTerm,
                 category = category,
                 pageable = pageable,
@@ -132,5 +134,35 @@ class ProgramService(
         programEntity.bookmarks.remove(bookmarkToDelete)
         userEntity.bookmarks.remove(bookmarkToDelete)
         bookmarkRepository.delete(bookmarkToDelete)
+    }
+
+    @Transactional
+    fun likeProgram(
+        userId: String,
+        programId: Long,
+        isLike: Boolean,
+    ) {
+        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        if (programEntity.programLikes.any { it.user.id == userEntity.id }) {
+            return
+        }
+        val programLikeEntity =
+            programLikeRepository.save(
+                ProgramLikeEntity(program = programEntity, user = userEntity, isLike = isLike, createdAt = OffsetDateTime.now()),
+            )
+        programEntity.programLikes.add(programLikeEntity)
+    }
+
+    @Transactional
+    fun unLikeProgram(
+        userId: String,
+        programId: Long,
+    ) {
+        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
+        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        val programLikeToDelete = programEntity.programLikes.find { it.user.id == userEntity.id } ?: return
+        programEntity.programLikes.remove(programLikeToDelete)
+        programLikeRepository.delete(programLikeToDelete)
     }
 }

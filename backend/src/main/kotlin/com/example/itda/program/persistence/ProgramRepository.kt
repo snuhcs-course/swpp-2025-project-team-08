@@ -58,16 +58,17 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
     @Query(
         """
         SELECT p FROM ProgramEntity p
-        WHERE (LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))) 
-           OR (LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')))
-           OR (LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')))
-           OR (:category IS NOT NULL AND p.category = :category)
-           
+        WHERE (
+                (LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))) 
+               OR (LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')))
+               OR (LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')))
+           )
+            And (:category IS NULL OR p.category = :category)
         ORDER BY p.createdAt DESC,
         p.id ASC
     """,
     )
-    fun searchWithCategoryFilter(
+    fun searchLatest(
         @Param("query") query: String,
         @Param("category") category: ProgramCategory?,
         pageable: Pageable,
@@ -77,24 +78,25 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
         """
         SELECT p
         FROM ProgramEntity p
-        WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) 
-           OR LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%'))
-           OR (:categoryEnum IS NOT NULL AND p.category = :categoryEnum) 
-           OR LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%'))
-           OR LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%'))
+        WHERE (
+                LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) 
+               OR LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%'))
+            )
+            And (:category IS NULL OR p.category = :category)
         ORDER BY 
-            (CASE WHEN LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) THEN 5 ELSE 0 END) +
-            (CASE WHEN LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')) THEN 4 ELSE 0 END) +
-            (CASE WHEN p.category = :categoryEnum THEN 3 ELSE 0 END) +
+            (CASE WHEN LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) THEN 4 ELSE 0 END) +
+            (CASE WHEN LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')) THEN 3 ELSE 0 END) +
             (CASE WHEN LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')) THEN 2 ELSE 0 END) +
             (CASE WHEN LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%')) THEN 1 ELSE 0 END) DESC,
             p.createdAt DESC,
             p.id ASC
     """,
     )
-    fun searchAndRankPrograms(
+    fun searchByRank(
         @Param("query") query: String,
-        @Param("categoryEnum") category: ProgramCategory?,
+        @Param("category") category: ProgramCategory?,
         pageable: Pageable,
     ): Page<ProgramEntity>
 

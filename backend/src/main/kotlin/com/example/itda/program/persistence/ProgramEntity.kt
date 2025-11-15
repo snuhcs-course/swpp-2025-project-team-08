@@ -95,4 +95,6 @@ class ProgramEntity(
     var embedding: FloatArray,
     @OneToMany(mappedBy = "program")
     var bookmarks: MutableSet<BookmarkEntity> = mutableSetOf(),
+    @OneToMany(mappedBy = "program")
+    var programLikes: MutableSet<ProgramLikeEntity> = mutableSetOf(),
 )

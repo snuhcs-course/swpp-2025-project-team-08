@@ -55,17 +55,19 @@ class ProgramController(
     @GetMapping("/programs/search/latest")
     fun searchLatestPrograms(
         @RequestParam("query") searchTerm: String,
+        @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchLatestPrograms(searchTerm, pageable)
+        return programService.searchLatestPrograms(searchTerm, category, pageable)
     }
 
     @GetMapping("/programs/search/rank")
     fun searchProgramsByRank(
         @RequestParam("query") searchTerm: String,
+        @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchProgramsByRank(searchTerm, pageable)
+        return programService.searchProgramsByRank(searchTerm, category, pageable)
     }
 
     @PostMapping("/programs/{programId}/bookmark")
@@ -83,6 +85,25 @@ class ProgramController(
         @AuthUser user: User,
     ): ResponseEntity<String> {
         programService.unbookmarkProgram(user.id, programId)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/programs/{programId}/like")
+    fun likeProgrma(
+        @PathVariable programId: Long,
+        @RequestParam("type") isLike: Boolean,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.likeProgram(user.id, programId, isLike)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/programs/{programId}/unlike")
+    fun unlikeProgram(
+        @PathVariable programId: Long,
+        @AuthUser user: User,
+    ): ResponseEntity<String> {
+        programService.unLikeProgram(user.id, programId)
         return ResponseEntity.noContent().build()
     }
 }

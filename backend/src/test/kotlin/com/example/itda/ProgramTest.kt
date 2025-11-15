@@ -184,13 +184,14 @@ class ProgramTest(
         mockMvc.perform(
             get("/api/v1/programs/search/latest")
                 .param("query", "Employment")
+                .param("category", "EMPLOYMENT")
                 .param("page", "0")
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON),
         )
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.content.length()").value(2))
-            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.totalElements").value(1))
     }
 
     @Test
