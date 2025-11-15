@@ -2,8 +2,7 @@ package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import retrofit2.HttpException
-import com.example.itda.data.repository.UserRepository
+import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,7 @@ import com.example.itda.ui.auth.components.isValidBirthDate
 
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     data class PersonalInfoUiState(
@@ -134,39 +133,34 @@ class PersonalInfoViewModel @Inject constructor(
         viewModelScope.launch {
             _personalInfoUi.update { it.copy(isLoading = true) }
 
-            try {
-                val user = userRepository.getMe()
-
-                // 🔧 수정: 서버가 이미 한글 값을 반환하므로 변환 없이 그대로 사용
-                _personalInfoUi.update {
-                    it.copy(
-                        name = user.name ?: "",
-                        birthDate = user.birthDate?.replace("-", "") ?: "",  // "2001-01-01" -> "20010101"
-                        gender = user.gender ?: "",
-                        address = user.address ?: "",
-                        postcode = user.postcode ?: "",
-                        maritalStatus = user.maritalStatus ?: "",
-                        education = user.educationLevel ?: "",
-                        householdSize = user.householdSize?.toString() ?: "",
-                        householdIncome = user.householdIncome?.toString() ?: "",
-                        employmentStatus = user.employmentStatus ?: "",
-                        isLoading = false,
-                        nameError = null,
-                        birthDateError = null,
-                        genderError = null,
-                        addressError = null,
-                        postcodeError = null,
-                        generalError = null
-                    )
+            authRepository.getProfile()
+                .onSuccess { profile ->
+                    _personalInfoUi.update {
+                        it.copy(
+                            name = profile.name ?: "",
+                            birthDate = profile.birthDate?.replace("-", "") ?: "",
+                            gender = profile.gender ?: "",
+                            address = profile.address ?: "",
+                            postcode = profile.postcode ?: "",
+                            maritalStatus = profile.maritalStatus ?: "",
+                            education = profile.educationLevel ?: "",
+                            householdSize = profile.householdSize?.toString() ?: "",
+                            householdIncome = profile.householdIncome?.toString() ?: "",
+                            employmentStatus = profile.employmentStatus ?: "",
+                            isLoading = false,
+                            generalError = null
+                        )
+                    }
                 }
-            } catch (e: Exception) {
-                _personalInfoUi.update {
-                    it.copy(
-                        isLoading = false,
-                        generalError = "사용자 정보를 불러오지 못했습니다"
-                    )
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _personalInfoUi.update {
+                        it.copy(
+                            isLoading = false,
+                            generalError = apiError.message
+                        )
+                    }
                 }
-            }
         }
     }
 
@@ -269,7 +263,7 @@ class PersonalInfoViewModel @Inject constructor(
         val educationEnum = convertKoreanToEnum(ui.education, "education")
         val employmentEnum = convertKoreanToEnum(ui.employmentStatus, "employment")
 
-        val result = userRepository.updateProfile(
+        val result = authRepository.updateProfile(
             name = ui.name,
             birthDate = formattedBirthDate,
             gender = genderEnum,
@@ -284,7 +278,7 @@ class PersonalInfoViewModel @Inject constructor(
 
         result.onFailure { exception ->
             val errorMessage = when {
-                exception is HttpException -> {
+                exception is retrofit2.HttpException -> {
                     when (exception.code()) {
                         400 -> "입력하신 정보를 다시 확인해주세요"
                         401 -> "로그인이 만료되었습니다. 다시 로그인해주세요"
@@ -304,14 +298,11 @@ class PersonalInfoViewModel @Inject constructor(
                 }
                 else -> "정보 저장 중 오류가 발생했습니다. 다시 시도해주세요"
             }
-
-            _personalInfoUi.update {
-                it.copy(generalError = errorMessage)
-            }
+            _personalInfoUi.update { it.copy(generalError = errorMessage) }
         }
 
-
         _personalInfoUi.update { it.copy(isLoading = false) }
+
         return result.isSuccess
     }
 }

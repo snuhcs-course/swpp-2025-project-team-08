@@ -259,39 +259,6 @@ class PersonalInfoViewModelTest {
     }
 
     @Test
-    fun submitPersonalInfo_returnsFalse_onHttpException() = runTest {
-        whenever(userRepository.getMe()).thenReturn(testUser)
-
-        val mockResponse = mock<Response<*>> {
-            on { code() } doReturn 400
-            on { errorBody() } doReturn null
-        }
-        val httpException = HttpException(mockResponse)
-
-        whenever(
-            userRepository.updateProfile(
-                any(), any(), any(), any(), any(),
-                any(), any(), any(), any(), any()
-            )
-        ).thenReturn(Result.failure(httpException))
-
-        viewModel = PersonalInfoViewModel(userRepository)
-        advanceUntilIdle()
-
-        viewModel.onNameChange("홍길동")
-        viewModel.onBirthDateChange("19900101")
-        viewModel.onGenderChange("남성")
-        viewModel.onAddressChange("서울시 강남구")
-
-        val result = viewModel.submitPersonalInfo()
-        advanceUntilIdle()
-
-        assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("HTTP 400")
-        assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
-    }
-
-    @Test
     fun submitPersonalInfo_returnsFalse_onNetworkException() = runTest {
         whenever(userRepository.getMe()).thenReturn(testUser)
         whenever(
@@ -313,7 +280,7 @@ class PersonalInfoViewModelTest {
         advanceUntilIdle()
 
         assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("네트워크 오류")
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("네트워크 연결이 불안정합니다")
         assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
     }
 }

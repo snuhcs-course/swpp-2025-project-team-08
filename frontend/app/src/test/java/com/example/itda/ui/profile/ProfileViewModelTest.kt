@@ -7,6 +7,7 @@ import com.example.itda.data.repository.UserRepository
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,8 +51,10 @@ class ProfileViewModelTest {
     )
 
     @Before
-    fun setup() = runTest {
-        `when`(userRepository.getMe()).thenReturn(testUser)
+    fun setup() {
+        runBlocking {  // runBlocking 사용!
+            `when`(userRepository.getMe()).thenReturn(testUser)
+        }
     }
 
     // ========================================
