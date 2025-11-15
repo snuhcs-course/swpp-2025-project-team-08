@@ -55,17 +55,19 @@ class ProgramController(
     @GetMapping("/programs/search/latest")
     fun searchLatestPrograms(
         @RequestParam("query") searchTerm: String,
+        @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchLatestPrograms(searchTerm, pageable)
+        return programService.searchLatestPrograms(searchTerm, category, pageable)
     }
 
     @GetMapping("/programs/search/rank")
     fun searchProgramsByRank(
         @RequestParam("query") searchTerm: String,
+        @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchProgramsByRank(searchTerm, pageable)
+        return programService.searchProgramsByRank(searchTerm, category, pageable)
     }
 
     @PostMapping("/programs/{programId}/bookmark")

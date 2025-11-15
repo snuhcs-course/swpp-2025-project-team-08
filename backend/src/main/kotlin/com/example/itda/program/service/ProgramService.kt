@@ -66,11 +66,11 @@ class ProgramService(
     @Transactional(readOnly = true)
     fun searchLatestPrograms(
         searchTerm: String,
+        category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
         val programs: Page<ProgramEntity> =
-            programRepository.searchWithCategoryFilter(
+            programRepository.searchLatest(
                 query = searchTerm,
                 category = category,
                 pageable = pageable,
@@ -79,25 +79,24 @@ class ProgramService(
         return PageResponse.from(programs, ProgramSummaryResponse::fromEntity)
     }
 
-    private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
-        val matchedByName =
-            ProgramCategory.entries
-                .find { it.name.equals(searchTerm, ignoreCase = true) }
-        if (matchedByName != null) return matchedByName
-
-        return ProgramCategory.entries
-            .find { it.value.contains(searchTerm) }
-    }
+//    private fun mapSearchTermToCategory(searchTerm: String): ProgramCategory? {
+//        val matchedByName =
+//            ProgramCategory.entries
+//                .find { it.name.equals(searchTerm, ignoreCase = true) }
+//        if (matchedByName != null) return matchedByName
+//
+//        return ProgramCategory.entries
+//            .find { it.value.contains(searchTerm) }
+//    }
 
     @Transactional
     fun searchProgramsByRank(
         searchTerm: String,
+        category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        val category: ProgramCategory? = mapSearchTermToCategory(searchTerm)
-
         val programs: Page<ProgramEntity> =
-            programRepository.searchAndRankPrograms(
+            programRepository.searchByRank(
                 query = searchTerm,
                 category = category,
                 pageable = pageable,
