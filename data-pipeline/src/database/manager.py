@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any, Dict, List
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
@@ -5,7 +7,11 @@ from psycopg_pool import ConnectionPool
 
 class PostgresManager:
     def __init__(
-        self, conn_string: str, min_pool_size: int = 1, max_pool_size: int = 10
+        self,
+        conn_string: str,
+        failure_path: Path,
+        min_pool_size: int = 1,
+        max_pool_size: int = 4,
     ) -> None:
         self.pool = ConnectionPool(
             conninfo=conn_string,
@@ -14,7 +20,7 @@ class PostgresManager:
             kwargs={"row_factory": dict_row},
         )
         self.insert_sql = """
-            INSERT INTO program (
+            INSERT INTO program_pending (
                 uuid, title, preview, summary, details, application_method, 
                 apply_url, reference_url,
                 eligibility_gender, eligibility_min_age, eligibility_max_age,
@@ -35,6 +41,8 @@ class PostgresManager:
             ON CONFLICT (uuid) DO NOTHING
         """
 
+        self.failure_path = failure_path
+
     def save_programs(self, programs: List[Dict[str, Any]]) -> int:
         if not programs:
             return 0
@@ -43,8 +51,14 @@ class PostgresManager:
         with self.pool.connection() as conn:
             with conn.cursor() as cur:
                 for program in programs:
-                    cur.execute(self.insert_sql, program)
-                    inserted_count += cur.rowcount
+                    try:
+                        cur.execute(self.insert_sql, program)
+                        inserted_count += cur.rowcount
+                    except Exception:
+                        with self.failure_path.open("a", encoding="utf-8") as f_out:
+                            json_string = json.dumps(program, ensure_ascii=False) + "\n"
+                            f_out.write(json_string)
+
             conn.commit()
 
         return inserted_count

@@ -8,8 +8,8 @@ Convert the raw_program JSON into the structured JSON format below.
 - uuid: string
 - title: string
 - preview: string (One line summary of the program, must be less than 10 words. e.g. 60세 이상 저소득 무릎관절 수술비 지원)
-- summary: string (A concise 3-5 line summary of the key points)
-- details: string (A comprehensive, highly specific description of all program contents)
+- summary: string (Concise 3-5 line summary as a markdown list; each line must start with '-')
+- details: string (A comprehensive, highly specific description of all program contents in markdown format)
 - application_method: string | null
 - apply_url: string | null (If applications are submitted online, provide a valid website URL)
 - reference_url: string | null
