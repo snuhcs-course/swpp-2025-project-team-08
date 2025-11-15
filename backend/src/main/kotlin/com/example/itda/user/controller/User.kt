@@ -16,6 +16,7 @@ data class User(
     val householdSize: Int?,
     val householdIncome: Int?,
     val employmentStatus: String?,
+    val tags: List<String>,
 ) {
     companion object {
         fun fromEntity(entity: UserEntity): User {
@@ -32,6 +33,7 @@ data class User(
                 maritalStatus = entity.maritalStatus?.value,
                 educationLevel = entity.educationLevel?.value,
                 employmentStatus = entity.employmentStatus?.value,
+                tags = entity.tags.map { it.name },
             )
         }
     }

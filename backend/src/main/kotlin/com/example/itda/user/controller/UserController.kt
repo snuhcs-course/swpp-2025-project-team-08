@@ -103,6 +103,7 @@ data class ProfileRequest(
     val householdSize: Int?,
     val householdIncome: Int?,
     val employmentStatus: EmploymentStatus?,
+    val tags: List<String>?,
 )
 
 data class PreferenceRequest(

@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.itda.ui.navigation.OnBoardingScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -112,6 +113,21 @@ fun PreferenceUpdateRoute(
                 if (success) {
                     onComplete()
                 }
+            }
+        }
+    )
+}
+
+@Composable
+fun OnBoardingRoute(
+    onComplete: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
+    OnBoardingScreen(
+        onSubmit = {
+            scope.launch {
+                onComplete()
             }
         }
     )

@@ -20,20 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
-import com.example.itda.ui.common.components.ScreenContract
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
-import com.example.itda.ui.common.theme.*
 
-object HomeContract : ScreenContract {
-    override val route = "home"
-    override val title = "home"
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +55,7 @@ fun HomeScreen(
 
     LaunchedEffect(listState) {
         // 마지막에서 N번째 아이템에 도달했을 때 로딩을 시작하도록 임계점 설정
-        val threshold = 4
+        val threshold = 1
 
         // listState의 스크롤 변화를 지속적으로 관찰
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
@@ -69,21 +63,19 @@ fun HomeScreen(
                 val totalItemCount = listState.layoutInfo.totalItemsCount
                 val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
 
-                // 3. 로딩 조건 확인
                 // 마지막 보이는 아이템의 인덱스가 전체 아이템 수 - 임계점보다 클 경우
                 val shouldLoadMore = lastVisibleItemIndex >= (totalItemCount - threshold)
 
                 // 4. 로딩 함수 호출
                 if (shouldLoadMore && totalItemCount > 0 && !ui.isPaginating) {
-                    onLoadNext() // HomeRoute에서 넘겨받은 함수
+                    onLoadNext()
                 }
             }
     }
 
 
     LaunchedEffect(ui.feedItems) {
-        if (ui.feedItems.isNotEmpty()) {
-            // scrollToItem 대신 animateScrollToItem을 사용하여 부드러운 애니메이션 적용 가능
+        if (ui.feedItems.isNotEmpty() && ui.currentPage == 0) {
             listState.animateScrollToItem(0)
         }
     }
@@ -146,7 +138,8 @@ fun HomeScreen(
                             listState = listState,
                             filterCategory = ui.selectedCategory.value,
                             onItemClick = { feed -> onFeedClick(feed.id) },
-                            onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) }
+                            onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) },
+                            isPaginating = ui.isPaginating
                         )
                     }
                 }

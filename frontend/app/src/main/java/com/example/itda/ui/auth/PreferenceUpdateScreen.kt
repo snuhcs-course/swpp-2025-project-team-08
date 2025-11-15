@@ -1,6 +1,8 @@
 package com.example.itda.ui.auth
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,20 +13,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,6 @@ import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
 import com.example.itda.ui.feed.components.FeedSummaryCard
-import kotlinx.coroutines.launch
 
 // TODO: AuthViewModel에 임시 Program List를 추가했다고 가정
 // val dummyProgramsForPreference = listOf(ProgramResponse(...), ...)
@@ -76,6 +76,10 @@ fun PreferenceUpdateScreen(
     val isSubmitEnabled = ui.examplePrograms.isNotEmpty() && currentPreferences.all { it.score > 0 }
 
     var detailExpanded by remember { mutableStateOf(false) }
+
+    val pageScores = ui.examplePrograms.map { program ->
+        currentPreferences.find { it.id == program.id }?.score ?: 0
+    }
 
     BaseScreen(
         title = "선호도 설정",
@@ -156,22 +160,9 @@ fun PreferenceUpdateScreen(
             PagerNavigation(
                 pagerState = pagerState,
                 pageCount = pageCount,
+                pageScores = pageScores,
                 isSubmitEnabled = isSubmitEnabled,
                 onSubmit = onSubmit,
-                onNext = {
-                    scope.launch {
-                        if (pagerState.currentPage < pageCount - 1) {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    }
-                },
-                onPrevious = {
-                    scope.launch {
-                        if (pagerState.currentPage > 0) {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                        }
-                    }
-                }
             )
         }
         ui.exampleProgramDetail?.let { program ->
@@ -270,64 +261,70 @@ fun PreferenceSlider(
     }
 }
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagerNavigation(
     pagerState: PagerState,
     pageCount: Int,
+    pageScores: List<Int>,
     isSubmitEnabled: Boolean,
     onSubmit: () -> Unit,
-    onNext: () -> Unit,
-    onPrevious: () -> Unit
 ) {
-    val isLastPage = pagerState.currentPage == pageCount - 1
+    val currentPage = pagerState.currentPage
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center, // 중앙 정렬
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 이전 버튼
-        Button(
-            onClick = onPrevious,
-            enabled = pagerState.currentPage > 0, // 0보다 클 때만 활성화
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary
-            )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "이전")
-        }
+            if(isSubmitEnabled) {
+                Button(
+                    onClick = onSubmit,
+                    enabled = isSubmitEnabled, // 모든 항목이 1점 이상일 때만 활성화
+                    shape = RoundedCornerShape(8.dp),
+                    // weight를 제거하고 고정된 너비를 주거나, 필요에 따라 조정 가능
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Primary50
+                    )
+                ) {
+                    Text(
+                        "선호도 제출",
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            else {
+                repeat(pageCount) { index ->
+                    val isSelected = index == currentPage
+                    val hasScore = (pageScores.getOrNull(index) ?: 0) > 0
 
-        // 최종 제출 버튼 또는 다음 버튼
-        Button(
-            onClick = onSubmit,
-            enabled = isSubmitEnabled, // 5개 모두 선택했을 때만 활성화
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Primary50
-            )
-        ) {
-            Text(
-                "선호도 제출",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-        }
+                    val dotSize by animateDpAsState(
+                        targetValue = if (isSelected) 12.dp else 8.dp,
+                        label = "Dot Size Animation"
+                    )
 
-        // 다음 버튼
-        Button(
-            onClick = onNext,
-            enabled = pagerState.currentPage < pageCount - 1,
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary
-            )
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "다음")
+                    val dotColor = if (hasScore || isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(dotSize)
+                            .clip(CircleShape)
+                            .background(dotColor)
+                    )
+                }
+            }
         }
     }
 }

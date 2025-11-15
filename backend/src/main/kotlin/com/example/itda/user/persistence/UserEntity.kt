@@ -6,10 +6,12 @@ import com.example.itda.program.persistence.enums.EducationLevel
 import com.example.itda.program.persistence.enums.EmploymentStatus
 import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -54,10 +56,22 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "employment_status", nullable = true)
     var employmentStatus: EmploymentStatus? = null,
-    @Column(name = "preference_embedding")
+    @Column(name = "embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
-    var preferenceEmbedding: FloatArray? = null,
-    @OneToMany(mappedBy = "user")
-    var bookmarks: MutableSet<BookmarkEntity> = mutableSetOf(),
+    var embedding: FloatArray? = null,
+    @OneToMany(
+        mappedBy = "user",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
+    var tags: MutableList<TagEntity> = mutableListOf(),
+    @OneToMany(
+        mappedBy = "user",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
+    var bookmarks: MutableList<BookmarkEntity> = mutableListOf(),
 )
