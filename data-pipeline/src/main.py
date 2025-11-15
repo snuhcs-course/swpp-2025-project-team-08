@@ -37,6 +37,7 @@ trimmed_path = data_dir / "trimmed_programs.jsonl"
 trimmed_path_ts = data_dir / f"trimmed_programs_{ts}.jsonl"
 embedding_path = data_dir / "embeddings.jsonl"
 embedding_path_ts = data_dir / f"embeddings_{ts}.jsonl"
+save_failure_path = data_dir / f"save_failures_{ts}.jsonl"
 
 
 def create_parser():
@@ -177,6 +178,7 @@ def do_save(args):
 
     with PostgresManager(
         conn_string=DATABASE_URL,
+        failure_path=save_failure_path,
         min_pool_size=args.db_min_pool_size,
         max_pool_size=args.db_max_pool_size,
     ) as db_manager:
