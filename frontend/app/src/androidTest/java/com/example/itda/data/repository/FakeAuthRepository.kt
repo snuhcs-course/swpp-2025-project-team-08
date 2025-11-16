@@ -23,7 +23,8 @@ class FakeAuthRepository : AuthRepository {
             educationLevel = "",
             householdSize = 0,
             householdIncome = 0,
-            employmentStatus = ""
+            employmentStatus = "",
+            tags = listOf("태그1", "태그2")
         )
     )
     var updateProfileResult: Result<Unit> = Result.success(Unit)
@@ -50,6 +51,7 @@ class FakeAuthRepository : AuthRepository {
     var lastSignupPassword: String? = null
     var lastUpdateProfileName: String? = null
     var lastUpdateProfileBirthDate: String? = null
+    var lastUpdateProfileTags: List<String>? = null
     var lastPreferenceScores: PreferenceRequestList? = null
 
     override fun isLoggedIn(): Flow<Boolean> = _isLoggedIn
@@ -103,11 +105,13 @@ class FakeAuthRepository : AuthRepository {
         educationLevel: String?,
         householdSize: Int?,
         householdIncome: Int?,
-        employmentStatus: String?
+        employmentStatus: String?,
+        tags: List<String>?
     ): Result<Unit> {
         updateProfileCalled = true
         lastUpdateProfileName = name
         lastUpdateProfileBirthDate = birthDate
+        lastUpdateProfileTags = tags
         return updateProfileResult
     }
 
@@ -159,6 +163,7 @@ class FakeAuthRepository : AuthRepository {
         lastSignupPassword = null
         lastUpdateProfileName = null
         lastUpdateProfileBirthDate = null
+        lastUpdateProfileTags = null
         lastPreferenceScores = null
     }
 }

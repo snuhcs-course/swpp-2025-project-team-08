@@ -76,6 +76,15 @@ class SearchViewModel @Inject constructor(
     fun onSortTypeChange(sortType: SortType) {
         if (_uiState.value.sortType == sortType) return
 
+        val query = _uiState.value.recentSearches.firstOrNull()
+
+        if (query == null) {
+            _uiState.value = _uiState.value.copy(
+                sortType = sortType
+            )
+            return
+        }
+
         _uiState.value = _uiState.value.copy(
             sortType = sortType,
             isSearching = true,
@@ -83,11 +92,18 @@ class SearchViewModel @Inject constructor(
             searchResults = emptyList()
         )
 
-        val query = _uiState.value.recentSearches.firstOrNull() ?: return
         performSearch(query, 0, sortType, _uiState.value.selectedCategory.category)
     }
 
     fun onCategorySelected(category: Category) {
+        val query = _uiState.value.recentSearches.firstOrNull()
+
+        if (query == null) {
+            _uiState.value = _uiState.value.copy(
+                selectedCategory = category
+            )
+            return
+        }
 
         _uiState.value = _uiState.value.copy(
             selectedCategory = category,
@@ -96,7 +112,6 @@ class SearchViewModel @Inject constructor(
             searchResults = emptyList()
         )
 
-        val query = _uiState.value.recentSearches.firstOrNull() ?: return
         performSearch(query, 0, _uiState.value.sortType, _uiState.value.selectedCategory.category)
     }
 

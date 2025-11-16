@@ -258,7 +258,8 @@ fun ProfileScreenPreview() {
                     educationLevel = "대졸",
                     householdSize = 4,
                     householdIncome = 500,
-                    employmentStatus = "재직자"
+                    employmentStatus = "재직자",
+                    tags = listOf("태그1", "태그2", "태그3")
                 ),
                 isLoading = false,
                 generalError = null
