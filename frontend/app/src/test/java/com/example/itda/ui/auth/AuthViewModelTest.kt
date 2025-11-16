@@ -947,6 +947,7 @@ class AuthViewModelTest {
             anyOrNull(),
             anyOrNull(),
             anyOrNull(),
+            anyOrNull(),
             anyOrNull()
         )).thenReturn(Result.success(Unit))
 
@@ -969,13 +970,15 @@ class AuthViewModelTest {
             educationLevel = null,
             householdSize = null,
             householdIncome = null,
-            employmentStatus = null
+            employmentStatus = null,
+            tags = null
         )
     }
 
     @Test
     fun submitPersonalInfo_successWithOptionalFields_callsRepositoryWithAllFields() = runTest {
         Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
             anyOrNull(),
             anyOrNull(),
             anyOrNull(),
@@ -1012,13 +1015,15 @@ class AuthViewModelTest {
             educationLevel = "대졸",
             householdSize = 4,
             householdIncome = 5000000,
-            employmentStatus = "재직 중"
+            employmentStatus = "재직 중",
+            tags = null
         )
     }
 
     @Test
     fun submitPersonalInfo_successSetsLoggedInTrue() = runTest {
         Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
             anyOrNull(),
             anyOrNull(),
             anyOrNull(),
@@ -1056,6 +1061,7 @@ class AuthViewModelTest {
             anyOrNull(),
             anyOrNull(),
             anyOrNull(),
+            anyOrNull(),
             anyOrNull()
         )).thenReturn(Result.failure(exception))
 
@@ -1074,6 +1080,199 @@ class AuthViewModelTest {
             assertThat(state.generalError).isNotNull()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // ========== Tag Tests ==========
+
+    @Test
+    fun onTagInputChange_updatesState() = runTest {
+        viewModel.onTagInputChange("독거노인")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.tagInput).isEqualTo("독거노인")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_validTag_addsToList() = runTest {
+        viewModel.addTag("독거노인")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+            assertThat(state.tagInput).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_trimmedTag_addsToList() = runTest {
+        viewModel.addTag("  독거노인  ")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_emptyTag_doesNotAdd() = runTest {
+        viewModel.addTag("")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_blankTag_doesNotAdd() = runTest {
+        viewModel.addTag("   ")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_duplicateTag_doesNotAddAgain() = runTest {
+        viewModel.addTag("독거노인")
+        viewModel.addTag("독거노인")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun addTag_multipleTags_addsAll() = runTest {
+        viewModel.addTag("독거노인")
+        viewModel.addTag("저소득층")
+        viewModel.addTag("기초생활수급자")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인", "저소득층", "기초생활수급자")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun removeTag_existingTag_removesFromList() = runTest {
+        viewModel.addTag("독거노인")
+        viewModel.addTag("저소득층")
+
+        viewModel.removeTag("독거노인")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("저소득층")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun removeTag_nonExistingTag_doesNothing() = runTest {
+        viewModel.addTag("독거노인")
+
+        viewModel.removeTag("저소득층")
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun submitPersonalInfo_withTags_callsRepositoryWithTags() = runTest {
+        Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull()
+        )).thenReturn(Result.success(Unit))
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19990101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시")
+        viewModel.onPostCodeChange("12345")
+        viewModel.addTag("독거노인")
+        viewModel.addTag("저소득층")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isTrue()
+        Mockito.verify(authRepository).updateProfile(
+            name = "홍길동",
+            birthDate = "1999-01-01",
+            gender = "남성",
+            address = "서울시",
+            postcode = "12345",
+            maritalStatus = null,
+            educationLevel = null,
+            householdSize = null,
+            householdIncome = null,
+            employmentStatus = null,
+            tags = listOf("독거노인", "저소득층")
+        )
+    }
+
+    @Test
+    fun submitPersonalInfo_withEmptyTags_callsRepositoryWithNullTags() = runTest {
+        Mockito.`when`(authRepository.updateProfile(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull()
+        )).thenReturn(Result.success(Unit))
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19990101")
+        viewModel.onGenderChange("남성")
+        viewModel.onAddressChange("서울시")
+        viewModel.onPostCodeChange("12345")
+        // No tags added
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isTrue()
+        Mockito.verify(authRepository).updateProfile(
+            name = "홍길동",
+            birthDate = "1999-01-01",
+            gender = "남성",
+            address = "서울시",
+            postcode = "12345",
+            maritalStatus = null,
+            educationLevel = null,
+            householdSize = null,
+            householdIncome = null,
+            employmentStatus = null,
+            tags = null
+        )
     }
 
     // ========== Preference Tests ==========

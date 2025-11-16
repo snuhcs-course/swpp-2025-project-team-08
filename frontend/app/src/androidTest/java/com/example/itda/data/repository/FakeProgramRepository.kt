@@ -161,30 +161,81 @@ class FakeProgramRepository : ProgramRepository {
 
     override suspend fun searchByRank(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse> {
         searchByRankCalled = true
         lastSearchByRankQuery = query
+        lastSearchByRankCategory = category
         lastSearchByRankPage = page
         lastSearchByRankSize = size
-        lastSearchByRankCategory = category
         return searchByRankResult
     }
 
     override suspend fun searchByLatest(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse> {
         searchByLatestCalled = true
         lastSearchByLatestQuery = query
+        lastSearchByLatestCategory = category
         lastSearchByLatestPage = page
         lastSearchByLatestSize = size
-        lastSearchByLatestCategory = category
         return searchByLatestResult
+    }
+
+    var getUserBookmarkProgramsResult: Result<ProgramPageResponse> = Result.success(
+        ProgramPageResponse(
+            content = emptyList(),
+            totalPages = 0,
+            totalElements = 0,
+            size = 20,
+            page = 0,
+            isFirst = true,
+            isLast = true
+        )
+    )
+    var getAllUserBookmarksResult: Result<List<ProgramResponse>> = Result.success(emptyList())
+    var bookmarkProgramResult: Result<Unit> = Result.success(Unit)
+    var unbookmarkProgramResult: Result<Unit> = Result.success(Unit)
+
+    var getUserBookmarkProgramsCalled = false
+    var getAllUserBookmarksCalled = false
+    var bookmarkProgramCalled = false
+    var unbookmarkProgramCalled = false
+
+    var lastGetUserBookmarkProgramsSort: String? = null
+    var lastGetUserBookmarkProgramsPage: Int? = null
+    var lastGetUserBookmarkProgramsSize: Int? = null
+    var lastBookmarkProgramId: Int? = null
+    var lastUnbookmarkProgramId: Int? = null
+
+    override suspend fun getUserBookmarkPrograms(sort: String, page: Int, size: Int): Result<ProgramPageResponse> {
+        getUserBookmarkProgramsCalled = true
+        lastGetUserBookmarkProgramsSort = sort
+        lastGetUserBookmarkProgramsPage = page
+        lastGetUserBookmarkProgramsSize = size
+        return getUserBookmarkProgramsResult
+    }
+
+    override suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>> {
+        getAllUserBookmarksCalled = true
+        return getAllUserBookmarksResult
+    }
+
+    override suspend fun bookmarkProgram(programId: Int): Result<Unit> {
+        bookmarkProgramCalled = true
+        lastBookmarkProgramId = programId
+        return bookmarkProgramResult
+    }
+
+    override suspend fun unbookmarkProgram(programId: Int): Result<Unit> {
+        unbookmarkProgramCalled = true
+        lastUnbookmarkProgramId = programId
+        return unbookmarkProgramResult
     }
 
     fun reset() {
@@ -286,6 +337,21 @@ class FakeProgramRepository : ProgramRepository {
             empty = true
         )
 
+        getUserBookmarkProgramsResult = Result.success(
+            ProgramPageResponse(
+                content = emptyList(),
+                totalPages = 0,
+                totalElements = 0,
+                size = 20,
+                page = 0,
+                isFirst = true,
+                isLast = true
+            )
+        )
+        getAllUserBookmarksResult = Result.success(emptyList())
+        bookmarkProgramResult = Result.success(Unit)
+        unbookmarkProgramResult = Result.success(Unit)
+
         getProgramsCalled = false
         getProgramDetailsCalled = false
         getExamplesCalled = false
@@ -293,6 +359,10 @@ class FakeProgramRepository : ProgramRepository {
         getFeedListCalled = false
         searchByRankCalled = false
         searchByLatestCalled = false
+        getUserBookmarkProgramsCalled = false
+        getAllUserBookmarksCalled = false
+        bookmarkProgramCalled = false
+        unbookmarkProgramCalled = false
 
         lastGetProgramsPage = null
         lastGetProgramsSize = null
@@ -307,5 +377,10 @@ class FakeProgramRepository : ProgramRepository {
         lastSearchByLatestPage = null
         lastSearchByLatestSize = null
         lastSearchByLatestCategory = null
+        lastGetUserBookmarkProgramsSort = null
+        lastGetUserBookmarkProgramsPage = null
+        lastGetUserBookmarkProgramsSize = null
+        lastBookmarkProgramId = null
+        lastUnbookmarkProgramId = null
     }
 }

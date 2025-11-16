@@ -37,29 +37,29 @@ class ProgramRepositoryImpl @Inject constructor(
 
     override suspend fun searchByRank(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse> {
         return api.searchProgramsByRank(
             query = query,
+            category = category,
             page = page,
-            size = size,
-            category = category
+            size = size
         )
     }
 
     override suspend fun searchByLatest(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse> {
         return api.searchProgramsByLatest(
             query = query,
+            category = category,
             page = page,
-            size = size,
-            category = category
+            size = size
         )
     }
 

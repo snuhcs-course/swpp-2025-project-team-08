@@ -38,9 +38,9 @@ class SearchViewModel @Inject constructor(
         val sortType: SortType = SortType.RANK,
         val categories: List<Category> = dummyCategories,
         val selectedCategory: Category = Category("","전체"),
-        val feedItems: List<ProgramResponse> = emptyList(),
-        val isLoadingMore: Boolean = false,
-        val hasMorePages: Boolean = true,
+        val totalPages: Int = 0,
+        val isPaginating: Boolean = false,
+        val isLastPage: Boolean = false,
         val generalError: String? = null
     )
 
@@ -76,6 +76,15 @@ class SearchViewModel @Inject constructor(
     fun onSortTypeChange(sortType: SortType) {
         if (_uiState.value.sortType == sortType) return
 
+        val query = _uiState.value.recentSearches.firstOrNull()
+
+        if (query == null) {
+            _uiState.value = _uiState.value.copy(
+                sortType = sortType
+            )
+            return
+        }
+
         _uiState.value = _uiState.value.copy(
             sortType = sortType,
             isSearching = true,
@@ -83,11 +92,18 @@ class SearchViewModel @Inject constructor(
             searchResults = emptyList()
         )
 
-        val query = _uiState.value.recentSearches.firstOrNull() ?: return
         performSearch(query, 0, sortType, _uiState.value.selectedCategory.category)
     }
 
     fun onCategorySelected(category: Category) {
+        val query = _uiState.value.recentSearches.firstOrNull()
+
+        if (query == null) {
+            _uiState.value = _uiState.value.copy(
+                selectedCategory = category
+            )
+            return
+        }
 
         _uiState.value = _uiState.value.copy(
             selectedCategory = category,
@@ -96,16 +112,16 @@ class SearchViewModel @Inject constructor(
             searchResults = emptyList()
         )
 
-        val query = _uiState.value.recentSearches.firstOrNull() ?: return
         performSearch(query, 0, _uiState.value.sortType, _uiState.value.selectedCategory.category)
     }
 
     fun onLoadNext() {
         val currentState = _uiState.value
+        val isLast = currentState.isLastPage
 
-        if (currentState.isLoadingMore || !currentState.hasMorePages) return
+        if (currentState.isPaginating || isLast) return
 
-        _uiState.value = currentState.copy(isLoadingMore = true)
+        _uiState.value = currentState.copy(isPaginating = true)
 
         val query = currentState.recentSearches.firstOrNull() ?: return
         val nextPage = currentState.currentPage + 1
@@ -139,20 +155,23 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    private fun handleSearchResults(response: PageResponse<ProgramResponse>, isLoadMore: Boolean) {
+    private fun handleSearchResults(response: PageResponse<ProgramResponse>, isLoadMore: Boolean, requestedPage: Int) {
         _uiState.value = _uiState.value.let { currentState ->
             val currentList = if (isLoadMore) currentState.searchResults else emptyList()
             val newList = response.content
 
             val combinedList = (currentList + newList).distinctBy { it.id }
 
+            val isLast = response.content.size < 20 || requestedPage >= response.totalPages - 1
+
             currentState.copy(
                 searchResults = combinedList,
                 totalElements = response.totalElements,
-                currentPage = response.number,
-                hasMorePages = !response.last,
+                totalPages = response.totalPages,
+                currentPage = requestedPage,
+                isLastPage = isLast,
                 isSearching = false,
-                isLoadingMore = false,
+                isPaginating = false,
                 generalError = null
             )
         }
@@ -162,7 +181,7 @@ class SearchViewModel @Inject constructor(
         query: String,
         page: Int,
         sortType: SortType,
-        category: String?,
+        category: String,
         isLoadMore: Boolean = false
     ) {
         viewModelScope.launch {
@@ -170,26 +189,26 @@ class SearchViewModel @Inject constructor(
                 val response = when (sortType) {
                     SortType.RANK -> programRepository.searchByRank(
                         query = query,
+                        category = category,
                         page = page,
-                        size = 10,
-                        category = category
+                        size = 20
                     )
                     SortType.LATEST -> programRepository.searchByLatest(
                         query = query,
+                        category = category,
                         page = page,
-                        size = 10,
-                        category = category
+                        size = 20
                     )
                 }
 
-                handleSearchResults(response, isLoadMore)
+                handleSearchResults(response, isLoadMore, page)
 
 
 
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSearching = false,
-                    isLoadingMore = false,
+                    isPaginating = false,
                     generalError = "검색 중 오류가 발생했습니다: ${e.message}"
                 )
             }

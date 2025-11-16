@@ -41,17 +41,17 @@ interface ProgramAPI {
     @GET("programs/search/rank")
     suspend fun searchProgramsByRank(
         @Query("query") query: String,
+        @Query("category") category: String,
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 10,
-        @Query("category") category: String? = null
+        @Query("size") size: Int = 20
     ): PageResponse<ProgramResponse>
 
     @GET("programs/search/latest")
     suspend fun searchProgramsByLatest(
         @Query("query") query: String,
+        @Query("category") category: String,
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 10,
-        @Query("category") category: String? = null
+        @Query("size") size: Int = 20
     ): PageResponse<ProgramResponse>
 
     /**
