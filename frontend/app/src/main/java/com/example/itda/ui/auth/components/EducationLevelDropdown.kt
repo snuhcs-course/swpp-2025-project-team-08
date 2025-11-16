@@ -47,9 +47,9 @@ fun EducationLevelDropdown(
                 .clickable { expanded = true },
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Neutral95
+                containerColor = MaterialTheme.colorScheme.surface
             ),
-            border = BorderStroke(1.dp, Neutral80)
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Row(
                 modifier = Modifier
@@ -61,13 +61,13 @@ fun EducationLevelDropdown(
                 Text(
                     text = selectedLabel,
                     fontSize = 14.scaledSp,
-                    color = if (selectedValue != null) Neutral10 else Neutral60,
+                    color = if (selectedValue != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (selectedValue != null) FontWeight.Normal else FontWeight.Normal
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "펼치기",
-                    tint = Neutral40
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -77,7 +77,7 @@ fun EducationLevelDropdown(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .background(Neutral100)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             educationOptions.forEach { (value, label) ->
                 DropdownMenuItem(
@@ -85,7 +85,7 @@ fun EducationLevelDropdown(
                         Text(
                             text = label,
                             fontSize = 14.scaledSp,
-                            color = if (selectedValue == value) Primary60 else Neutral10
+                            color = if (selectedValue == value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     },
                     onClick = {

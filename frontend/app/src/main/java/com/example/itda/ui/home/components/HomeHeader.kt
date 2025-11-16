@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun HomeHeader(
@@ -36,14 +37,14 @@ fun HomeHeader(
                     withStyle(style = SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 24.scaledSp
                         )
                     ) {
                         append(username)
                     }
                     append("님의 맞춤 정책")
                 },
-                fontSize = 20.sp,
+                fontSize = 20.scaledSp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
             )

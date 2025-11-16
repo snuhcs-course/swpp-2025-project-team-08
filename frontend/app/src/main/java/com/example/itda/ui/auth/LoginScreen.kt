@@ -110,14 +110,14 @@ fun LoginScreen(
                             checked = ui.rememberEmail,
                             onCheckedChange = onRememberEmailChange,
                             colors = CheckboxDefaults.colors(
-                                checkedColor = Primary60,
-                                uncheckedColor = Neutral60
+                                checkedColor = MaterialTheme.colorScheme.primary,
+                                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                         Text(
                             text = "아이디 저장",
-                            fontSize = 14.sp,
-                            color = Neutral20,
+                            fontSize = 14.scaledSp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }

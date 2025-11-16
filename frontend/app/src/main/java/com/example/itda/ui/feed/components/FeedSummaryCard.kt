@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.ui.navigation.LoadingScreen
 import kotlinx.coroutines.delay
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun FeedSummaryCard(
@@ -157,8 +158,8 @@ fun FeedSummaryCard(
                             }
                         },
                         style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 20.sp,
+                            fontSize = 16.scaledSp,
+                            lineHeight = 20.scaledSp,
                             textAlign = TextAlign.Left,
                         )
                     )

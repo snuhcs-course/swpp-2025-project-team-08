@@ -45,7 +45,7 @@ import com.example.itda.R
 import com.example.itda.ui.auth.components.PreferenceSelector
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedCard
-import com.example.itda.ui.common.theme.Primary50
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
 import com.example.itda.ui.feed.components.FeedInfoCard
@@ -97,7 +97,7 @@ fun PreferenceUpdateScreen(
             Text(
                 text = "선호도 설정 (${pagerState.currentPage + 1} / $pageCount)",
                 fontWeight = FontWeight.Bold,
-                color = Primary50,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -246,10 +246,10 @@ fun PreferenceSlider(
             steps = 0, // 1, 2, 3, 4, 5
             valueRange = 1f..5f,
             modifier = Modifier.fillMaxWidth(0.8f),
-           
 
 
-        )
+
+            )
 
         Row(
             modifier = Modifier.fillMaxWidth(0.8f),
@@ -291,7 +291,7 @@ fun PagerNavigation(
                     shape = RoundedCornerShape(8.dp),
                     // weight를 제거하고 고정된 너비를 주거나, 필요에 따라 조정 가능
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary50
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(

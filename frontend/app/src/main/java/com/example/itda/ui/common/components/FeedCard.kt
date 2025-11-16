@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.itda.R
 import com.example.itda.data.model.dummyCategories
-
+import com.example.itda.ui.common.theme.*
 
 @Composable
 fun FeedCard(
@@ -84,15 +84,15 @@ fun FeedCard(
                     Column {
                         Text(
                             text = department, // 정부 기관명
-                            fontSize = 14.sp,
-                            lineHeight = 16.sp,
+                            fontSize = 14.scaledSp,
+                            lineHeight = 16.scaledSp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
                             for (category in categories) {
                                 Text(
                                     text = category, // 카테고리
-                                    fontSize = 12.sp,
+                                    fontSize = 12.scaledSp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -126,7 +126,7 @@ fun FeedCard(
             ) {
                 Text(
                     text = title,
-                    fontSize = 20.sp,
+                    fontSize = 20.scaledSp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -138,7 +138,7 @@ fun FeedCard(
             // 하단 섹션: content
             Text(
                 text = content,
-                fontSize = 14.sp,
+                fontSize = 14.scaledSp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

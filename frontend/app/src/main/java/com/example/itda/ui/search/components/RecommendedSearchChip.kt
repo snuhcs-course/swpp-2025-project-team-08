@@ -26,7 +26,7 @@ fun RecommendedSearchChip(
         modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface, // 배경 투명(흰색)
-        border = BorderStroke(1.dp, Neutral90), // 테두리만
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline), // 테두리만
         tonalElevation = 0.dp
     ) {
         Row(
@@ -36,9 +36,9 @@ fun RecommendedSearchChip(
         ) {
             Text(
                 text = keyword,
-                fontSize = 14.sp,
+                fontSize = 14.scaledSp,
                 fontWeight = FontWeight.Normal,
-                color = Neutral40
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
