@@ -134,12 +134,12 @@ fun HomeScreen(
                     }
                     else {
                         FeedList(
-                            items = ui.feedItems, // TODO
+                            items = ui.feedItems,
+                            bookmarkPrograms = ui.bookmarkPrograms,
                             listState = listState,
-                            filterCategory = ui.selectedCategory.value,
                             onItemClick = { feed -> onFeedClick(feed.id) },
                             onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) },
-                            isPaginating = ui.isPaginating
+                            isPaginating = ui.isPaginating,
                         )
                     }
                 }

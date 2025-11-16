@@ -54,7 +54,7 @@ import kotlin.math.roundToInt
 fun FeedList(
     // 표시할 FeedItem 데이터의 리스트를 인자로 받습니다.
     items: List<ProgramResponse>,
-    filterCategory: String,
+    bookmarkPrograms : List<Int>,
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (ProgramResponse) -> Unit,
     onItemDismissed : (ProgramResponse) -> Unit = {},
@@ -161,7 +161,7 @@ fun FeedList(
                             categories = listOf(item.categoryValue),
                             department = item.operatingEntity,
                             content = item.preview,
-                            isBookmarked = false, // TODO - 변수로 지정 필요
+                            isBookmarked = item.id in bookmarkPrograms,
                             logo =
                                 if (item.operatingEntityType == "central")
                                     R.drawable.gov_logo

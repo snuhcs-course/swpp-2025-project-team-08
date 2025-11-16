@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val programRepository: ProgramRepository
+    private val programRepository: ProgramRepository,
 ) : ViewModel() {
 //    val programs = programRepository.getPrograms()
     data class HomeUiState(
@@ -35,6 +35,7 @@ class HomeViewModel @Inject constructor(
     val totalElements : Int = 0,             // 전체 정책 수
     val isPaginating : Boolean = false,
     val isLoading: Boolean = false,
+    val isLoadingBookmark : Boolean = false,
     val loadDataCount : Int = 0,
     val loadProfileCount : Int = 0,
     val loadNextCount : Int = 0,
@@ -50,6 +51,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             loadHomeData()
             loadMyProfile()
+            initBookmarkList()
         }
     }
 
@@ -58,6 +60,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _homeUi.update { it.copy(isRefreshing = true) }
             loadHomeData() // TODO - 그냥 load 가 아니라 메트릭을 조정해서 더 나은 결과 / 더 넓은 추천범위로 load 하는 방식 고민중
+            initBookmarkList()
             _homeUi.update { it.copy(isRefreshing = false) }
         }
     }
@@ -187,62 +190,85 @@ class HomeViewModel @Inject constructor(
         loadHomeData()
     }
 
-    fun getBookmarkPrograms() {
-        /*viewModelScope.launch {
-            _homeUi.update { it.copy(isLoading = true) }
+    fun initBookmarkList() {
+        viewModelScope.launch {
+            _homeUi.update { it.copy(
+                isLoading = true,
+                isLoadingBookmark = true,
+                bookmarkPrograms = emptyList()
+            ) }
 
-            val programs = programRepository.getBookmarkPrograms()
-            programs
-                .onFailure { exception ->
-                    val apiError = ApiErrorParser.parseError(exception)
-                    _homeUi.update {
-                        it.copy(
-                            generalError = apiError.message,
-                        )
-                    }
-                }
-                .onSuccess { response ->
-                    _homeUi.update {
-                        it.copy(
-                            bookmarkPrograms = response.map { it.id },
-                        )
-                    }
-                }
-        }*/
-    }
-
-    fun onFeedBookmarkClicked(id: Int) {
-        /*viewModelScope.launch {
-            _homeUi.update { it.copy(isLoading = true) }
-
-            //TODO - bookmark list 불러오고 거기에 포함되어 있으면 unbookmark 아니면 bookamrk 호출 하도록 구분
-
-            val programBookmarked =
-                if(id in homeUi.value.bookmarkPrograms)
-                    unBookmarkProgram(id)
-                else
-                    bookmarkProgram(id)
-
-            programBookmarked
+            val allBookmarkPrograms = programRepository.getAllUserBookmarks()
+            allBookmarkPrograms
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
                             isLoading = false,
+                            isLoadingBookmark = false,
                         )
                     }
                 }
-            programBookmarked
                 .onSuccess { response ->
                     _homeUi.update {
                         it.copy(
                             generalError = null,
+                            bookmarkPrograms = response.map { it.id },
                             isLoading = false,
+                            isLoadingBookmark = false,
                         )
                     }
-                    getBookmarkPrograms() // bookmark / unbookmark 반영한 값 새로 로드
                 }
-        }*/
+        }
+    }
+
+
+    fun onFeedBookmarkClicked(id: Int) {
+        viewModelScope.launch {
+            _homeUi.update { it.copy(
+                isLoadingBookmark = true, // 로딩 시작
+            ) }
+
+            // 1. UI 에서 즉시 북마크 상태를 토글합니다.
+            val isBookmarked = id in homeUi.value.bookmarkPrograms
+            val updatedBookmarkPrograms = if (isBookmarked) {
+                homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+            } else {
+                homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+            }
+
+            // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
+            _homeUi.update { it.copy(bookmarkPrograms = updatedBookmarkPrograms) }
+
+
+            // 3. API 호출
+            val apiCall = if(isBookmarked)
+                programRepository.unbookmarkProgram(id)
+            else
+                programRepository.bookmarkProgram(id)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    // 4. API 실패 시, UI 상태를 원래대로 되돌립니다.
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isLoadingBookmark = false,
+                            bookmarkPrograms = homeUi.value.bookmarkPrograms, // 원래 리스트로 롤백
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = null,
+                            isLoadingBookmark = false,
+                        )
+                    }
+                }
+        }
     }
 }
