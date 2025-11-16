@@ -1,6 +1,6 @@
 python ./src/main.py \
     all \
-    --api-page-size 10 \
-    --api-max-page-num 1 \
+    --load-max-page-bokjiro 10 \
+    --load-max-page-subsidy24 10 \
     --vectorize-batch-size 32 \
-    --db-commit-batch-size 10 \
+    --db-commit-batch-size 32 \
