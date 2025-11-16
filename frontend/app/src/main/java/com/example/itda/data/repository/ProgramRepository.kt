@@ -20,16 +20,16 @@ interface ProgramRepository {
 
     suspend fun searchByRank(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse>
 
     suspend fun searchByLatest(
         query: String,
+        category: String,
         page: Int,
-        size: Int,
-        category: String?
+        size: Int
     ): PageResponse<ProgramResponse>
 
     suspend fun getUserBookmarkPrograms(sort: String, page: Int, size: Int): Result<ProgramPageResponse>
