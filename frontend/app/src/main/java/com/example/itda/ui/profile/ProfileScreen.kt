@@ -267,7 +267,7 @@ fun ProfileInfoItem(
 //                    householdSize = 4,
 //                    householdIncome = 500,
 //                    employmentStatus = "재직자",
-//                    tags = listOf("독거노인", "당뇨", "기초생활수급자")
+//                    tags = listOf("태그1", "태그2", "태그3")
 //                ),
 //                isLoading = false,
 //                generalError = null

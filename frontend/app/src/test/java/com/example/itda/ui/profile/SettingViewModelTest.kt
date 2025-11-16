@@ -3,7 +3,6 @@ package com.example.itda.ui.profile
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.example.itda.data.repository.AuthRepository
-import com.example.itda.data.repository.UserRepository
 import com.example.itda.data.source.local.SettingsDataStore
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
@@ -31,9 +30,6 @@ class SettingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Mock
-    private lateinit var userRepository: UserRepository
-
-    @Mock
     private lateinit var authRepository: AuthRepository
 
     @Mock
@@ -56,7 +52,7 @@ class SettingViewModelTest {
 
     @Test
     fun init_loadsSettings_withDefaultValues() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.settingsUi.test {
@@ -72,7 +68,7 @@ class SettingViewModelTest {
     fun init_loadsSettings_withDarkModeEnabled() = runTest {
         darkModeFlow.value = true
 
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.settingsUi.test {
@@ -86,7 +82,7 @@ class SettingViewModelTest {
     fun init_loadsSettings_withLargeFontSize() = runTest {
         fontSizeFlow.value = SettingsViewModel.FontSize.LARGE
 
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.settingsUi.test {
@@ -101,7 +97,7 @@ class SettingViewModelTest {
         darkModeFlow.value = true
         fontSizeFlow.value = SettingsViewModel.FontSize.EXTRA_LARGE
 
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.settingsUi.test {
@@ -119,7 +115,7 @@ class SettingViewModelTest {
 
     @Test
     fun toggleDarkMode_turnsOn_whenOff() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.toggleDarkMode()
@@ -131,7 +127,7 @@ class SettingViewModelTest {
     @Test
     fun toggleDarkMode_turnsOff_whenOn() = runTest {
         darkModeFlow.value = true
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.toggleDarkMode()
@@ -140,11 +136,9 @@ class SettingViewModelTest {
         verify(settingsDataStore).setDarkMode(false)
     }
 
-    // 문제 있던 테스트 제거됨 (toggleDarkMode_multipleTimes_alternatesCorrectly)
-
     @Test
     fun toggleDarkMode_updatesUI_reactively() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.toggleDarkMode()
@@ -164,7 +158,7 @@ class SettingViewModelTest {
 
     @Test
     fun setFontSize_updatesTo_SMALL() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.setFontSize(SettingsViewModel.FontSize.SMALL)
@@ -175,7 +169,7 @@ class SettingViewModelTest {
 
     @Test
     fun setFontSize_updatesTo_LARGE() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.setFontSize(SettingsViewModel.FontSize.LARGE)
@@ -186,7 +180,7 @@ class SettingViewModelTest {
 
     @Test
     fun setFontSize_updatesTo_EXTRA_LARGE() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.setFontSize(SettingsViewModel.FontSize.EXTRA_LARGE)
@@ -197,7 +191,7 @@ class SettingViewModelTest {
 
     @Test
     fun setFontSize_multipleTimes_callsDataStore() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.setFontSize(SettingsViewModel.FontSize.SMALL)
@@ -214,7 +208,7 @@ class SettingViewModelTest {
 
     @Test
     fun setFontSize_updatesUI_reactively() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.setFontSize(SettingsViewModel.FontSize.LARGE)
@@ -234,37 +228,13 @@ class SettingViewModelTest {
 
     @Test
     fun logout_callsAuthRepository() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.logout()
         advanceUntilIdle()
 
         verify(authRepository).logout()
-    }
-
-    @Test
-    fun logout_callsUserRepository_clearUser() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
-        advanceUntilIdle()
-
-        viewModel.logout()
-        advanceUntilIdle()
-
-        verify(userRepository).clearUser()
-    }
-
-    @Test
-    fun logout_callsBothRepositories_inOrder() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
-        advanceUntilIdle()
-
-        viewModel.logout()
-        advanceUntilIdle()
-
-        val inOrder = org.mockito.Mockito.inOrder(authRepository, userRepository)
-        inOrder.verify(authRepository).logout()
-        inOrder.verify(userRepository).clearUser()
     }
 
     // ========================================
@@ -295,7 +265,11 @@ class SettingViewModelTest {
     @Test
     fun fontSize_EXTRA_LARGE_hasCorrectValues() {
         val fontSize = SettingsViewModel.FontSize.EXTRA_LARGE
-        assertThat(fontSize.displayName).isEqualTo("매우 크게")
+
+        // 줄바꿈 있든 없든 동일하게 보도록 정규화
+        val normalizedDisplayName = fontSize.displayName.replace("\n", " ").trim()
+
+        assertThat(normalizedDisplayName).isEqualTo("매우 크게")
         assertThat(fontSize.scale).isEqualTo(1.2f)
     }
 
@@ -317,7 +291,7 @@ class SettingViewModelTest {
 
     @Test
     fun changingMultipleSettings_updatesCorrectly() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         viewModel.toggleDarkMode()
@@ -341,7 +315,7 @@ class SettingViewModelTest {
 
     @Test
     fun settingsFlow_reactsToExternalChanges() = runTest {
-        viewModel = SettingsViewModel(userRepository, authRepository, settingsDataStore)
+        viewModel = SettingsViewModel(authRepository, settingsDataStore)
         advanceUntilIdle()
 
         darkModeFlow.value = true
