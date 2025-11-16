@@ -32,7 +32,7 @@ interface ProgramRepository {
         size: Int
     ): PageResponse<ProgramResponse>
 
-    suspend fun getUserBookmarkPrograms(sort: String, page: Int, size: Int): Result<ProgramPageResponse>
+    suspend fun getUserBookmarkPrograms(sort: String, page: Int = 0, size: Int = 20): Result<ProgramPageResponse>
     suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>>
 
     suspend fun bookmarkProgram(programId: Int): Result<Unit>
