@@ -174,15 +174,15 @@ class SearchViewModel @Inject constructor(
                 val response = when (sortType) {
                     SortType.RANK -> programRepository.searchByRank(
                         query = query,
+                        category = category,
                         page = page,
-                        size = 20,
-                        category = category
+                        size = 20
                     )
                     SortType.LATEST -> programRepository.searchByLatest(
                         query = query,
+                        category = category,
                         page = page,
-                        size = 20,
-                        category = category
+                        size = 20
                     )
                 }
 
