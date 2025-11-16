@@ -92,7 +92,7 @@ jobs:
           script: |
             sudo docker compose down
             
-            sudo docker pull ${{ secrets.DOCKT_USERNAME }}/itda
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/itda
             
             cat <<EOF > .env
             DB_URL=${{ secrets.DB_URL }}
