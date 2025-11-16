@@ -221,7 +221,7 @@ fun KakaoAddressSearchDialog(
                                     text = "검색 Tip",
                                     fontSize = 14.scaledSp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Neutral10
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -380,7 +380,7 @@ private fun AddressItem(
                 text = "[도로명] ${roadAddress.addressName}",
                 fontSize = 15.scaledSp,
                 fontWeight = FontWeight.Medium,
-                color = Neutral10
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             if (roadAddress.zoneNo.isNotBlank()) {
@@ -406,7 +406,7 @@ private fun AddressItem(
                     text = "[지번] ${address.addressName}",
                     fontSize = 15.scaledSp,
                     fontWeight = FontWeight.Medium,
-                    color = Neutral10
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (!address.zipCode.isNullOrBlank()) {
