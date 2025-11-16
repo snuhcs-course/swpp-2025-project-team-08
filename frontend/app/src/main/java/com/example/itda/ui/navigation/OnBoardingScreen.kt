@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +44,10 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.itda.R
+import com.example.itda.ui.common.theme.Neutral100
+import com.example.itda.ui.common.theme.Neutral30
+import com.example.itda.ui.common.theme.Neutral80
+import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.common.theme.scaledSp
 
 // ⚠️ 실제 프로젝트의 R.raw. ID로 대체해야 합니다.
@@ -55,14 +61,24 @@ private val onboardingVideos = listOf(
     R.raw.onboarding5_setting
 )
 
+private val onboardingVideotitle = listOf(
+    "홈 화면",
+    "홈 화면",
+    "홈 화면",
+    "검색 화면",
+    "북마크 화면",
+    "내 정보 화면",
+    "내 정보 화면"
+)
+
 private val onboardingVideoDescription = listOf(
-    "📄 홈 화면에서 맞춤 정책을 확인하세요.",
+    "📄 맞춤 정책을 확인하세요.",
     "🗂️ 카테고리 별로 확인할 수 있습니다.",
     "❌ 관심없는 정책은 왼쪽으로 밀어 제외하세요.",
-    "🔍 검색 화면에서 원하는 정책을 키워드로 검색해보세요.",
-    "🔖 북마크 화면에서 북마크한 정책들을 모아서 확인해보세요.",
-    "👤 내 정보 화면에서 내가 입력했던 정보들을 수정할 수 있습니다.",
-    "⚙️ 내 정보 화면에서 설정에 들어가 다크모드 / 글자크기 조정이 가능합니다."
+    "🔍 원하는 정책을 검색해보세요.",
+    "🔖 북마크한 정책들을 모아서 확인해보세요.",
+    "👤 내가 입력했던 정보들을 수정할 수 있습니다.",
+    "⚙️ 설정에서 다크모드 / 글자크기 조정이 가능합니다."
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -75,36 +91,105 @@ fun OnBoardingScreen(
     val pagerState = rememberPagerState(pageCount = { pageCount })
 
     val currentPage = pagerState.currentPage
+    val density = LocalDensity.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // 1. HorizontalPager: 스와이프 가능한 영역
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f) // 남은 공간을 모두 차지
-        ) { pageIndex ->
-            val videoResId = onboardingVideos[pageIndex]
-            val videoDescription = onboardingVideoDescription[pageIndex]
-
-            VideoPage(
-                videoResId = videoResId,
-                videoDescription = videoDescription,
-                isCurrentPage = pageIndex == currentPage,
+        with(density) {
+            // 2. 🚀 Box 컴포저블 전체
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 32.dp, end = 12.dp, start = 12.dp)
-            )
-        }
+            ) {
+                val totalProgress = pagerState.currentPage + pagerState.currentPageOffsetFraction
+                val rotation1 = totalProgress * 60f // 0도 -> 90도
 
-        // 2. 페이지 인디케이터 및 네비게이션 버튼
-        OnBoardingBottomNavigation(
-            pagerState = pagerState,
-            pageCount = pageCount,
-            onSubmit = onSubmit,
-        )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .offset(x = (-160).dp, y = (-120).dp) // 기준 위치 (미세 조정)
+                        .size(280.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.2f))
+                )
+
+                // --- 배경 원 요소 2: 왼쪽 중간 원 (반대 방향 회전하며 화면 밖으로 이동) ---
+                val rotation2 = totalProgress * (-90f) // 페이지당 -90도 회전
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-80).dp, y = 180.dp) // 기준 위치
+                        .size(240.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.4f))
+                )
+
+                // --- 배경 원 요소 3: 우측 작은 원 (크기만 줄어들도록) ---
+                // 이 원은 회전 대신 크기만 줄어들어 부드럽게 사라지도록 합니다. // 1.0 -> 0.5 로 크기가 줄어듦
+                val rotation3 = totalProgress * 45f // 페이지당 45도 회전
+                val scale3_new = 1.0f - (totalProgress % 1.0f) * 0.2f // 0.8 ~ 1.0 사이로 크기 변화
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 70.dp, y = (-40).dp) // 기준 위치
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.2f))
+                )
+                Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(2f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = onboardingVideotitle[pagerState.currentPage],
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.scaledSp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                        )
+                    }
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(7f)
+                    ) { pageIndex ->
+                        val videoResId = onboardingVideos[pageIndex]
+                        val videoDescription = onboardingVideoDescription[pageIndex]
+
+                        VideoPage(
+                            videoResId = videoResId,
+                            videoDescription = videoDescription,
+                            isCurrentPage = pageIndex == currentPage,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 32.dp, end = 12.dp, start = 12.dp)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // 2. 페이지 인디케이터 및 네비게이션 버튼
+                        OnBoardingBottomNavigation(
+                            pagerState = pagerState,
+                            pageCount = pageCount,
+                            onSubmit = onSubmit,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -158,7 +243,7 @@ private fun VideoPage(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
 
-        ) {
+    ) {
         AndroidView(
             modifier = Modifier
                 .weight(8f)
@@ -180,7 +265,7 @@ private fun VideoPage(
         Text(
             text = videoDescription,
             fontSize = 16.scaledSp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = Neutral30,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier

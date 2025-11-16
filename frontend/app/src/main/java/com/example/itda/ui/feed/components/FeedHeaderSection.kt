@@ -30,7 +30,8 @@ fun FeedHeaderSection(
     tags: List<String>, // TODO - 지금은 category 이름을 String 으로 하나만 받아오지만 여러개 카테고리로 바뀌면 List 를 잘 활용할 수 있을 것
     isEligible: Boolean,
     isBookmarked: Boolean,
-    onBookmarkClicked : () -> Unit
+    onBookmarkClicked : () -> Unit,
+    isExample : Boolean = false,
 ) {
     val dayDiff =
         try {
@@ -57,10 +58,12 @@ fun FeedHeaderSection(
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            BookmarkButton(
-                isBookmarked = isBookmarked,
-                onClick = onBookmarkClicked
-            )
+            if(!isExample) {
+                BookmarkButton(
+                    isBookmarked = isBookmarked,
+                    onClick = onBookmarkClicked
+                )
+            }
         }
         Spacer(Modifier.height(16.dp))
         FlowRow(

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,20 +25,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +45,7 @@ import com.example.itda.R
 import com.example.itda.ui.auth.components.PreferenceSelector
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedCard
+import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.feed.components.FeedDetailCard
 import com.example.itda.ui.feed.components.FeedHeaderSection
@@ -63,10 +64,11 @@ fun PreferenceUpdateScreen(
     onDismissExampleDetail : () -> Unit,
     onSubmit: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+//    val scope = rememberCoroutineScope()
 
 
-    val pageCount = ui.examplePrograms.size // 7
+    val exampleProgramCount = ui.examplePrograms.size // 7
+    val pageCount = exampleProgramCount + 1 // 7 + 설명 페이지
     val pagerState = rememberPagerState(pageCount = { pageCount })
 
     // 현재 선택된 선호도 목록 (MutableStateFlow의 preferenceRequestList 대신 화면용 State 사용)
@@ -80,95 +82,199 @@ fun PreferenceUpdateScreen(
     val pageScores = ui.examplePrograms.map { program ->
         currentPreferences.find { it.id == program.id }?.score ?: 0
     }
+    val density = LocalDensity.current
 
     BaseScreen(
         title = "선호도 설정",
         topBarVisible = false,
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+// 아래 Box 블록을 with(density)로 감싸서 dp.toPx() 사용 가능하게 함
+        with(density) {
+            // 2. 🚀 Box 컴포저블 전체
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // 현재 페이지의 오프셋 (-1.0 ~ 0.0)
+                val offsetFraction = pagerState.currentPageOffsetFraction
 
-            Spacer(Modifier.height(16.dp))
+                // 페이지 0에서 벗어날 때 (offsetFraction이 0에서 -1로 갈 때) 애니메이션 활성화
+                // animationProgress: 0.0 (Page 0) -> 1.0 (Page 1)
+                val animationProgress =
+                    if (pagerState.currentPage == 0) offsetFraction * -1.0f else 1.0f
 
-            Text(
-                text = "선호도 설정 (${pagerState.currentPage + 1} / $pageCount)",
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+                val scale3 = 1.0f - (animationProgress * 1.8f)
+                val alpha3 = (1.0f - (animationProgress * 2.4f)).coerceIn(0f, 1f)
+                // --- 배경 원 요소 1: 상단 오른쪽 큰 원 (회전하며 화면 밖으로 이동) ---
+                val rotation1 = animationProgress * 90f // 0도 -> 90도
 
-            // --- 1. Horizontal Pager (정책 카드 뷰어) ---
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f) // 남은 공간 차지
-            ) { page ->
-                val program = ui.examplePrograms[page]
-                val currentScore = currentPreferences.find { it.id == program.id }?.score ?: 0
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 60.dp, y = (-80).dp) // 기준 위치 (미세 조정)
+                        .graphicsLayer {
+                            // 회전 및 화면 크기에 비례한 이동 적용
+                            rotationZ = rotation1
+                            // 화면 너비/높이의 60% 만큼 이동하여 화면 밖으로 사라지도록 설정
+                            translationX = animationProgress * (-this.size.width) * 0.6f
+                            translationY = animationProgress * (this.size.height) * 0.6f
+                            // 원이 사라질 때 투명도도 같이 줄여 자연스럽게 만듦
+                            alpha = alpha3
+                        }
+                        .size(280.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.2f))
+                )
 
-                // 정책 카드와 슬라이더를 담는 컬럼
+                // --- 배경 원 요소 2: 왼쪽 중간 원 (반대 방향 회전하며 화면 밖으로 이동) ---
+                val rotation2 = animationProgress * (-90).dp.toPx() // 0도 -> -90도
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-80).dp, y = 180.dp) // 기준 위치
+                        .graphicsLayer {
+                            rotationZ = rotation2
+                            // 왼쪽 아래로 사라지도록 설정
+                            translationX = animationProgress * (this.size.width) * 0.6f
+                            translationY = animationProgress * (-this.size.height) * 0.4f
+                            alpha = alpha3
+                        }
+                        .size(240.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.4f))
+                )
+
+                // --- 배경 원 요소 3: 우측 작은 원 (크기만 줄어들도록) ---
+                // 이 원은 회전 대신 크기만 줄어들어 부드럽게 사라지도록 합니다. // 1.0 -> 0.5 로 크기가 줄어듦
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(x = 160.dp, y = (-100).dp) // 기준 위치
+                        .graphicsLayer {
+                            // 크기만 줄어들도록 설정
+                            scaleX = scale3
+                            scaleY = scale3
+                            alpha = alpha3 // 투명도 감소
+                        }
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .background(Primary50.copy(alpha = 0.2f))
+                )
+
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // 중앙 정책 카드 (FeedCard)
-                    FeedCard(
-                        id = program.id,
-                        title = program.title,
-                        categories = listOf(program.categoryValue),
-                        department = program.operatingEntity,
-                        content = program.preview,
-                        isBookmarked = false,
-                        logo = if (program.operatingEntityType == "central") R.drawable.gov_logo else R.drawable.local,
-                        isEligible = false,
-                        onClick = { onFeedExampleClick(program.id) },
-                        onBookmarkClicked = {},
-                        isExample = true,
-                        onDismissRequest = {}
-                    )
 
-
-                    // --- 2. 선호도 선택 섹션 ---
-                    PreferenceSelector(
-                        currentScore = currentScore,
-                        onScoreChange = { newScore ->
-                            // 선호도 상태 업데이트
-                            onPreferenceScoreChange(program.id, newScore)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(128.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (pagerState.currentPage > 0) {
+                            Text(
+                                text = "이런 정책은 어떠신가요?",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.scaledSp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(top = 64.dp, bottom = 16.dp)
+                            )
                         }
-                    )
+                        else {
+                            Spacer(Modifier.fillMaxSize())
+                        }
+                    }
+
+
+
+                    // --- 1. Horizontal Pager (정책 카드 뷰어) ---
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.weight(1f) // 남은 공간 차지
+                    ) { page ->
+                        if (page == 0) {
+                            // --- 안내 페이지 (Page 0) ---
+                            PreferenceIntroPage()
+                        } else {
+                            val programIndex = page - 1 // page가 1일 때, programIndex는 0이 됨
+                            val program = ui.examplePrograms[programIndex]
+                            val currentScore = currentPreferences.find { it.id == program.id }?.score ?: 0
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(280.dp)
+                                    .padding(horizontal = 18.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                FeedCard(
+                                    id = program.id,
+                                    title = program.title,
+                                    categories = listOf(program.categoryValue),
+                                    department = program.operatingEntity,
+                                    content = program.preview,
+                                    isBookmarked = false,
+                                    logo = if (program.operatingEntityType == "central") R.drawable.gov_logo else R.drawable.local,
+                                    isEligible = false,
+                                    onClick = { onFeedExampleClick(program.id) },
+                                    onBookmarkClicked = {},
+                                    isExample = true,
+                                    onDismissRequest = {}
+                                )
+
+
+                                PreferenceSelector(
+                                    currentScore = currentScore,
+                                    onScoreChange = { newScore ->
+                                        onPreferenceScoreChange(program.id, newScore)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    if (ui.generalError != null) {
+                        Text(
+                            text = ui.generalError,
+                            color = MaterialTheme.colorScheme.error, // 빨간 글씨
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        // --- 3. 내비게이션 및 제출 버튼 섹션 ---
+                        PagerNavigation(
+                            pagerState = pagerState,
+                            pageCount = pageCount,
+                            pageScores = pageScores,
+                            isSubmitEnabled = isSubmitEnabled,
+                            onSubmit = onSubmit,
+                        )
+                    }
                 }
             }
-
-            if (ui.generalError != null) {
-                Text(
-                    text = ui.generalError,
-                    color = MaterialTheme.colorScheme.error, // 빨간 글씨
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 8.dp)
-                )
-            }
-
-            // --- 3. 내비게이션 및 제출 버튼 섹션 ---
-            PagerNavigation(
-                pagerState = pagerState,
-                pageCount = pageCount,
-                pageScores = pageScores,
-                isSubmitEnabled = isSubmitEnabled,
-                onSubmit = onSubmit,
-            )
         }
+
         ui.exampleProgramDetail?.let { program ->
             AlertDialog(
                 onDismissRequest = onDismissExampleDetail,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                containerColor = MaterialTheme.colorScheme.background,
                 text = {
                     Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         Column() {
@@ -180,7 +286,8 @@ fun PreferenceUpdateScreen(
                                 tags = listOf(ui.exampleProgramDetail.categoryValue),
                                 isEligible = false,
                                 isBookmarked = false,
-                                onBookmarkClicked = {}
+                                onBookmarkClicked = {},
+                                isExample = true
                             )
 
                             Spacer(Modifier.height(16.dp))
@@ -227,39 +334,62 @@ fun PreferenceUpdateScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceSlider(
-    currentScore: Int,
-    onScoreChange: (Int) -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun PreferenceIntroPage() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
-            text = "선호도: ${if (currentScore == 0) "선택해주세요" else "$currentScore 점"}",
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 8.dp)
+            text = "여러분을 더 알려주세요",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = Primary50,
+            textAlign = TextAlign.Center
         )
-
-        Slider(
-            value = currentScore.toFloat(),
-            onValueChange = { onScoreChange(it.toInt()) },
-            steps = 0, // 1, 2, 3, 4, 5
-            valueRange = 1f..5f,
-            modifier = Modifier.fillMaxWidth(0.8f),
-
-
-
-            )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = "어떤 정책이 마음에 드시나요?",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = "다음 정책들이 얼마나 필요한지 알려주세요.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = "이를 바탕으로 당신에게 딱 맞는 정책들을 추천해 드립니다.",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(24.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(16.dp)
         ) {
-            Text("1 (매우 싫음)", style = MaterialTheme.typography.bodySmall)
-            Text("(매우 좋음) 5", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = "👉 화면을 오른쪽으로 밀어서 넘기기",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
+
+
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -272,7 +402,6 @@ fun PagerNavigation(
     onSubmit: () -> Unit,
 ) {
     val currentPage = pagerState.currentPage
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -303,8 +432,13 @@ fun PagerNavigation(
             }
             else {
                 repeat(pageCount) { index ->
-                    val isSelected = index == currentPage
-                    val hasScore = (pageScores.getOrNull(index) ?: 0) > 0
+                    val isSelected = index == currentPage  // page 1 -> index 0 선택
+                    val hasScore =
+                        if(index == 0)
+                            true
+                        else
+                            (pageScores.getOrNull(index - 1) ?: 0) > 0
+
 
                     val dotSize by animateDpAsState(
                         targetValue = if (isSelected) 12.dp else 8.dp,
