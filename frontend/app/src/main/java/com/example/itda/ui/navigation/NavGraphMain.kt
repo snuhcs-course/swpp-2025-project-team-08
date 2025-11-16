@@ -13,9 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.itda.ui.auth.AuthViewModel
+import com.example.itda.ui.bookmark.BookmarkRoute
 import com.example.itda.ui.feed.FeedRoute
 import com.example.itda.ui.home.HomeRoute
-import com.example.itda.ui.notification.NotificationScreen
 import com.example.itda.ui.profile.PersonalInfoRoute
 import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
@@ -24,7 +24,7 @@ import com.example.itda.ui.search.SearchRoute
 
 // Bottom Navigation 탭의 경로 목록을 정의합니다.
 private val MainTabRoutes = listOf(
-    "home", "search", "notification", "profile"
+    "home", "search", "bookmark", "profile"
 )
 
 fun NavGraphBuilder.mainGraph(
@@ -49,7 +49,8 @@ fun NavGraphBuilder.mainGraph(
                             onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)
                          )
-                        "notification" -> NotificationScreen(
+                        "bookmark" -> BookmarkRoute(
+                            onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)
                          )
                         "profile" -> ProfileRoute(

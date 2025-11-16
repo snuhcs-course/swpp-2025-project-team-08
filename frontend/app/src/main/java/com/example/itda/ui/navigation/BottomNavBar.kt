@@ -1,12 +1,9 @@
 package com.example.itda.ui.navigation
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -30,7 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Home : BottomNavItem("home", Icons.Default.Home, "홈")
     object Search : BottomNavItem("search", Icons.Default.Search, "검색")
-    object Notification : BottomNavItem("notification", Icons.Default.Bookmark, "북마크")
+    object Notification : BottomNavItem("bookmark", Icons.Default.Bookmark, "북마크")
     object Profile : BottomNavItem("profile", Icons.Default.Person, "내 정보")
 }
 
