@@ -40,7 +40,7 @@ class HomeViewModelIntegrationTest {
         id = "user123", email = "test@test.com", name = "테스트 사용자",
         birthDate = "2000-01-01", gender = "남성", address = "서울", postcode = "12345",
         maritalStatus = null, educationLevel = null, householdSize = null,
-        householdIncome = null, employmentStatus = null
+        householdIncome = null, employmentStatus = null, tags = null
     )
     private val dummyProgramPage0 = ProgramResponse(
         id = 1, title = "Program 1 (Page 0)", preview = "P1",

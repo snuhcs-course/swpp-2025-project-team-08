@@ -209,51 +209,47 @@ fun KakaoAddressSearchDialog(
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "💡",
+                                    fontSize = 16.scaledSp,
+                                    modifier = Modifier.padding(end = 6.dp)
+                                )
+                                Text(
+                                    text = "검색 Tip",
+                                    fontSize = 14.scaledSp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Neutral10
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "💡 검색 Tip",
-                                fontSize = 14.scaledSp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(bottom = 12.dp)
+                                text = "정확한 검색을 위해 아래 형식으로 입력해주세요",
+                                fontSize = 13.scaledSp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-
-                            TipExample(
-                                title = "도로명으로 검색",
-                                example = "관악로 1"
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            TipExample(
-                                title = "건물명으로 검색",
-                                example = "서울대학교"
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            TipExample(
-                                title = "지번 주소로 검색",
-                                example = "봉천동 1234"
-                            )
-
                             Spacer(modifier = Modifier.height(12.dp))
 
-                            Text(
-                                text = "⚠️ 우편번호를 찾으려면 정확한 건물번호까지 입력해주세요",
-                                fontSize = 11.scaledSp,
-                                color = MaterialTheme.colorScheme.error,
-                                fontWeight = FontWeight.Medium
-                            )
+                            // 예시들
+                            TipExample("도로명 + 건물번호", "판교역로 166")
+                            Spacer(modifier = Modifier.height(6.dp))
+                            TipExample("도로명 + 건물번호", "동일로 216길 92")
+                            Spacer(modifier = Modifier.height(6.dp))
+                            TipExample("동/리 + 번지", "백현동 532")
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // 에러 메시지
                 if (errorMessage != null) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .padding(horizontal = 16.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         ),
@@ -384,7 +380,7 @@ private fun AddressItem(
                 text = "[도로명] ${roadAddress.addressName}",
                 fontSize = 15.scaledSp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Neutral10
             )
             Spacer(modifier = Modifier.height(4.dp))
             if (roadAddress.zoneNo.isNotBlank()) {
@@ -410,7 +406,7 @@ private fun AddressItem(
                     text = "[지번] ${address.addressName}",
                     fontSize = 15.scaledSp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Neutral10
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (!address.zipCode.isNullOrBlank()) {
