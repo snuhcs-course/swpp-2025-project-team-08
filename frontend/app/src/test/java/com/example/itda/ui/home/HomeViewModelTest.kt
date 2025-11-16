@@ -51,7 +51,7 @@ class HomeViewModelTest {
         id = "user123", email = "test@test.com", name = "테스트유저",
         birthDate = null, gender = null, address = null, postcode = null,
         maritalStatus = null, educationLevel = null, householdSize = null,
-        householdIncome = null, employmentStatus = null
+        householdIncome = null, employmentStatus = null, tags = null
     )
 
     private val dummyProgramResponse = ProgramResponse(

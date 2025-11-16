@@ -197,7 +197,8 @@ object DummyData {
             educationLevel = "대졸",
             householdSize = 3,
             householdIncome = 5000,
-            employmentStatus = "재직자"
+            employmentStatus = "재직자" ,
+            //tags = listOf("독거노인", "당뇨", "기초생활수급자")
         ),
         User(
             id = "2",
@@ -211,7 +212,8 @@ object DummyData {
             educationLevel = "석사",
             householdSize = 4,
             householdIncome = 8000,
-            employmentStatus = "재직자"
+            employmentStatus = "재직자",
+            //tags = listOf("독거노인", "당뇨", "기초생활수급자")
         )
     )
 

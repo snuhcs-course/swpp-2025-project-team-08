@@ -40,7 +40,8 @@ class PersonalInfoViewModelTest {
         educationLevel = "대졸",
         householdSize = 3,
         householdIncome = 5000,
-        employmentStatus = "재직자"
+        employmentStatus = "재직자",
+        tags = "저소득층"
     )
 
     // @Before 제거 - 각 테스트에서 모킹합니다
