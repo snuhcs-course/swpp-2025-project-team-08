@@ -59,7 +59,7 @@ jobs:
         if: contains(github.ref, 'main')
         working-directory: ./backend
         run: |
-          docker build -f ./Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/itda .
+          docker build -f ./Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/itda . --no-cache
           docker push ${{ secrets.DOCKER_USERNAME }}/itda  
 
   CD:
