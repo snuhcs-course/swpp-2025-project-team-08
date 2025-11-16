@@ -1,1 +1,1 @@
-from .loaders import BokjiroLoader, YouthCenterLoader
+from .loaders import BokjiroLoader, Subsidy24Loader

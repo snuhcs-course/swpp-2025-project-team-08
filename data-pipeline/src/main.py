@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 from graph import graph
-from loader import BokjiroLoader
+from loader import BokjiroLoader, Subsidy24Loader
 from utils.errors import MismatchError
 from vectorizer import Vectorizer
 from database.manager import PostgresManager
@@ -48,8 +48,8 @@ def create_parser():
         choices=["load", "trim", "vectorize", "save", "all"],
     )
 
-    parser.add_argument("--api-page-size", type=int, default=50)
-    parser.add_argument("--api-max-page-num", type=int, default=10)
+    parser.add_argument("--load-max-page-bokjiro", type=int, default=1)
+    parser.add_argument("--load-max-page-subsidy24", type=int, default=1)
     parser.add_argument("--vectorize-batch-size", type=int, default=32)
     parser.add_argument("--db-commit-batch-size", type=int, default=32)
     parser.add_argument("--db-min-pool-size", type=int, default=1)
@@ -74,19 +74,34 @@ def do_load(args):
     print("[*] Start loading...")
     loaders = [
         BokjiroLoader(
-            page_size=args.api_page_size,
-            max_page_num=args.api_max_page_num,
+            max_page=args.load_max_page_bokjiro,
+        ),
+        Subsidy24Loader(
+            max_page=args.load_max_page_subsidy24,
         ),
     ]
 
     count = 0
-    for loader in loaders:
-        print(f"Running {loader}...")
+    with raw_path.open("w", encoding="utf-8") as f, raw_path_ts.open(
+        "w", encoding="utf-8"
+    ) as f_ts:
+        for loader in loaders:
+            print(f"Running {loader}...")
 
-        programs = loader.load()
-        save_raw_programs(programs)
+            for page in tqdm(
+                range(1, loader.max_page + 1),
+                desc=f"{loader}",
+                unit="page",
+            ):
+                # TODO: try catch load for each page
+                programs = loader.load(page)
 
-        count += len(programs)
+                for program in programs:
+                    json_string = json.dumps(program, ensure_ascii=False) + "\n"
+                    f.write(json_string)
+                    f_ts.write(json_string)
+
+                count += len(programs)
 
     print(f"Total {count} programs are loaded.\n")
 
