@@ -47,7 +47,7 @@ fun TagSelectionSection(
                 text = "📌회원님에 대해 더 알고 싶어요!",
                 fontSize = 20.scaledSp,
                 fontWeight = FontWeight.SemiBold,
-                color = Neutral10,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -58,7 +58,7 @@ fun TagSelectionSection(
                         "더 정확한 맞춤 복지 정보를 받아보실 수 있어요!\n" +
                         "예시를 참고하시면 더 쉽게 작성하실 수 있어요☺️",
                 fontSize = 13.scaledSp,
-                color = Neutral40,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.scaledSp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -68,7 +68,7 @@ fun TagSelectionSection(
             text = "직접 입력",
             fontSize = 13.scaledSp,
             fontWeight = FontWeight.Medium,
-            color = Neutral20,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -87,16 +87,16 @@ fun TagSelectionSection(
                     Text(
                         "태그를 입력하세요",
                         fontSize = 14.scaledSp,
-                        color = Neutral60
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Primary60,
-                    unfocusedBorderColor = Neutral80,
-                    focusedContainerColor = Neutral100,
-                    unfocusedContainerColor = Neutral100
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
 
@@ -105,16 +105,16 @@ fun TagSelectionSection(
                 modifier = Modifier.size(48.dp),
                 enabled = tagInput.trim().isNotEmpty(),
                 colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = if (tagInput.trim().isNotEmpty()) Primary60 else Neutral90,
-                    contentColor = Neutral100,
-                    disabledContainerColor = Neutral90,
-                    disabledContentColor = Neutral60
+                    containerColor = if (tagInput.trim().isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "태그 추가",
-                    tint = Neutral100
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -123,7 +123,7 @@ fun TagSelectionSection(
             text = "예시 태그",
             fontSize = 13.scaledSp,
             fontWeight = FontWeight.Medium,
-            color = Neutral20,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -153,14 +153,17 @@ fun TagSelectionSection(
                         )
                     },
                     colors = FilterChipDefaults.filterChipColors(
-                        containerColor = Neutral100,
-                        labelColor = Neutral30,
-                        selectedContainerColor = Primary60,
-                        selectedLabelColor = Neutral100
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = if (isSelected) Primary60 else Neutral80
+                        color = if (isSelected)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.outline
                     )
                 )
             }
@@ -171,7 +174,7 @@ fun TagSelectionSection(
                 text = "추가한 태그",
                 fontSize = 13.scaledSp,
                 fontWeight = FontWeight.Medium,
-                color = Neutral20,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -198,13 +201,13 @@ fun TagSelectionSection(
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = Neutral100,
-                            labelColor = Primary60,
-                            trailingIconContentColor = Primary60
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.primary,
+                            trailingIconContentColor = MaterialTheme.colorScheme.primary
                         ),
                         border = BorderStroke(
                             width = 1.dp,
-                            color = Primary60
+                            color = MaterialTheme.colorScheme.primary
                         )
                     )
                 }

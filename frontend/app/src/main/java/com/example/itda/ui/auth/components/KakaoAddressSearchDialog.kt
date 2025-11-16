@@ -177,14 +177,14 @@ fun KakaoAddressSearchDialog(
                         .height(48.dp),
                     enabled = !isLoading && searchQuery.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary60
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Neutral100,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                     } else {
@@ -201,55 +201,59 @@ fun KakaoAddressSearchDialog(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Neutral95
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Neutral90)
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "💡",
-                                    fontSize = 16.scaledSp,
-                                    modifier = Modifier.padding(end = 6.dp)
-                                )
-                                Text(
-                                    text = "검색 Tip",
-                                    fontSize = 14.scaledSp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Neutral10
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "정확한 검색을 위해 아래 형식으로 입력해주세요",
-                                fontSize = 13.scaledSp,
-                                color = Neutral40
+                                text = "💡 검색 Tip",
+                                fontSize = 14.scaledSp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 12.dp)
                             )
+
+                            TipExample(
+                                title = "도로명으로 검색",
+                                example = "관악로 1"
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            TipExample(
+                                title = "건물명으로 검색",
+                                example = "서울대학교"
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            TipExample(
+                                title = "지번 주소로 검색",
+                                example = "봉천동 1234"
+                            )
+
                             Spacer(modifier = Modifier.height(12.dp))
 
-                            // 예시들
-                            TipExample("도로명 + 건물번호", "판교역로 166")
-                            Spacer(modifier = Modifier.height(6.dp))
-                            TipExample("도로명 + 건물번호", "동일로 216길 92")
-                            Spacer(modifier = Modifier.height(6.dp))
-                            TipExample("동/리 + 번지", "백현동 532")
+                            Text(
+                                text = "⚠️ 우편번호를 찾으려면 정확한 건물번호까지 입력해주세요",
+                                fontSize = 11.scaledSp,
+                                color = MaterialTheme.colorScheme.error,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // 에러 메시지
                 if (errorMessage != null) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         ),
@@ -307,7 +311,7 @@ fun KakaoAddressSearchDialog(
                         text = "검색 결과 (${searchResults.size}개)",
                         fontSize = 14.scaledSp,
                         fontWeight = FontWeight.Medium,
-                        color = Neutral40,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
@@ -380,14 +384,14 @@ private fun AddressItem(
                 text = "[도로명] ${roadAddress.addressName}",
                 fontSize = 15.scaledSp,
                 fontWeight = FontWeight.Medium,
-                color = Neutral10
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             if (roadAddress.zoneNo.isNotBlank()) {
                 Text(
                     text = "우편번호: ${roadAddress.zoneNo}",
                     fontSize = 13.scaledSp,
-                    color = Primary60,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
             } else {
@@ -406,14 +410,14 @@ private fun AddressItem(
                     text = "[지번] ${address.addressName}",
                     fontSize = 15.scaledSp,
                     fontWeight = FontWeight.Medium,
-                    color = Neutral10
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (!address.zipCode.isNullOrBlank()) {
                     Text(
                         text = "우편번호: ${address.zipCode}",
                         fontSize = 13.scaledSp,
-                        color = Primary60,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
                 } else {
@@ -443,20 +447,20 @@ private fun TipExample(
         Text(
             text = "•",
             fontSize = 14.scaledSp,
-            color = Neutral30,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(end = 8.dp)
         )
         Column {
             Text(
                 text = title,
                 fontSize = 11.scaledSp,
-                color = Neutral50
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "예) $example",
                 fontSize = 12.scaledSp,
                 fontWeight = FontWeight.Medium,
-                color = Neutral40
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

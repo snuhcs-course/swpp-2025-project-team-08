@@ -143,15 +143,15 @@ fun PersonalInfoScreen(
                             )
                         }
 
-                    if (ui.genderError != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = ui.genderError,
-                            fontSize = 12.scaledSp,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
+                        if (ui.genderError != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = ui.genderError,
+                                fontSize = 12.scaledSp,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -251,7 +251,7 @@ fun PersonalInfoScreen(
                         text = "💡딱 맞는 복지 프로그램을 찾아드릴 수 있어요!",
                         fontSize = 16.scaledSp,
                         fontWeight = FontWeight.Bold,
-                        color = Neutral10,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
 
@@ -263,7 +263,7 @@ fun PersonalInfoScreen(
                                 "지금 입력하지 않아도 괜찮아요.\n" +
                                 "나중에 언제든 추가하거나 바꿀 수 있어요!",
                         fontSize = 14.scaledSp,
-                        color = Neutral40,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 20.scaledSp,
                         textAlign = TextAlign.Center
                     )
@@ -281,12 +281,12 @@ fun PersonalInfoScreen(
                         .wrapContentHeight(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Neutral100
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 0.dp
                     ),
-                    border = BorderStroke(1.dp, Neutral90)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Column(
                         modifier = Modifier
@@ -297,7 +297,7 @@ fun PersonalInfoScreen(
                             text = "혼인 상태",
                             fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -317,7 +317,7 @@ fun PersonalInfoScreen(
                             text = "최종 학력",
                             fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -352,7 +352,7 @@ fun PersonalInfoScreen(
                             text = "고용 상태",
                             fontSize = 14.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral10,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 

@@ -108,13 +108,13 @@ fun SearchScreen(
                             text = "최근 검색어",
                             fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral20
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Text(
                             text = "전체 삭제",
                             fontSize = 14.scaledSp,
-                            color = Neutral50,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.clickable {
                                 onClearAllRecentSearches()
                             }
@@ -152,9 +152,9 @@ fun SearchScreen(
                 ) {
                     Text(
                         text = "💡 이런 키워드로 검색해보세요 !",
-                        fontSize = 16.sp,
+                        fontSize = 16.scaledSp,
                         fontWeight = FontWeight.Medium,
-                        color = Neutral20,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
@@ -245,13 +245,13 @@ fun SearchScreen(
                                     text = "검색 결과가 없습니다",
                                     fontSize = 18.scaledSp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Neutral40
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "다른 검색어로 다시 시도해보세요",
                                     fontSize = 14.scaledSp,
-                                    color = Neutral50
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

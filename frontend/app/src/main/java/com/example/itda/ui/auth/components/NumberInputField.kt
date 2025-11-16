@@ -27,7 +27,7 @@ fun NumberInputField(
         Text(
             text = label,
             fontSize = 14.scaledSp,
-            color = Neutral10,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -35,9 +35,9 @@ fun NumberInputField(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Neutral95
+                containerColor = MaterialTheme.colorScheme.surface
             ),
-            border = BorderStroke(1.dp, Neutral80)
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Row(
                 modifier = Modifier
@@ -56,14 +56,14 @@ fun NumberInputField(
                         Text(
                             text = placeholder,
                             fontSize = 14.scaledSp,
-                            color = Neutral60
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Neutral95,
-                        unfocusedContainerColor = Neutral95,
-                        disabledContainerColor = Neutral95,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
                         focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                         unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                     ),
@@ -77,7 +77,7 @@ fun NumberInputField(
                 Text(
                     text = suffix,
                     fontSize = 14.scaledSp,
-                    color = Neutral40,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 16.dp, start = 8.dp)
                 )
             }

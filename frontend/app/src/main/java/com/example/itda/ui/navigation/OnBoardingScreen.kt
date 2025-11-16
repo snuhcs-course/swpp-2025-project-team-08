@@ -42,9 +42,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.itda.R
-import com.example.itda.ui.common.theme.Neutral30
-import com.example.itda.ui.common.theme.Neutral80
-import com.example.itda.ui.common.theme.Neutral90
 import com.example.itda.ui.common.theme.scaledSp
 
 // ⚠️ 실제 프로젝트의 R.raw. ID로 대체해야 합니다.
@@ -82,7 +79,7 @@ fun OnBoardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Neutral90)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // 1. HorizontalPager: 스와이프 가능한 영역
         HorizontalPager(
@@ -161,7 +158,7 @@ private fun VideoPage(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
 
-    ) {
+        ) {
         AndroidView(
             modifier = Modifier
                 .weight(8f)
@@ -183,7 +180,7 @@ private fun VideoPage(
         Text(
             text = videoDescription,
             fontSize = 16.scaledSp,
-            color = Neutral30,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -248,7 +245,7 @@ private fun OnBoardingBottomNavigation(
                     val color = if (index == currentPage) {
                         MaterialTheme.colorScheme.primary
                     } else {
-                        Neutral80
+                        MaterialTheme.colorScheme.outline
                     }
 
                     Box(

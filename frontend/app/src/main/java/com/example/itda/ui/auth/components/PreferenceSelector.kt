@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.itda.ui.common.theme.Primary50
 
 @Composable
 fun PreferenceSelector(
@@ -75,7 +74,7 @@ fun PreferenceSelector(
                     Icon(
                         imageVector = icon,
                         contentDescription = description,
-                        tint = if (isSelected) Primary50 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
@@ -89,7 +88,7 @@ fun PreferenceSelector(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (isSelected) Primary50 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
             }

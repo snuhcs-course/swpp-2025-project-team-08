@@ -28,12 +28,12 @@ fun GenderOption(
         onClick = onClick,
         modifier = modifier.height(48.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (selected) Primary60 else Neutral100,
-            contentColor = if (selected) Neutral100 else Neutral40
+            containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = if (selected) Primary60 else Neutral80
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -64,7 +64,7 @@ fun BirthDateInput(
             text = label,
             fontSize = 14.scaledSp,
             fontWeight = FontWeight.Medium,
-            color = Neutral10,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -78,17 +78,17 @@ fun BirthDateInput(
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
-                Text("(예: 20001205)", color = Neutral60, fontSize = 14.scaledSp)
+                Text("(예: 20001205)", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.scaledSp)
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number  // 숫자 키패드
             ),
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary60,
-                unfocusedBorderColor = Neutral90,
-                focusedTextColor = Neutral10,
-                unfocusedTextColor = Neutral10
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
             shape = RoundedCornerShape(8.dp),
             singleLine = true,
@@ -96,7 +96,7 @@ fun BirthDateInput(
                 if (isError) {
                     Text(
                         text = errorMessage,
-                        fontSize = 12.sp,
+                        fontSize = 12.scaledSp,
                         color = MaterialTheme.colorScheme.error
                     )
                 }

@@ -31,12 +31,12 @@ fun SelectionButtonRow(
                 onClick = { onOptionSelected(value) },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (isSelected) Primary60 else Neutral100,
-                    contentColor = if (isSelected) Neutral100 else Neutral40
+                    containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 border = BorderStroke(
                     width = 1.dp,
-                    color = if (isSelected) Primary60 else Neutral80
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                 ),
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(vertical = 12.dp)

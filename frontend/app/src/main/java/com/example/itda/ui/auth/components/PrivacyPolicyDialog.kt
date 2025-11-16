@@ -24,7 +24,7 @@ fun PrivacyPolicyDialog(
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f),
             shape = RoundedCornerShape(16.dp),
-            color = Neutral100
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -35,7 +35,7 @@ fun PrivacyPolicyDialog(
                     text = "개인정보 수집 및 이용 동의",
                     fontSize = 20.scaledSp,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral0
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -49,7 +49,7 @@ fun PrivacyPolicyDialog(
                         text = buildPrivacyPolicyText(),
                         fontSize = 14.scaledSp,
                         lineHeight = 24.scaledSp,
-                        color = Neutral20
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -68,7 +68,7 @@ fun PrivacyPolicyDialog(
                     ) {
                         Text(
                             text = "취소",
-                            fontSize = 16.sp,
+                            fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -82,7 +82,7 @@ fun PrivacyPolicyDialog(
                             .weight(1f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Primary60
+                            containerColor = MaterialTheme.colorScheme.primary
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -90,7 +90,7 @@ fun PrivacyPolicyDialog(
                             text = "동의하기",
                             fontSize = 16.scaledSp,
                             fontWeight = FontWeight.Medium,
-                            color = Neutral100
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
