@@ -201,6 +201,7 @@ class AuthViewModelIntegrationTest {
         assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
         assertThat(fakeAuthRepository.lastUpdateProfileName).isEqualTo(name)
         assertThat(fakeAuthRepository.lastUpdateProfileBirthDate).isEqualTo("2000-01-01")
+        assertThat(fakeAuthRepository.lastUpdateProfileTags).isNull()
     }
 
     @Test
@@ -240,6 +241,71 @@ class AuthViewModelIntegrationTest {
         viewModel.personalInfoUi.test {
             val state = awaitItem()
             assertThat(state.postcodeError).isEqualTo("우편번호를 입력해주세요")
+        }
+    }
+
+    @Test
+    fun updateProfile_withTags_callsRepositoryWithTags() = runTest {
+        val name = "홍길동"
+        val birthDate = "20000101"
+        val gender = "남성"
+        val address = "서울시"
+        val postcode = "12345"
+
+        viewModel.onNameChange(name)
+        viewModel.onBirthDateChange(birthDate)
+        viewModel.onGenderChange(gender)
+        viewModel.onAddressChange(address)
+        viewModel.onPostCodeChange(postcode)
+        viewModel.addTag("독거노인")
+        viewModel.addTag("저소득층")
+
+        fakeAuthRepository.updateProfileResult = Result.success(Unit)
+
+        val result = viewModel.submitPersonalInfo()
+        advanceUntilIdle()
+
+        assertThat(result).isTrue()
+        assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
+        assertThat(fakeAuthRepository.lastUpdateProfileTags).isNotNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileTags).containsExactly("독거노인", "저소득층")
+    }
+
+    @Test
+    fun addTag_updatesStateAndClearsInput() = runTest {
+        viewModel.onTagInputChange("독거노인")
+        viewModel.addTag("독거노인")
+        advanceUntilIdle()
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+            assertThat(state.tagInput).isEmpty()
+        }
+    }
+
+    @Test
+    fun addTag_duplicateTag_doesNotAddAgain() = runTest {
+        viewModel.addTag("독거노인")
+        viewModel.addTag("독거노인")
+        advanceUntilIdle()
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("독거노인")
+        }
+    }
+
+    @Test
+    fun removeTag_removesFromList() = runTest {
+        viewModel.addTag("독거노인")
+        viewModel.addTag("저소득층")
+        viewModel.removeTag("독거노인")
+        advanceUntilIdle()
+
+        viewModel.personalInfoUi.test {
+            val state = awaitItem()
+            assertThat(state.selectedTags).containsExactly("저소득층")
         }
     }
 
