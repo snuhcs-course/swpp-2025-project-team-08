@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import com.example.itda.ui.common.theme.*
 import androidx.compose.runtime.LaunchedEffect
 
@@ -179,7 +182,12 @@ fun ProfileScreen(
                         ProfileInfoItem("학력", user?.educationLevel ?: "")
                         ProfileInfoItem("가구원 수", user?.householdSize?.toString() ?: "")
                         ProfileInfoItem("가구원 소득", user?.householdIncome?.let { "${it}만원" } ?: "")
-                        ProfileInfoItem("취업 상태", user?.employmentStatus ?: "", isLast = true)
+                        ProfileInfoItem("취업 상태", user?.employmentStatus ?: "")
+                        ProfileInfoItem(
+                            "관심 태그",
+                            user?.tags?.joinToString(", ") { "#$it" } ?: "",
+                            isLast = true
+                        )
                     }
                 }
 
@@ -240,33 +248,33 @@ fun ProfileInfoItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    MaterialTheme {
-        ProfileScreen(
-            ui = ProfileViewModel.ProfileUiState(
-                user = com.example.itda.data.source.remote.ProfileResponse(
-                    id = "1",
-                    email = "test@example.com",
-                    name = "백일",
-                    birthDate = "1949-01-01",
-                    gender = "남성",
-                    address = "서울 노원구 동일로216길 92",
-                    postcode = "01754",
-                    maritalStatus = "미혼",
-                    educationLevel = "대졸",
-                    householdSize = 4,
-                    householdIncome = 500,
-                    employmentStatus = "재직자",
-                    tags = listOf("태그1", "태그2", "태그3")
-                ),
-                isLoading = false,
-                generalError = null
-            ),
-            onSettingClick = {},
-            onPersonalInfoClick = {},
-            onRefresh = {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ProfileScreenPreview() {
+//    MaterialTheme {
+//        ProfileScreen(
+//            ui = ProfileViewModel.ProfileUiState(
+//                user = com.example.itda.data.source.remote.ProfileResponse(
+//                    id = "1",
+//                    email = "test@example.com",
+//                    name = "백일",
+//                    birthDate = "1949-01-01",
+//                    gender = "남성",
+//                    address = "서울 노원구 동일로216길 92",
+//                    postcode = "01754",
+//                    maritalStatus = "미혼",
+//                    educationLevel = "대졸",
+//                    householdSize = 4,
+//                    householdIncome = 500,
+//                    employmentStatus = "재직자",
+//                    tags = listOf("태그1", "태그2", "태그3")
+//                ),
+//                isLoading = false,
+//                generalError = null
+//            ),
+//            onSettingClick = {},
+//            onPersonalInfoClick = {},
+//            onRefresh = {}
+//        )
+//    }
+//}

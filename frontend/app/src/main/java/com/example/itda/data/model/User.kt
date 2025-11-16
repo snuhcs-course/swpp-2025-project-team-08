@@ -13,4 +13,5 @@ data class User(
     val householdSize: Int?,
     val householdIncome: Int?,
     val employmentStatus: String?,
+//    val tags: List<String>?,
 )

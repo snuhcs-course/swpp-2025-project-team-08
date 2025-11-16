@@ -30,6 +30,8 @@ class PersonalInfoViewModel @Inject constructor(
         val householdSize: String = "",
         val householdIncome: String = "",
         val employmentStatus: String = "",
+        val tags: List<String> = emptyList(),
+        val tagInput: String = "",
         val isLoading: Boolean = false,
         val nameError: String? = null,
         val birthDateError: String? = null,
@@ -147,6 +149,7 @@ class PersonalInfoViewModel @Inject constructor(
                             householdSize = profile.householdSize?.toString() ?: "",
                             householdIncome = profile.householdIncome?.toString() ?: "",
                             employmentStatus = profile.employmentStatus ?: "",
+                            tags = profile.tags ?: emptyList(),
                             isLoading = false,
                             generalError = null
                         )
@@ -217,6 +220,28 @@ class PersonalInfoViewModel @Inject constructor(
         _personalInfoUi.update { it.copy(employmentStatus = v, generalError = null) }
     }
 
+    fun onTagInputChange(v: String) {
+        _personalInfoUi.update { it.copy(tagInput = v) }
+    }
+
+    fun onAddTag(tag: String) {
+        val trimmedTag = tag.trim()
+        if (trimmedTag.isNotEmpty() && trimmedTag !in _personalInfoUi.value.tags) {
+            _personalInfoUi.update {
+                it.copy(
+                    tags = it.tags + trimmedTag,
+                    tagInput = "" // 태그 추가 후 입력 필드 클리어
+                )
+            }
+        }
+    }
+
+    fun onRemoveTag(tag: String) {
+        _personalInfoUi.update {
+            it.copy(tags = it.tags.filter { t -> t != tag })
+        }
+    }
+
     suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
@@ -273,7 +298,8 @@ class PersonalInfoViewModel @Inject constructor(
             educationLevel = educationEnum,
             householdSize = ui.householdSize.toIntOrNull(),
             householdIncome = ui.householdIncome.toIntOrNull(),
-            employmentStatus = employmentEnum
+            employmentStatus = employmentEnum,
+            tags = ui.tags.ifEmpty { null }
         )
 
         result.onFailure { exception ->
