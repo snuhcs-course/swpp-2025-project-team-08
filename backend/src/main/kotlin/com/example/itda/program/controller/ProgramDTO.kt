@@ -13,6 +13,7 @@ data class ProgramSummaryResponse(
     val operatingEntityType: String,
     val category: String,
     val categoryValue: String,
+    val reason: String?,
 ) {
     companion object {
         fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
@@ -24,6 +25,22 @@ data class ProgramSummaryResponse(
                 operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
+                reason = null,
+            )
+
+        fun fromEntityWithReason(
+            entity: ProgramEntity,
+            reason: String?,
+        ): ProgramSummaryResponse =
+            ProgramSummaryResponse(
+                id = entity.id!!,
+                title = entity.title,
+                preview = entity.preview,
+                operatingEntity = entity.operatingEntity,
+                operatingEntityType = entity.operatingEntityType.toString().lowercase(),
+                category = entity.category.toString().lowercase(),
+                categoryValue = entity.category.value,
+                reason = reason,
             )
 
         fun fromEntity(entity: ProgramExampleEntity): ProgramSummaryResponse =
@@ -35,6 +52,7 @@ data class ProgramSummaryResponse(
                 operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
+                reason = null,
             )
     }
 }
