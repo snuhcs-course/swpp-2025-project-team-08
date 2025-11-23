@@ -198,7 +198,7 @@ object DummyData {
             householdSize = 3,
             householdIncome = 5000,
             employmentStatus = "재직자" ,
-            //tags = listOf("독거노인", "당뇨", "기초생활수급자")
+            tags = listOf("독거노인", "당뇨", "기초생활수급자")
         ),
         User(
             id = "2",
@@ -213,7 +213,7 @@ object DummyData {
             householdSize = 4,
             householdIncome = 8000,
             employmentStatus = "재직자",
-            //tags = listOf("독거노인", "당뇨", "기초생활수급자")
+            tags = listOf("독거노인", "당뇨", "기초생활수급자")
         )
     )
 

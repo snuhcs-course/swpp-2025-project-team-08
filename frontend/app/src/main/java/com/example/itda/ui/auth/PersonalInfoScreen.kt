@@ -14,6 +14,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.itda.ui.common.enums.EmploymentStatus
+import com.example.itda.ui.common.enums.Gender
+import com.example.itda.ui.common.enums.MaritalStatus
 import com.example.itda.ui.auth.components.*
 import com.example.itda.ui.common.theme.*
 
@@ -130,15 +133,15 @@ fun PersonalInfoScreen(
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             GenderOption(
-                                text = "남성",
-                                selected = ui.gender == "MALE",
-                                onClick = { onGenderChange("MALE") },
+                                text = Gender.MALE.korean,
+                                selected = ui.gender == Gender.MALE.serverValue,
+                                onClick = { onGenderChange(Gender.MALE.serverValue) },
                                 modifier = Modifier.weight(1f)
                             )
                             GenderOption(
-                                text = "여성",
-                                selected = ui.gender == "FEMALE",
-                                onClick = { onGenderChange("FEMALE") },
+                                text = Gender.FEMALE.korean,
+                                selected = ui.gender == Gender.FEMALE.serverValue,
+                                onClick = { onGenderChange(Gender.FEMALE.serverValue) },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -302,11 +305,9 @@ fun PersonalInfoScreen(
                         )
 
                         SelectionButtonRow(
-                            options = listOf(
-                                "SINGLE" to "미혼",
-                                "MARRIED" to "기혼",
-                                "DIVORCED_OR_BEREAVED" to "이혼/사별"
-                            ),
+                            options = MaritalStatus.entries.map {
+                                it.serverValue to it.korean
+                            },
                             selectedValue = ui.maritalStatus,
                             onOptionSelected = onMaritalStatusChange
                         )
@@ -357,11 +358,9 @@ fun PersonalInfoScreen(
                         )
 
                         SelectionButtonRow(
-                            options = listOf(
-                                "EMPLOYED" to "재직자",
-                                "UNEMPLOYED" to "미취업자",
-                                "SELF_EMPLOYED" to "자영업자"
-                            ),
+                            options = EmploymentStatus.entries.map {
+                                it.serverValue to it.korean
+                            },
                             selectedValue = ui.employmentStatus,
                             onOptionSelected = onEmploymentStatusChange
                         )

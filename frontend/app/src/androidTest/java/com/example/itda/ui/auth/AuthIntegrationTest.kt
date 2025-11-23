@@ -182,7 +182,7 @@ class AuthViewModelIntegrationTest {
     fun updateProfile_success_callsRepository() = runTest {
         val name = "홍길동"
         val birthDate = "20000101"
-        val gender = "남성"
+        val gender = "MALE"
         val address = "서울시"
         val postcode = "12345"
 
@@ -199,16 +199,17 @@ class AuthViewModelIntegrationTest {
 
         assertThat(result).isTrue()
         assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
-        assertThat(fakeAuthRepository.lastUpdateProfileName).isEqualTo(name)
-        assertThat(fakeAuthRepository.lastUpdateProfileBirthDate).isEqualTo("2000-01-01")
-        assertThat(fakeAuthRepository.lastUpdateProfileTags).isNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest).isNotNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.name).isEqualTo(name)
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.birthDate).isEqualTo("2000-01-01")
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.tags).isNull()
     }
 
     @Test
     fun updateProfile_emptyName_setsNameError() = runTest {
         viewModel.onNameChange("")
         viewModel.onBirthDateChange("20000101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
@@ -220,7 +221,7 @@ class AuthViewModelIntegrationTest {
 
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.nameError).isEqualTo("이름을 입력해주세요")
+            assertThat(state.nameError).isEqualTo("성함을 입력해주세요")
         }
     }
 
@@ -228,7 +229,7 @@ class AuthViewModelIntegrationTest {
     fun updateProfile_emptyPostcode_setsPostcodeError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("20000101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("")
 
@@ -248,7 +249,7 @@ class AuthViewModelIntegrationTest {
     fun updateProfile_withTags_callsRepositoryWithTags() = runTest {
         val name = "홍길동"
         val birthDate = "20000101"
-        val gender = "남성"
+        val gender = "MALE"
         val address = "서울시"
         val postcode = "12345"
 
@@ -267,8 +268,9 @@ class AuthViewModelIntegrationTest {
 
         assertThat(result).isTrue()
         assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
-        assertThat(fakeAuthRepository.lastUpdateProfileTags).isNotNull()
-        assertThat(fakeAuthRepository.lastUpdateProfileTags).containsExactly("독거노인", "저소득층")
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest).isNotNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.tags).isNotNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.tags).containsExactly("독거노인", "저소득층")
     }
 
     @Test

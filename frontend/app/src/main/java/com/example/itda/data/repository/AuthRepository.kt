@@ -1,7 +1,8 @@
 package com.example.itda.data.repository
 
-import com.example.itda.data.source.remote.PreferenceRequestList
-import com.example.itda.data.source.remote.ProfileResponse
+import com.example.itda.data.model.PreferenceRequestList
+import com.example.itda.data.model.ProfileUpdateRequest
+import com.example.itda.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
@@ -16,21 +17,9 @@ interface AuthRepository {
 
     suspend fun logout(): Result<Unit>
 
-    suspend fun getProfile(): Result<ProfileResponse>
+    suspend fun getProfile(): Result<User>
 
-    suspend fun updateProfile(
-        name: String,
-        birthDate: String? = null,
-        gender: String? = null,
-        address: String? = null,
-        postcode: String? = null,
-        maritalStatus: String? = null,
-        educationLevel: String? = null,
-        householdSize: Int? = null,
-        householdIncome: Int? = null,
-        employmentStatus: String? = null,
-        tags: List<String>? = null
-    ): Result<Unit>
+    suspend fun updateProfile(request: ProfileUpdateRequest): Result<Unit>
 
     suspend fun updatePreference(
         satisfactionScores: PreferenceRequestList

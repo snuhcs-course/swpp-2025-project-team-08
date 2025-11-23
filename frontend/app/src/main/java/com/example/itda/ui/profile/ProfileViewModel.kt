@@ -2,9 +2,9 @@ package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiErrorParser
-import com.example.itda.data.source.remote.ProfileResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     data class ProfileUiState(
-        val user: ProfileResponse? = null,
+        val user: User? = null,
         val isLoading: Boolean = false,
         val generalError: String? = null
     )
