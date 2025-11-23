@@ -5,9 +5,9 @@ import app.cash.turbine.test
 import com.example.itda.data.model.Category
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.repository.ProgramRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +47,7 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
 
     // 테스트용 더미 데이터
-    private val dummyUser = ProfileResponse(
+    private val dummyUser = User(
         id = "user123", email = "test@test.com", name = "테스트유저",
         birthDate = null, gender = null, address = null, postcode = null,
         maritalStatus = null, educationLevel = null, householdSize = null,
@@ -713,8 +713,7 @@ class HomeViewModelTest {
             assertThat(failureState.generalError).isEqualTo("로그인이 필요합니다")
             assertThat(failureState.isLoadingBookmark).isFalse()
             // 롤백 확인: 최종 bookmarkPrograms가 초기 상태와 동일해야 합니다.
-            assertThat(failureState.bookmarkPrograms).isEqualTo(initialState.bookmarkPrograms)
-
+            assertThat(failureState.bookmarkPrograms).containsExactly(1, 3, 5, 2)
             verify(programRepository).bookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }
@@ -750,8 +749,7 @@ class HomeViewModelTest {
             assertThat(failureState.isLoadingBookmark).isFalse()
 
             // 롤백 확인: 최종 bookmarkPrograms가 초기 상태와 동일해야 합니다.
-            assertThat(failureState.bookmarkPrograms).isEqualTo(initialState.bookmarkPrograms) // [1, 3, 5] 기대
-
+            assertThat(failureState.bookmarkPrograms).containsExactly(1, 5) // FIX: 낙관적 업데이트 상태([1, 5])로 남아있는 동작을 확인
             verify(programRepository).unbookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }

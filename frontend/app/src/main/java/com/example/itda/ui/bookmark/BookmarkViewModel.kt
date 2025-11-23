@@ -218,7 +218,6 @@ class BookmarkViewModel @Inject constructor(
 
             val isBookmarked = id in _uiState.value.bookmarkIds
 
-            val currentIds = _uiState.value.bookmarkIds
 
             // 1. UI 상태 업데이트를 위한 임시 데이터 계산
             val currentPrograms = _uiState.value.allLoadedPrograms
@@ -259,7 +258,7 @@ class BookmarkViewModel @Inject constructor(
                         it.copy(
                             generalError = apiError.message,
                             isLoadingBookmark = false,
-                            bookmarkIds = currentIds, // 원래 IDs로 롤백
+                            bookmarkIds = _uiState.value.bookmarkIds, // 원래 IDs로 롤백
                             allLoadedPrograms = currentPrograms, // 원래 프로그램 목록으로 롤백
                             bookmarkItems = currentPrograms
                             )

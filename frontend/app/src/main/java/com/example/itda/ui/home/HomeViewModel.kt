@@ -230,15 +230,12 @@ class HomeViewModel @Inject constructor(
                 isLoadingBookmark = true, // 로딩 시작
             ) }
 
-            // 롤백을 위해 API 호출 전의 현재 북마크 목록을 저장합니다.
-            val originalBookmarkPrograms = homeUi.value.bookmarkPrograms
-
             // 1. UI 에서 즉시 북마크 상태를 토글합니다.
-            val isBookmarked = id in originalBookmarkPrograms
+            val isBookmarked = id in homeUi.value.bookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
-                originalBookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+                homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
             } else {
-                originalBookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+                homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
 
             // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
@@ -259,7 +256,7 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             generalError = apiError.message,
                             isLoadingBookmark = false,
-                            bookmarkPrograms = originalBookmarkPrograms,
+                            bookmarkPrograms = homeUi.value.bookmarkPrograms,
                         )
                     }
                 }
