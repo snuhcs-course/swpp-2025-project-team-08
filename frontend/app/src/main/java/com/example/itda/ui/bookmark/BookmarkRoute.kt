@@ -16,7 +16,6 @@ fun BookmarkRoute(
 
     BookmarkScreen (
         ui = ui,
-        onCategorySelected = vm::onCategorySelected,
         onFeedClick = onFeedClick,
         onFeedBookmarkClick = vm::onFeedBookmarkClicked,
         onRefresh = vm::refreshBookmarkData,

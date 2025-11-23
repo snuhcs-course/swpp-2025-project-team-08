@@ -52,7 +52,6 @@ fun BookmarkScreen(
     ui: BookmarkViewModel.BookmarkUiState,
     onFeedClick: (Int) -> Unit,
     onFeedBookmarkClick : (Int) -> Unit,
-    onCategorySelected: (Category) -> Unit,
     onRefresh: () -> Unit,
     onLoadNext: () -> Unit,
     onRefreshProfile: () -> Unit,

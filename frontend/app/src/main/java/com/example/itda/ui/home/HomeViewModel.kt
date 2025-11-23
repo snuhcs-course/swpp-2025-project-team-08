@@ -22,26 +22,26 @@ class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val programRepository: ProgramRepository,
 ) : ViewModel() {
-//    val programs = programRepository.getPrograms()
+    //    val programs = programRepository.getPrograms()
     data class HomeUiState(
-    val userId: String = "", // 사용자 정보
-    val username: String = "", // 사용자 정보
-    val categories: List<Category> = dummyCategories, // 필터 카테고리
-    val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
-    val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
-    val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
-    val isLastPage: Boolean = false,        // 마지막 페이지 여부
-    val totalPages: Int = 0,                // 전체 페이지 수
-    val totalElements : Int = 0,             // 전체 정책 수
-    val isPaginating : Boolean = false,
-    val isLoading: Boolean = false,
-    val isLoadingBookmark : Boolean = false,
-    val loadDataCount : Int = 0,
-    val loadProfileCount : Int = 0,
-    val loadNextCount : Int = 0,
-    val isRefreshing: Boolean = false,
-    val generalError: String? = null,
-    val bookmarkPrograms : List<Int> = emptyList<Int>()
+        val userId: String = "", // 사용자 정보
+        val username: String = "", // 사용자 정보
+        val categories: List<Category> = dummyCategories, // 필터 카테고리
+        val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
+        val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+        val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
+        val isLastPage: Boolean = false,        // 마지막 페이지 여부
+        val totalPages: Int = 0,                // 전체 페이지 수
+        val totalElements : Int = 0,             // 전체 정책 수
+        val isPaginating : Boolean = false,
+        val isLoading: Boolean = false,
+        val isLoadingBookmark : Boolean = false,
+        val loadDataCount : Int = 0,
+        val loadProfileCount : Int = 0,
+        val loadNextCount : Int = 0,
+        val isRefreshing: Boolean = false,
+        val generalError: String? = null,
+        val bookmarkPrograms : List<Int> = emptyList<Int>()
     )
 
     private val _homeUi = MutableStateFlow(HomeUiState())
@@ -130,7 +130,7 @@ class HomeViewModel @Inject constructor(
                             totalPages = response.totalPages,   // 전체 페이지 수 저장
                             isLastPage = response.isLast,
                             totalElements = response.totalElements,   // 전체 정책 수 저장
-                            generalError = null,
+                            generalError = if (it.isRefreshing) null else it.generalError,
                             isLoading = false,
                         )
                     }
@@ -213,7 +213,7 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { response ->
                     _homeUi.update {
                         it.copy(
-                            generalError = null,
+                            // generalError = null,
                             bookmarkPrograms = response.map { it.id },
                             isLoading = false,
                             isLoadingBookmark = false,
@@ -230,12 +230,15 @@ class HomeViewModel @Inject constructor(
                 isLoadingBookmark = true, // 로딩 시작
             ) }
 
+            // 롤백을 위해 API 호출 전의 현재 북마크 목록을 저장합니다.
+            val originalBookmarkPrograms = homeUi.value.bookmarkPrograms
+
             // 1. UI 에서 즉시 북마크 상태를 토글합니다.
-            val isBookmarked = id in homeUi.value.bookmarkPrograms
+            val isBookmarked = id in originalBookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
-                homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+                originalBookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
             } else {
-                homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+                originalBookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
 
             // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
@@ -256,7 +259,7 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             generalError = apiError.message,
                             isLoadingBookmark = false,
-                            bookmarkPrograms = homeUi.value.bookmarkPrograms, // 원래 리스트로 롤백
+                            bookmarkPrograms = originalBookmarkPrograms,
                         )
                     }
                 }

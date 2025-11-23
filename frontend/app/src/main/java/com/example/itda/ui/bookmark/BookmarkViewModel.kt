@@ -181,21 +181,23 @@ class BookmarkViewModel @Inject constructor(
                 }
                 .onSuccess { response ->
                     val newPrograms = response.content
-                    val currentPrograms = _uiState.value.allLoadedPrograms
-                    val currentIds = _uiState.value.bookmarkIds
+//                    val currentPrograms = _uiState.value.allLoadedPrograms
+//                    val currentIds = _uiState.value.bookmarkIds
 
-                    _uiState.update {
-                        it.copy(
+                    _uiState.update { currentState ->
+                        val updatedPrograms = currentState.allLoadedPrograms + newPrograms
+                        val updatedIds = currentState.bookmarkIds + newPrograms.map { p -> p.id }
+
+                        currentState.copy(
                             generalError = null,
-                            allLoadedPrograms = currentPrograms + newPrograms, // 전체 목록에 추가
-                            bookmarkIds = currentIds + newPrograms.map { p -> p.id }, // ID 목록에 추가
+                            allLoadedPrograms = updatedPrograms, // 전체 목록에 추가
+                            bookmarkIds = updatedIds, // ID 목록에 추가
+                            bookmarkItems = updatedPrograms,
                             isLastPage = response.isLast,
                             currentPage = nextPage,
                             isPaginating = false,
                         )
                     }
-                    // 💡 새로운 데이터가 로드된 후, 현재 선택된 카테고리에 맞춰 필터링을 다시 적용
-                    onCategorySelected(_uiState.value.selectedCategory)
                 }
         }
     }
@@ -209,24 +211,14 @@ class BookmarkViewModel @Inject constructor(
         loadBookmarkData(isRefresh = true)
     }
 
-    /**
-     * 💡 로드된 전체 목록을 기반으로 카테고리 필터링
-     */
-    fun onCategorySelected(category: Category) {
-        _uiState.update {
-            it.copy(
-                selectedCategory = category
-            )
-        }
-
-        loadBookmarkData()
-    }
 
     fun onFeedBookmarkClicked(id: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingBookmark = true) }
 
             val isBookmarked = id in _uiState.value.bookmarkIds
+
+            val currentIds = _uiState.value.bookmarkIds
 
             // 1. UI 상태 업데이트를 위한 임시 데이터 계산
             val currentPrograms = _uiState.value.allLoadedPrograms
@@ -245,8 +237,13 @@ class BookmarkViewModel @Inject constructor(
             }
 
             // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백 (아이콘 및 목록 제거)을 제공
-            _uiState.update { it.copy(bookmarkIds = updatedIds, allLoadedPrograms = updatedPrograms) }
-            onCategorySelected(_uiState.value.selectedCategory) // 필터링된 UI 목록에도 반영
+            _uiState.update {
+                it.copy(
+                    bookmarkIds = updatedIds,
+                    allLoadedPrograms = updatedPrograms,
+                    bookmarkItems = updatedPrograms
+                )
+            }
 
             // 3. API 호출
             val apiCall = if (isBookmarked)
@@ -262,11 +259,11 @@ class BookmarkViewModel @Inject constructor(
                         it.copy(
                             generalError = apiError.message,
                             isLoadingBookmark = false,
-                            bookmarkIds = _uiState.value.bookmarkIds, // 원래 IDs로 롤백
+                            bookmarkIds = currentIds, // 원래 IDs로 롤백
                             allLoadedPrograms = currentPrograms, // 원래 프로그램 목록으로 롤백
-                        )
+                            bookmarkItems = currentPrograms
+                            )
                     }
-                    onCategorySelected(_uiState.value.selectedCategory) // 롤백된 목록으로 필터링 재적용
                 }
                 .onSuccess {
                     // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
