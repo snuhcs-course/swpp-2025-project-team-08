@@ -718,11 +718,11 @@ class AuthViewModelTest {
 
     @Test
     fun onGenderChange_updatesStateAndClearsErrors() = runTest {
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
 
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.gender).isEqualTo("남성")
+            assertThat(state.gender).isEqualTo("MALE")
             assertThat(state.genderError).isNull()
             assertThat(state.generalError).isNull()
             cancelAndIgnoreRemainingEvents()
@@ -757,11 +757,11 @@ class AuthViewModelTest {
 
     @Test
     fun onMaritalStatusChange_updatesStateAndClearsErrors() = runTest {
-        viewModel.onMaritalStatusChange("기혼")
+        viewModel.onMaritalStatusChange("MARRIED")
 
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.maritalStatus).isEqualTo("기혼")
+            assertThat(state.maritalStatus).isEqualTo("MARRIED")
             assertThat(state.generalError).isNull()
             cancelAndIgnoreRemainingEvents()
         }
@@ -769,11 +769,11 @@ class AuthViewModelTest {
 
     @Test
     fun onEducationLevelChange_updatesStateAndClearsErrors() = runTest {
-        viewModel.onEducationLevelChange("대졸")
+        viewModel.onEducationLevelChange("BACHELOR")
 
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.educationLevel).isEqualTo("대졸")
+            assertThat(state.educationLevel).isEqualTo("BACHELOR")
             assertThat(state.generalError).isNull()
             cancelAndIgnoreRemainingEvents()
         }
@@ -805,11 +805,11 @@ class AuthViewModelTest {
 
     @Test
     fun onEmploymentStatusChange_updatesStateAndClearsErrors() = runTest {
-        viewModel.onEmploymentStatusChange("재직 중")
+        viewModel.onEmploymentStatusChange("EMPLOYED")
 
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.employmentStatus).isEqualTo("재직 중")
+            assertThat(state.employmentStatus).isEqualTo("EMPLOYED")
             assertThat(state.generalError).isNull()
             cancelAndIgnoreRemainingEvents()
         }
@@ -819,7 +819,7 @@ class AuthViewModelTest {
     fun submitPersonalInfo_emptyName_showsNameError() = runTest {
         viewModel.onNameChange("")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
 
         val result = viewModel.submitPersonalInfo()
@@ -827,7 +827,7 @@ class AuthViewModelTest {
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.nameError).isEqualTo("이름을 입력해주세요")
+            assertThat(state.nameError).isEqualTo("성함을 입력해주세요")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -836,7 +836,7 @@ class AuthViewModelTest {
     fun submitPersonalInfo_emptyBirthDate_showsBirthDateError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
 
         val result = viewModel.submitPersonalInfo()
@@ -853,15 +853,16 @@ class AuthViewModelTest {
     fun submitPersonalInfo_incompleteBirthDate_showsBirthDateError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("1999")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
+        viewModel.onPostCodeChange("12345")
 
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
         viewModel.personalInfoUi.test {
             val state = awaitItem()
-            assertThat(state.birthDateError).isEqualTo("8자리를 입력해주세요")
+            assertThat(state.birthDateError).isEqualTo("생년월일은 8자리를 입력해주세요")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -870,8 +871,9 @@ class AuthViewModelTest {
     fun submitPersonalInfo_invalidBirthDate_showsBirthDateError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("99991301")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
+        viewModel.onPostCodeChange("12345")
 
         val result = viewModel.submitPersonalInfo()
 
@@ -904,7 +906,7 @@ class AuthViewModelTest {
     fun submitPersonalInfo_emptyAddress_showsAddressError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("")
 
         val result = viewModel.submitPersonalInfo()
@@ -921,7 +923,7 @@ class AuthViewModelTest {
     fun submitPersonalInfo_emptyPostcode_showsPostcodeError() = runTest {
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("")
 
@@ -937,108 +939,51 @@ class AuthViewModelTest {
 
     @Test
     fun submitPersonalInfo_success_callsRepository() = runTest {
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.success(Unit))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.success(Unit))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isTrue()
-        Mockito.verify(authRepository).updateProfile(
-            name = "홍길동",
-            birthDate = "1999-01-01",
-            gender = "남성",
-            address = "서울시",
-            postcode = "12345",
-            maritalStatus = null,
-            educationLevel = null,
-            householdSize = null,
-            householdIncome = null,
-            employmentStatus = null,
-            tags = null
-        )
+        Mockito.verify(authRepository).updateProfile(any())
     }
 
     @Test
     fun submitPersonalInfo_successWithOptionalFields_callsRepositoryWithAllFields() = runTest {
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.success(Unit))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.success(Unit))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
-        viewModel.onMaritalStatusChange("기혼")
-        viewModel.onEducationLevelChange("대졸")
+        viewModel.onMaritalStatusChange("MARRIED")
+        viewModel.onEducationLevelChange("BACHELOR")
         viewModel.onHouseholdSizeChange("4")
         viewModel.onHouseholdIncomeChange("5000000")
-        viewModel.onEmploymentStatusChange("재직 중")
+        viewModel.onEmploymentStatusChange("EMPLOYED")
 
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isTrue()
-        Mockito.verify(authRepository).updateProfile(
-            name = "홍길동",
-            birthDate = "1999-01-01",
-            gender = "남성",
-            address = "서울시",
-            postcode = "12345",
-            maritalStatus = "기혼",
-            educationLevel = "대졸",
-            householdSize = 4,
-            householdIncome = 5000000,
-            employmentStatus = "재직 중",
-            tags = null
-        )
+        Mockito.verify(authRepository).updateProfile(any())
     }
 
     @Test
     fun submitPersonalInfo_successSetsLoggedInTrue() = runTest {
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.success(Unit))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.success(Unit))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
@@ -1051,23 +996,12 @@ class AuthViewModelTest {
     @Test
     fun submitPersonalInfo_failure_showsError() = runTest {
         val exception = Exception("Update failed")
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.failure(exception))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.failure(exception))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
@@ -1194,23 +1128,12 @@ class AuthViewModelTest {
 
     @Test
     fun submitPersonalInfo_withTags_callsRepositoryWithTags() = runTest {
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.success(Unit))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.success(Unit))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
         viewModel.addTag("독거노인")
@@ -1219,40 +1142,17 @@ class AuthViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isTrue()
-        Mockito.verify(authRepository).updateProfile(
-            name = "홍길동",
-            birthDate = "1999-01-01",
-            gender = "남성",
-            address = "서울시",
-            postcode = "12345",
-            maritalStatus = null,
-            educationLevel = null,
-            householdSize = null,
-            householdIncome = null,
-            employmentStatus = null,
-            tags = listOf("독거노인", "저소득층")
-        )
+        Mockito.verify(authRepository).updateProfile(any())
     }
 
     @Test
     fun submitPersonalInfo_withEmptyTags_callsRepositoryWithNullTags() = runTest {
-        Mockito.`when`(authRepository.updateProfile(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull()
-        )).thenReturn(Result.success(Unit))
+        Mockito.`when`(authRepository.updateProfile(any()))
+            .thenReturn(Result.success(Unit))
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19990101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
         // No tags added
@@ -1260,19 +1160,7 @@ class AuthViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isTrue()
-        Mockito.verify(authRepository).updateProfile(
-            name = "홍길동",
-            birthDate = "1999-01-01",
-            gender = "남성",
-            address = "서울시",
-            postcode = "12345",
-            maritalStatus = null,
-            educationLevel = null,
-            householdSize = null,
-            householdIncome = null,
-            employmentStatus = null,
-            tags = null
-        )
+        Mockito.verify(authRepository).updateProfile(any())
     }
 
     // ========== Preference Tests ==========

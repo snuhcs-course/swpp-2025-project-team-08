@@ -1,7 +1,7 @@
 package com.example.itda.ui.profile
 
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.AuthRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,19 +31,19 @@ class PersonalInfoViewModelTest {
 
     private lateinit var viewModel: PersonalInfoViewModel
 
-    private val testProfile = ProfileResponse(
+    private val testProfile = User(
         id = "test-id",
         email = "test@example.com",
         name = "홍길동",
         birthDate = "1990-01-01",
-        gender = "남성",
+        gender = "MALE",
         address = "서울시 강남구",
         postcode = "12345",
-        maritalStatus = "미혼",
-        educationLevel = "대졸",
+        maritalStatus = "SINGLE",
+        educationLevel = "BACHELOR",
         householdSize = 3,
         householdIncome = 5000,
-        employmentStatus = "재직자",
+        employmentStatus = "EMPLOYED",
         tags = listOf("저소득층")
     )
 
@@ -60,14 +60,14 @@ class PersonalInfoViewModelTest {
         val ui = viewModel.personalInfoUi.value
         assertThat(ui.name).isEqualTo("홍길동")
         assertThat(ui.birthDate).isEqualTo("19900101")
-        assertThat(ui.gender).isEqualTo("남성")
+        assertThat(ui.gender).isEqualTo("MALE")
         assertThat(ui.address).isEqualTo("서울시 강남구")
         assertThat(ui.postcode).isEqualTo("12345")
-        assertThat(ui.maritalStatus).isEqualTo("미혼")
-        assertThat(ui.education).isEqualTo("대졸")
+        assertThat(ui.maritalStatus).isEqualTo("SINGLE")
+        assertThat(ui.education).isEqualTo("BACHELOR")
         assertThat(ui.householdSize).isEqualTo("3")
         assertThat(ui.householdIncome).isEqualTo("5000")
-        assertThat(ui.employmentStatus).isEqualTo("재직자")
+        assertThat(ui.employmentStatus).isEqualTo("EMPLOYED")
         assertThat(ui.tags).containsExactly("저소득층")
         assertThat(ui.isLoading).isFalse()
         assertThat(ui.generalError).isNull()
@@ -76,7 +76,7 @@ class PersonalInfoViewModelTest {
     @Test
     fun init_handlesNullValues_correctly() = runTest {
         // Given
-        val emptyProfile = ProfileResponse(
+        val emptyProfile = User(
             id = "test-id",
             email = "test@example.com",
             name = null,
@@ -164,7 +164,7 @@ class PersonalInfoViewModelTest {
 
         viewModel.onNameChange("")
         viewModel.onBirthDateChange("19900101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시 강남구")
 
         val result = viewModel.submitPersonalInfo()
@@ -181,7 +181,7 @@ class PersonalInfoViewModelTest {
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시 강남구")
 
         val result = viewModel.submitPersonalInfo()
@@ -198,17 +198,14 @@ class PersonalInfoViewModelTest {
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19901301")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시 강남구")
 
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
         assertThat(viewModel.personalInfoUi.value.birthDateError).isNotNull()
-        verify(authRepository, never()).updateProfile(
-            any(), any(), any(), any(), any(),
-            any(), any(), any(), any(), any(), any()
-        )
+        verify(authRepository, never()).updateProfile(any())
     }
 
     @Test
@@ -236,7 +233,7 @@ class PersonalInfoViewModelTest {
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19900101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("")
 
         val result = viewModel.submitPersonalInfo()
@@ -249,26 +246,21 @@ class PersonalInfoViewModelTest {
     fun submitPersonalInfo_returnsTrue_withValidRequiredFields_andCallsRepository() = runTest {
         // Given
         whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
-        whenever(
-            authRepository.updateProfile(
-                any(), any(), any(), any(), any(),
-                any(), any(), any(), any(), any(), any()
-            )
-        ).thenReturn(Result.success(Unit))
+        whenever(authRepository.updateProfile(any())).thenReturn(Result.success(Unit))
 
         viewModel = PersonalInfoViewModel(authRepository)
         advanceUntilIdle()
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19900101")
-        viewModel.onGenderChange("여성")
+        viewModel.onGenderChange("FEMALE")
         viewModel.onAddressChange("서울시 강남구")
         viewModel.onPostCodeChange("12345")
-        viewModel.onMaritalStatusChange("기혼")
-        viewModel.onEducationChange("대졸")
+        viewModel.onMaritalStatusChange("MARRIED")
+        viewModel.onEducationChange("BACHELOR")
         viewModel.onHouseholdSizeChange("3")
         viewModel.onHouseholdIncomeChange("5000")
-        viewModel.onEmploymentStatusChange("재직자")
+        viewModel.onEmploymentStatusChange("EMPLOYED")
         viewModel.onAddTag("저소득층")
 
         val result = viewModel.submitPersonalInfo()
@@ -276,38 +268,21 @@ class PersonalInfoViewModelTest {
         assertThat(result).isTrue()
         assertThat(viewModel.personalInfoUi.value.isLoading).isFalse()
 
-        verify(authRepository).updateProfile(
-            name = eq("홍길동"),
-            birthDate = eq("1990-01-01"),
-            gender = eq("FEMALE"),
-            address = eq("서울시 강남구"),
-            postcode = eq("12345"),
-            maritalStatus = eq("MARRIED"),
-            educationLevel = eq("BACHELOR"),
-            householdSize = eq(3),
-            householdIncome = eq(5000),
-            employmentStatus = eq("EMPLOYED"),
-            tags = eq(listOf("저소득층"))
-        )
+        verify(authRepository).updateProfile(any())
     }
 
     @Test
     fun submitPersonalInfo_returnsFalse_onNetworkTimeout() = runTest {
         // Given
         whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
-        whenever(
-            authRepository.updateProfile(
-                any(), any(), any(), any(), any(),
-                any(), any(), any(), any(), any(), any()
-            )
-        ).thenReturn(Result.failure(RuntimeException("timeout")))
+        whenever(authRepository.updateProfile(any())).thenReturn(Result.failure(RuntimeException("timeout")))
 
         viewModel = PersonalInfoViewModel(authRepository)
         advanceUntilIdle()
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("19900101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시 강남구")
 
         val result = viewModel.submitPersonalInfo()

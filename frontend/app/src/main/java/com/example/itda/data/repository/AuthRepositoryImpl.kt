@@ -1,10 +1,11 @@
 package com.example.itda.data.repository
 
+import com.example.itda.data.model.AuthRequest
+import com.example.itda.data.model.PreferenceRequestList
+import com.example.itda.data.model.ProfileRequest
+import com.example.itda.data.model.ProfileUpdateRequest
+import com.example.itda.data.model.User
 import com.example.itda.data.source.local.PrefDataSource
-import com.example.itda.data.source.remote.AuthRequest
-import com.example.itda.data.source.remote.PreferenceRequestList
-import com.example.itda.data.source.remote.ProfileRequest
-import com.example.itda.data.source.remote.ProfileResponse
 import com.example.itda.data.source.remote.RetrofitInstance
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -32,58 +33,42 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun signup(email: String, password: String): Result<Unit> {
-        return try {
-            val res = api.signup(AuthRequest(email, password))
-            pref.saveTokens(
-                access = res.accessToken,
-                refresh = res.refreshToken,
-                type = res.tokenType,
-                expires = res.expiresIn
-            )
-            Result.success(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
-        }
+    override suspend fun signup(email: String, password: String): Result<Unit> = runCatching {
+        val res = api.signup(AuthRequest(email, password))
+
+        pref.saveTokens(
+            access = res.accessToken,
+            refresh = res.refreshToken,
+            type = res.tokenType,
+            expires = res.expiresIn
+        )
     }
 
     override suspend fun logout(): Result<Unit> = runCatching {
+        // 서버 로그아웃 실패해도 로컬 데이터는 삭제
         runCatching { api.logout() }
         pref.clear()
     }
 
-    override suspend fun getProfile(): Result<ProfileResponse> = runCatching {
+    override suspend fun getProfile(): Result<User> = runCatching {
         api.getProfile()
     }
 
-    override suspend fun updateProfile(
-        name: String,
-        birthDate: String?,
-        gender: String?,
-        address: String?,
-        postcode: String?,
-        maritalStatus: String?,
-        educationLevel: String?,
-        householdSize: Int?,
-        householdIncome: Int?,
-        employmentStatus: String?,
-        tags: List<String>?
-    ): Result<Unit> = runCatching {
-        val request = ProfileRequest(
-            name = name,
-            birthDate = birthDate,
-            gender = gender,
-            address = address,
-            postcode = postcode,
-            maritalStatus = maritalStatus,
-            educationLevel = educationLevel,
-            householdSize = householdSize,
-            householdIncome = householdIncome,
-            employmentStatus = employmentStatus,
-            tags = tags
+    override suspend fun updateProfile(request: ProfileUpdateRequest): Result<Unit> = runCatching {
+        val apiRequest = ProfileRequest(
+            name = request.name,
+            birthDate = request.birthDate,
+            gender = request.gender,
+            address = request.address,
+            postcode = request.postcode,
+            maritalStatus = request.maritalStatus,
+            educationLevel = request.educationLevel,
+            householdSize = request.householdSize,
+            householdIncome = request.householdIncome,
+            employmentStatus = request.employmentStatus,
+            tags = request.tags
         )
-        api.updateProfile(request)
+        api.updateProfile(apiRequest)
     }
 
 

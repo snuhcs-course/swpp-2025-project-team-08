@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiErrorParser
+import com.example.itda.ui.common.enums.EducationLevel
+import com.example.itda.ui.common.enums.EmploymentStatus
+import com.example.itda.ui.common.enums.Gender
+import com.example.itda.ui.common.enums.MaritalStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,8 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.itda.ui.auth.components.formatBirthDate
-import com.example.itda.ui.auth.components.isValidBirthDate
 
 @HiltViewModel
 class PersonalInfoViewModel @Inject constructor(
@@ -48,107 +50,41 @@ class PersonalInfoViewModel @Inject constructor(
         loadUserData()
     }
 
-    // Enum 이름 → 한글 (서버값 -> UI표시)
-    // 참고: 서버가 이미 한글을 반환하는 경우 이 함수는 사용되지 않음
-    private fun convertEnumToKorean(enumName: String?, type: String): String {
-        return when (type) {
-            "gender" -> when (enumName) {
-                "MALE" -> "남성"
-                "FEMALE" -> "여성"
-                else -> ""
-            }
-
-            "marital" -> when (enumName) {
-                "SINGLE" -> "미혼"
-                "MARRIED" -> "기혼"
-                "DIVORCED_OR_BEREAVED" -> "이혼/사별"
-                else -> ""
-            }
-
-            "education" -> when (enumName) {
-                "ELEMENTARY_SCHOOL_STUDENT" -> "초등학생"
-                "MIDDLE_SCHOOL_STUDENT" -> "중학생"
-                "HIGH_SCHOOL_STUDENT" -> "고등학생"
-                "COLLEGE_STUDENT" -> "대학생"
-                "ELEMENTARY_SCHOOL" -> "초졸"
-                "MIDDLE_SCHOOL" -> "중졸"
-                "HIGH_SCHOOL" -> "고졸"
-                "ASSOCIATE" -> "전문대졸"
-                "BACHELOR" -> "대졸"
-                else -> ""
-            }
-
-            "employment" -> when (enumName) {
-                "EMPLOYED" -> "재직자"
-                "UNEMPLOYED" -> "미취업자"
-                "SELF_EMPLOYED" -> "자영업자"
-                else -> ""
-            }
-
-            else -> ""
-        }
-    }
-
-    // 한글 → Enum 이름 (UI입력 -> 서버전송)
-    private fun convertKoreanToEnum(korean: String?, type: String): String? {
-        if (korean.isNullOrBlank()) return null
-
-        return when (type) {
-            "gender" -> when (korean) {
-                "남성" -> "MALE"
-                "여성" -> "FEMALE"
-                else -> null
-            }
-
-            "marital" -> when (korean) {
-                "미혼" -> "SINGLE"
-                "기혼" -> "MARRIED"
-                "이혼/사별" -> "DIVORCED_OR_BEREAVED"
-                else -> null
-            }
-
-            "education" -> when (korean) {
-                "초등학생" -> "ELEMENTARY_SCHOOL_STUDENT"
-                "중학생" -> "MIDDLE_SCHOOL_STUDENT"
-                "고등학생" -> "HIGH_SCHOOL_STUDENT"
-                "대학생" -> "COLLEGE_STUDENT"
-                "초졸" -> "ELEMENTARY_SCHOOL"
-                "중졸" -> "MIDDLE_SCHOOL"
-                "고졸" -> "HIGH_SCHOOL"
-                "전문대졸" -> "ASSOCIATE"
-                "대졸" -> "BACHELOR"
-                else -> null
-            }
-
-            "employment" -> when (korean) {
-                "재직자" -> "EMPLOYED"
-                "미취업자" -> "UNEMPLOYED"
-                "자영업자" -> "SELF_EMPLOYED"
-                else -> null
-            }
-
-            else -> null
-        }
-    }
-
     private fun loadUserData() {
         viewModelScope.launch {
             _personalInfoUi.update { it.copy(isLoading = true) }
 
             authRepository.getProfile()
                 .onSuccess { profile ->
+                    // 서버에서 한글로 받은 값을 serverValue로 변환
+                    val genderServerValue = profile.gender?.let {
+                        Gender.fromKorean(it)?.serverValue ?: Gender.fromServerValue(it)?.serverValue ?: it
+                    } ?: ""
+
+                    val maritalStatusServerValue = profile.maritalStatus?.let {
+                        MaritalStatus.fromKorean(it)?.serverValue ?: MaritalStatus.fromServerValue(it)?.serverValue ?: it
+                    } ?: ""
+
+                    val educationServerValue = profile.educationLevel?.let {
+                        EducationLevel.fromKorean(it)?.serverValue ?: EducationLevel.fromServerValue(it)?.serverValue ?: it
+                    } ?: ""
+
+                    val employmentServerValue = profile.employmentStatus?.let {
+                        EmploymentStatus.fromKorean(it)?.serverValue ?: EmploymentStatus.fromServerValue(it)?.serverValue ?: it
+                    } ?: ""
+
                     _personalInfoUi.update {
                         it.copy(
                             name = profile.name ?: "",
                             birthDate = profile.birthDate?.replace("-", "") ?: "",
-                            gender = profile.gender ?: "",
+                            gender = genderServerValue,
                             address = profile.address ?: "",
                             postcode = profile.postcode ?: "",
-                            maritalStatus = profile.maritalStatus ?: "",
-                            education = profile.educationLevel ?: "",
+                            maritalStatus = maritalStatusServerValue,
+                            education = educationServerValue,
                             householdSize = profile.householdSize?.toString() ?: "",
                             householdIncome = profile.householdIncome?.toString() ?: "",
-                            employmentStatus = profile.employmentStatus ?: "",
+                            employmentStatus = employmentServerValue,
                             tags = profile.tags ?: emptyList(),
                             isLoading = false,
                             generalError = null
@@ -245,62 +181,62 @@ class PersonalInfoViewModel @Inject constructor(
     suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
-        var hasError = false
-
-        if (ui.name.isBlank()) {
-            _personalInfoUi.update { it.copy(nameError = "이름을 입력해주세요") }
-            hasError = true
+        _personalInfoUi.update {
+            it.copy(
+                isLoading = true,
+                nameError = null,
+                birthDateError = null,
+                genderError = null,
+                addressError = null,
+                postcodeError = null,
+                generalError = null
+            )
         }
 
-        val birthDateDigits = ui.birthDate.filter { it.isDigit() }
-        if (birthDateDigits.isBlank()) {
-            _personalInfoUi.update { it.copy(birthDateError = "생년월일을 입력해주세요") }
-            hasError = true
-        } else if (!isValidBirthDate(birthDateDigits)) {
-            _personalInfoUi.update { it.copy(birthDateError = "올바른 생년월일을 입력해주세요 (예: 19990101)") }
-            hasError = true
-        }
+        // Builder 구현
+        val requestResult = com.example.itda.data.model.ProfileUpdateRequest.builder()
+            .name(ui.name)
+            .birthDate(ui.birthDate)
+            .gender(ui.gender.ifBlank { null })
+            .address(ui.address)
+            .postcode(ui.postcode)
+            .maritalStatus(ui.maritalStatus.ifBlank { null })
+            .educationLevel(ui.education.ifBlank { null })
+            .householdSize(ui.householdSize.toIntOrNull())
+            .householdIncome(ui.householdIncome.toIntOrNull())
+            .employmentStatus(ui.employmentStatus.ifBlank { null })
+            .tags(ui.tags.ifEmpty { null })
+            .build()
 
-        if (hasError) {
+        // 에러 처리
+        requestResult.onFailure { exception ->
+            val errorMessage = exception.message ?: "유효성 검사 실패"
+
+            when {
+                errorMessage.contains("성함") -> {
+                    _personalInfoUi.update { it.copy(nameError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("생년월일") || errorMessage.contains("8자리") -> {
+                    _personalInfoUi.update { it.copy(birthDateError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("성별") -> {
+                    _personalInfoUi.update { it.copy(genderError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("주소") -> {
+                    _personalInfoUi.update { it.copy(addressError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("우편번호") -> {
+                    _personalInfoUi.update { it.copy(postcodeError = errorMessage, isLoading = false) }
+                }
+                else -> {
+                    _personalInfoUi.update { it.copy(generalError = errorMessage, isLoading = false) }
+                }
+            }
             return false
         }
 
-        if (ui.gender.isBlank()) {
-            _personalInfoUi.update { it.copy(genderError = "성별을 선택해주세요") }
-            hasError = true
-        }
-
-        if (ui.address.isBlank()) {
-            _personalInfoUi.update { it.copy(addressError = "주소를 입력해주세요") }
-            hasError = true
-        }
-
-        if (hasError) {
-            return false
-        }
-
-        // 검증 통과. 저장 시작.
-        _personalInfoUi.update { it.copy(isLoading = true, generalError = null) }
-
-        val formattedBirthDate = formatBirthDate(ui.birthDate)
-        val genderEnum = convertKoreanToEnum(ui.gender, "gender")
-        val maritalEnum = convertKoreanToEnum(ui.maritalStatus, "marital")
-        val educationEnum = convertKoreanToEnum(ui.education, "education")
-        val employmentEnum = convertKoreanToEnum(ui.employmentStatus, "employment")
-
-        val result = authRepository.updateProfile(
-            name = ui.name,
-            birthDate = formattedBirthDate,
-            gender = genderEnum,
-            address = ui.address,
-            postcode = ui.postcode,
-            maritalStatus = maritalEnum,
-            educationLevel = educationEnum,
-            householdSize = ui.householdSize.toIntOrNull(),
-            householdIncome = ui.householdIncome.toIntOrNull(),
-            employmentStatus = employmentEnum,
-            tags = ui.tags.ifEmpty { null }
-        )
+        val request = requestResult.getOrThrow()
+        val result = authRepository.updateProfile(request)
 
         result.onFailure { exception ->
             val errorMessage = when {

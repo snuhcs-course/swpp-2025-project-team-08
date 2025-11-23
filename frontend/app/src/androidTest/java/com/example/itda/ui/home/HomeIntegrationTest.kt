@@ -5,9 +5,9 @@ import app.cash.turbine.test
 import com.example.itda.data.model.Category
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.FakeAuthRepository
 import com.example.itda.data.repository.FakeProgramRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,9 +36,9 @@ class HomeViewModelIntegrationTest {
     private lateinit var fakeProgramRepository: FakeProgramRepository
 
     // ========== 더미 데이터 정의 ==========
-    private val dummyProfile = ProfileResponse(
+    private val dummyProfile = User(
         id = "user123", email = "test@test.com", name = "테스트 사용자",
-        birthDate = "2000-01-01", gender = "남성", address = "서울", postcode = "12345",
+        birthDate = "2000-01-01", gender = "MALE", address = "서울", postcode = "12345",
         maritalStatus = null, educationLevel = null, householdSize = null,
         householdIncome = null, employmentStatus = null, tags = null
     )

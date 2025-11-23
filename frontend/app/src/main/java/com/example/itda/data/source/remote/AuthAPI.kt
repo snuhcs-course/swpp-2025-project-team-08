@@ -1,59 +1,14 @@
 package com.example.itda.data.source.remote
 
+import com.example.itda.data.model.AuthRequest
+import com.example.itda.data.model.AuthResponse
+import com.example.itda.data.model.PreferenceRequestList
+import com.example.itda.data.model.ProfileRequest
+import com.example.itda.data.model.User
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-
-data class AuthRequest(
-    val email: String,
-    val password: String
-)
-
-data class AuthResponse(
-    val accessToken: String,
-    val refreshToken: String?,
-    val tokenType: String?,
-    val expiresIn: Int?
-)
-
-data class ProfileRequest(
-    val name: String?,
-    val birthDate: String?,
-    val gender: String?,
-    val address: String?,
-    val postcode: String?,
-    val maritalStatus: String?,
-    val educationLevel: String?,
-    val householdSize: Int?,
-    val householdIncome: Int?,
-    val employmentStatus: String?,
-    val tags: List<String>?
-)
-
-data class ProfileResponse(
-    val id: String,
-    val email: String,
-    val name: String?,
-    val birthDate: String?,
-    val gender: String?,
-    val address: String?,
-    val postcode: String?,
-    val maritalStatus: String?,
-    val educationLevel: String?,
-    val householdSize: Int?,
-    val householdIncome: Int?,
-    val employmentStatus: String?,
-    val tags: List<String>?
-)
-
-typealias PreferenceRequestList = List<PreferenceRequest>
-
-data class PreferenceRequest(
-    val id : Int,
-    val score : Int
-)
-
 
 interface AuthAPI {
     @POST("auth/signup")
@@ -66,7 +21,7 @@ interface AuthAPI {
     suspend fun logout()
 
     @GET("my-profile")
-    suspend fun getProfile(): ProfileResponse
+    suspend fun getProfile(): User
 
     @PUT("my-profile")
     suspend fun updateProfile(@Body request: ProfileRequest): Unit

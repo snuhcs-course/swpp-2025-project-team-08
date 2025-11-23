@@ -33,6 +33,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.components.AddressResult
 import com.example.itda.ui.auth.components.KakaoAddressSearchDialog
 import com.example.itda.ui.auth.components.isValidBirthDate
+import com.example.itda.ui.common.enums.EducationLevel
+import com.example.itda.ui.common.enums.EmploymentStatus
+import com.example.itda.ui.common.enums.Gender
+import com.example.itda.ui.common.enums.MaritalStatus
 import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.profile.PersonalInfoViewModel
 import com.example.itda.ui.auth.components.TagSelectionSection
@@ -256,9 +260,12 @@ fun PersonalInfoScreen(
 
                     PersonalInfoDropdown(
                         label = "성별",
-                        value = ui.gender,
-                        options = listOf("남성", "여성"),
-                        onValueChange = onGenderChange,
+                        value = Gender.entries.find { it.serverValue == ui.gender }?.korean ?: ui.gender,
+                        options = Gender.entries.map { it.korean },
+                        onValueChange = { korean ->
+                            val serverValue = Gender.fromKorean(korean)?.serverValue ?: korean
+                            onGenderChange(serverValue)
+                        },
                         errorMessage = ui.genderError,
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             genderFieldY = coordinates.positionInParent().y
@@ -370,19 +377,22 @@ fun PersonalInfoScreen(
 
                     PersonalInfoDropdown(
                         label = "결혼여부",
-                        value = ui.maritalStatus,
-                        options = listOf("미혼", "기혼", "이혼/사별"),
-                        onValueChange = onMaritalStatusChange
+                        value = MaritalStatus.entries.find { it.serverValue == ui.maritalStatus }?.korean ?: ui.maritalStatus,
+                        options = MaritalStatus.entries.map { it.korean },
+                        onValueChange = { korean ->
+                            val serverValue = MaritalStatus.fromKorean(korean)?.serverValue ?: korean
+                            onMaritalStatusChange(serverValue)
+                        }
                     )
 
                     PersonalInfoDropdown(
                         label = "학력",
-                        value = ui.education,
-                        options = listOf(
-                            "초등학생", "중학생", "고등학생", "대학생",
-                            "초졸", "중졸", "고졸", "전문대졸", "대졸"
-                        ),
-                        onValueChange = onEducationChange
+                        value = EducationLevel.entries.find { it.serverValue == ui.education }?.korean ?: ui.education,
+                        options = EducationLevel.entries.map { it.korean },
+                        onValueChange = { korean ->
+                            val serverValue = EducationLevel.fromKorean(korean)?.serverValue ?: korean
+                            onEducationChange(serverValue)
+                        }
                     )
 
                     PersonalInfoFieldSimple(
@@ -401,9 +411,12 @@ fun PersonalInfoScreen(
 
                     PersonalInfoDropdown(
                         label = "취업상태",
-                        value = ui.employmentStatus,
-                        options = listOf("재직자", "미취업자", "자영업자"),
-                        onValueChange = onEmploymentStatusChange,
+                        value = EmploymentStatus.entries.find { it.serverValue == ui.employmentStatus }?.korean ?: ui.employmentStatus,
+                        options = EmploymentStatus.entries.map { it.korean },
+                        onValueChange = { korean ->
+                            val serverValue = EmploymentStatus.fromKorean(korean)?.serverValue ?: korean
+                            onEmploymentStatusChange(serverValue)
+                        },
                         isLast = true
                     )
                     Spacer(modifier = Modifier.height(24.dp))

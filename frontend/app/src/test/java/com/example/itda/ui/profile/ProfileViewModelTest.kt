@@ -2,8 +2,8 @@ package com.example.itda.ui.profile
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.AuthRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +37,7 @@ class ProfileViewModelTest {
 
     private lateinit var viewModel: ProfileViewModel
 
-    private val testProfile = ProfileResponse(
+    private val testProfile = User(
         id = "test-id",
         email = "test@example.com",
         name = "테스트유저",

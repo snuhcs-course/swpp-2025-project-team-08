@@ -2,16 +2,14 @@ package com.example.itda.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.PreferenceRequest
+import com.example.itda.data.model.PreferenceRequestList
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramResponse
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.repository.ProgramRepository
 import com.example.itda.data.source.remote.ApiError
 import com.example.itda.data.source.remote.ApiErrorParser
-import com.example.itda.data.source.remote.PreferenceRequest
-import com.example.itda.data.source.remote.PreferenceRequestList
-import com.example.itda.ui.auth.components.formatBirthDate
-import com.example.itda.ui.auth.components.isValidBirthDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -343,41 +341,6 @@ class AuthViewModel @Inject constructor(
     suspend fun submitPersonalInfo(): Boolean {
         val ui = _personalInfoUi.value
 
-        var hasError = false
-
-        if (ui.name.isBlank()) {
-            _personalInfoUi.update { it.copy(nameError = "이름을 입력해주세요") }
-            hasError = true
-        }
-
-        if (ui.birthDate.isBlank()) {
-            _personalInfoUi.update { it.copy(birthDateError = "생년월일을 입력해주세요") }
-            hasError = true
-        } else if (ui.birthDate.length != 8) {
-            _personalInfoUi.update { it.copy(birthDateError = "8자리를 입력해주세요") }
-            hasError = true
-        } else if (!isValidBirthDate(ui.birthDate)) {
-            _personalInfoUi.update { it.copy(birthDateError = "올바른 생년월일을 입력해주세요") }
-            hasError = true
-        }
-
-        if (ui.gender.isBlank()) {
-            _personalInfoUi.update { it.copy(genderError = "성별을 선택해주세요") }
-            hasError = true
-        }
-
-        if (ui.address.isBlank()) {
-            _personalInfoUi.update { it.copy(addressError = "주소를 입력해주세요") }
-            hasError = true
-        }
-
-        if (ui.postcode.isBlank()) {
-            _personalInfoUi.update { it.copy(postcodeError = "우편번호를 입력해주세요") }
-            hasError = true
-        }
-
-        if (hasError) return false
-
         _personalInfoUi.update {
             it.copy(
                 isLoading = true,
@@ -390,23 +353,54 @@ class AuthViewModel @Inject constructor(
             )
         }
 
-        val formattedBirthDate = formatBirthDate(ui.birthDate)
+        // Builder 구현
         val householdSizeInt = ui.householdSize.toIntOrNull()
         val householdIncomeInt = ui.householdIncome.toIntOrNull()
 
-        val result = authRepository.updateProfile(
-            name = ui.name,
-            birthDate = formattedBirthDate,
-            gender = ui.gender,
-            address = ui.address,
-            postcode = ui.postcode,
-            maritalStatus = ui.maritalStatus,
-            educationLevel = ui.educationLevel,
-            householdSize = householdSizeInt,
-            householdIncome = householdIncomeInt,
-            employmentStatus = ui.employmentStatus,
-            tags = ui.selectedTags.ifEmpty { null }
-        )
+        val requestResult = com.example.itda.data.model.ProfileUpdateRequest.builder()
+            .name(ui.name)
+            .birthDate(ui.birthDate)
+            .gender(ui.gender)
+            .address(ui.address)
+            .postcode(ui.postcode)
+            .maritalStatus(ui.maritalStatus)
+            .educationLevel(ui.educationLevel)
+            .householdSize(householdSizeInt)
+            .householdIncome(householdIncomeInt)
+            .employmentStatus(ui.employmentStatus)
+            .tags(ui.selectedTags.ifEmpty { null })
+            .build()
+
+        // 에러 처리
+        requestResult.onFailure { exception ->
+            val errorMessage = exception.message ?: "유효성 검사 실패"
+
+            when {
+                errorMessage.contains("성함") -> {
+                    _personalInfoUi.update { it.copy(nameError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("생년월일") || errorMessage.contains("8자리") -> {
+                    _personalInfoUi.update { it.copy(birthDateError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("성별") -> {
+                    _personalInfoUi.update { it.copy(genderError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("주소") -> {
+                    _personalInfoUi.update { it.copy(addressError = errorMessage, isLoading = false) }
+                }
+                errorMessage.contains("우편번호") -> {
+                    _personalInfoUi.update { it.copy(postcodeError = errorMessage, isLoading = false) }
+                }
+                else -> {
+                    _personalInfoUi.update { it.copy(generalError = errorMessage, isLoading = false) }
+                }
+            }
+            return false
+        }
+
+        // 유효성 검사 성공 시 API 호출
+        val request = requestResult.getOrThrow()
+        val result = authRepository.updateProfile(request)
 
         result.onFailure { exception ->
             val apiError = ApiErrorParser.parseError(exception)

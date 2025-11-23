@@ -1,8 +1,6 @@
 package com.example.itda.data.model
 
-data class User(
-    val id: String,
-    val email: String,
+data class ProfileRequest(
     val name: String?,
     val birthDate: String?,
     val gender: String?,
@@ -14,4 +12,11 @@ data class User(
     val householdIncome: Int?,
     val employmentStatus: String?,
     val tags: List<String>?
+)
+
+typealias PreferenceRequestList = List<PreferenceRequest>
+
+data class PreferenceRequest(
+    val id : Int,
+    val score : Int
 )

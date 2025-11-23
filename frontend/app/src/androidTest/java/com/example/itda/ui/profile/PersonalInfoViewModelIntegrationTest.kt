@@ -1,8 +1,8 @@
 package com.example.itda.ui.profile
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.FakeAuthRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,19 +47,19 @@ class PersonalInfoViewModelIntegrationTest {
     @Test
     fun init_success_loadsProfileIntoUiState() = runTest {
         // Given
-        val profile = ProfileResponse(
+        val profile = User(
             id = "1",
             email = "test@example.com",
             name = "홍길동",
             birthDate = "1990-01-01",
-            gender = "남성",
+            gender = "MALE",
             address = "서울시 강남구",
             postcode = "12345",
-            maritalStatus = "미혼",
-            educationLevel = "대졸",
+            maritalStatus = "SINGLE",
+            educationLevel = "BACHELOR",
             householdSize = 3,
             householdIncome = 5000,
-            employmentStatus = "재직자",
+            employmentStatus = "EMPLOYED",
             tags = listOf("저소득층", "당뇨")
         )
         fakeAuthRepository.getProfileResult = Result.success(profile)
@@ -74,7 +74,7 @@ class PersonalInfoViewModelIntegrationTest {
         val ui = viewModel.personalInfoUi.value
         assertThat(ui.name).isEqualTo("홍길동")
         assertThat(ui.birthDate).isEqualTo("19900101") // '-' 제거
-        assertThat(ui.gender).isEqualTo("남성")
+        assertThat(ui.gender).isEqualTo("MALE")
         assertThat(ui.address).isEqualTo("서울시 강남구")
         assertThat(ui.postcode).isEqualTo("12345")
     }
@@ -99,7 +99,7 @@ class PersonalInfoViewModelIntegrationTest {
     fun submitPersonalInfo_success_callsUpdateProfile() = runTest {
         // Given
         fakeAuthRepository.getProfileResult = Result.success(
-            ProfileResponse(
+            User(
                 id = "1",
                 email = "test@example.com",
                 name = null,
@@ -124,7 +124,7 @@ class PersonalInfoViewModelIntegrationTest {
         // 필수 필드 채우기
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("20000101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
@@ -133,9 +133,10 @@ class PersonalInfoViewModelIntegrationTest {
 
         assertThat(result).isTrue()
         assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
-        assertThat(fakeAuthRepository.lastUpdateProfileName).isEqualTo("홍길동")
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest).isNotNull()
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.name).isEqualTo("홍길동")
         // yyyyMMdd -> yyyy-MM-dd 변환 확인
-        assertThat(fakeAuthRepository.lastUpdateProfileBirthDate)
+        assertThat(fakeAuthRepository.lastUpdateProfileRequest!!.birthDate)
             .isEqualTo("2000-01-01")
     }
 
@@ -151,7 +152,7 @@ class PersonalInfoViewModelIntegrationTest {
         // 이름 비워서 유효성 검사 실패 유도
         viewModel.onNameChange("")
         viewModel.onBirthDateChange("20000101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 
@@ -161,7 +162,7 @@ class PersonalInfoViewModelIntegrationTest {
         assertThat(result).isFalse()
         assertThat(fakeAuthRepository.updateProfileCalled).isFalse()
         assertThat(viewModel.personalInfoUi.value.nameError)
-            .isEqualTo("이름을 입력해주세요")
+            .isEqualTo("성함을 입력해주세요")
     }
 
     @Test
@@ -178,7 +179,7 @@ class PersonalInfoViewModelIntegrationTest {
 
         viewModel.onNameChange("홍길동")
         viewModel.onBirthDateChange("20000101")
-        viewModel.onGenderChange("남성")
+        viewModel.onGenderChange("MALE")
         viewModel.onAddressChange("서울시")
         viewModel.onPostCodeChange("12345")
 

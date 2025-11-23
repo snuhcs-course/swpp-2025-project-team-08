@@ -2,8 +2,8 @@ package com.example.itda.ui.profile
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
+import com.example.itda.data.model.User
 import com.example.itda.data.repository.FakeAuthRepository
-import com.example.itda.data.source.remote.ProfileResponse
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,19 +51,19 @@ class ProfileViewModelIntegrationTest {
     @Test
     fun init_success_loadsProfileFromRepository() = runTest {
         // Given
-        val profile = ProfileResponse(
+        val profile = User(
             id = "1",
             email = "test@example.com",
             name = "테스트유저",
             birthDate = "1990-01-01",
-            gender = "남성",
+            gender = "MALE",
             address = "서울시 강남구",
             postcode = "12345",
-            maritalStatus = "미혼",
-            educationLevel = "대졸",
+            maritalStatus = "SINGLE",
+            educationLevel = "BACHELOR",
             householdSize = 3,
             householdIncome = 5000,
-            employmentStatus = "재직자",
+            employmentStatus = "EMPLOYED",
             tags = listOf("저소득층", "당뇨")
         )
         fakeAuthRepository.getProfileResult = Result.success(profile)

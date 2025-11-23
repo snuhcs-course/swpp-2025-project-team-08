@@ -1,7 +1,8 @@
 package com.example.itda.data.repository
 
-import com.example.itda.data.source.remote.PreferenceRequestList
-import com.example.itda.data.source.remote.ProfileResponse
+import com.example.itda.data.model.PreferenceRequestList
+import com.example.itda.data.model.ProfileUpdateRequest
+import com.example.itda.data.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -10,13 +11,13 @@ class FakeAuthRepository : AuthRepository {
     var loginResult: Result<Unit> = Result.success(Unit)
     var signupResult: Result<Unit> = Result.success(Unit)
     var logoutResult: Result<Unit> = Result.success(Unit)
-    var getProfileResult: Result<ProfileResponse> = Result.success(
-        ProfileResponse(
+    var getProfileResult: Result<User> = Result.success(
+        User(
             id = "1",
             email = "test@example.com",
             name = "테스트",
             birthDate = "2000-01-01",
-            gender = "여성",
+            gender = "FEMALE",
             address = "서울시",
             postcode = "12345",
             maritalStatus = "",
@@ -49,9 +50,7 @@ class FakeAuthRepository : AuthRepository {
     var lastLoginPassword: String? = null
     var lastSignupEmail: String? = null
     var lastSignupPassword: String? = null
-    var lastUpdateProfileName: String? = null
-    var lastUpdateProfileBirthDate: String? = null
-    var lastUpdateProfileTags: List<String>? = null
+    var lastUpdateProfileRequest: ProfileUpdateRequest? = null
     var lastPreferenceScores: PreferenceRequestList? = null
 
     override fun isLoggedIn(): Flow<Boolean> = _isLoggedIn
@@ -90,28 +89,14 @@ class FakeAuthRepository : AuthRepository {
         return logoutResult
     }
 
-    override suspend fun getProfile(): Result<ProfileResponse> {
+    override suspend fun getProfile(): Result<User> {
         getProfileCalled = true
         return getProfileResult
     }
 
-    override suspend fun updateProfile(
-        name: String,
-        birthDate: String?,
-        gender: String?,
-        address: String?,
-        postcode: String?,
-        maritalStatus: String?,
-        educationLevel: String?,
-        householdSize: Int?,
-        householdIncome: Int?,
-        employmentStatus: String?,
-        tags: List<String>?
-    ): Result<Unit> {
+    override suspend fun updateProfile(request: ProfileUpdateRequest): Result<Unit> {
         updateProfileCalled = true
-        lastUpdateProfileName = name
-        lastUpdateProfileBirthDate = birthDate
-        lastUpdateProfileTags = tags
+        lastUpdateProfileRequest = request
         return updateProfileResult
     }
 
@@ -161,9 +146,7 @@ class FakeAuthRepository : AuthRepository {
         lastLoginPassword = null
         lastSignupEmail = null
         lastSignupPassword = null
-        lastUpdateProfileName = null
-        lastUpdateProfileBirthDate = null
-        lastUpdateProfileTags = null
+        lastUpdateProfileRequest = null
         lastPreferenceScores = null
     }
 }

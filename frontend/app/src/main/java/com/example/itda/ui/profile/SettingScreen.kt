@@ -244,7 +244,7 @@ fun SettingFontSizeItem(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            SettingsViewModel.FontSize.values().forEach { fontSize ->
+            SettingsViewModel.FontSize.entries.forEach { fontSize ->
                 FontSizeOption(
                     fontSize = fontSize,
                     isSelected = currentFontSize == fontSize,
