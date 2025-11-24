@@ -16,7 +16,7 @@ fun AppNavHost() {
 
     val isLoadingInitial by authViewModel.isLoadingInitial.collectAsState()
     if (isLoadingInitial) {
-        LoadingScreen()
+        SplashScreen()
         return
     }
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState() // 로그인 여부

@@ -61,7 +61,7 @@ object RetrofitInstance {
             .build()
     }
 
-    // API 인터페이스 - 이 아래 추가해주시면 됩니다!
+    // API 인터페이스
     val authAPI: AuthAPI by lazy {
         retrofit.create(AuthAPI::class.java)
     }

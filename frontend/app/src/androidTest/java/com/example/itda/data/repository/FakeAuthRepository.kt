@@ -11,6 +11,7 @@ class FakeAuthRepository : AuthRepository {
     var loginResult: Result<Unit> = Result.success(Unit)
     var signupResult: Result<Unit> = Result.success(Unit)
     var logoutResult: Result<Unit> = Result.success(Unit)
+    var refreshTokenResult: Result<Unit> = Result.success(Unit)
     var getProfileResult: Result<User> = Result.success(
         User(
             id = "1",
@@ -35,8 +36,10 @@ class FakeAuthRepository : AuthRepository {
     override val isLoggedInFlow: Flow<Boolean> = _isLoggedIn
 
     private var savedEmail: String? = null
+    private var refreshToken: String? = null
 
     var loginCalled = false
+    var refreshTokenCalled = false
     var signupCalled = false
     var logoutCalled = false
     var getProfileCalled = false
@@ -84,9 +87,24 @@ class FakeAuthRepository : AuthRepository {
 
         if (logoutResult.isSuccess) {
             _isLoggedIn.value = false
+            refreshToken = null
         }
 
         return logoutResult
+    }
+
+    override suspend fun getRefreshToken(): String? {
+        return refreshToken
+    }
+
+    override suspend fun refreshToken(): Result<Unit> {
+        refreshTokenCalled = true
+
+        if (refreshTokenResult.isSuccess) {
+            _isLoggedIn.value = true
+        }
+
+        return refreshTokenResult
     }
 
     override suspend fun getProfile(): Result<User> {
