@@ -48,15 +48,35 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoadingInitial.value = true
 
-            val hasToken = authRepository.isLoggedInFlow.first()
-            _isLoggedIn.value = hasToken
+            val startTime = System.currentTimeMillis()
 
+            val refreshToken = authRepository.getRefreshToken()
+
+            if (refreshToken != null) {
+                val refreshResult = authRepository.refreshToken()
+
+                if (refreshResult.isSuccess) {
+                    _isLoggedIn.value = true
+                } else {
+                    authRepository.logout()
+                    _isLoggedIn.value = false
+                }
+            } else {
+                _isLoggedIn.value = false
+            }
+
+            // 저장된 이메일 불러오기
             val savedEmail = authRepository.getSavedEmail()
             if (!savedEmail.isNullOrBlank()) {
                 _loginUi.update { it.copy(email = savedEmail, rememberEmail = true) }
             }
 
-             delay(1000L) // TODO - loading page 보이게 하려면 delay 필요?? 왜 delay 없으면 점만 보이다가 내려갈까..
+            val elapsedTime = System.currentTimeMillis() - startTime
+            val remainingTime = (2500L - elapsedTime).coerceAtLeast(0L)
+            if (remainingTime > 0) {
+                delay(remainingTime)
+            }
+
             _isLoadingInitial.value = false
         }
     }

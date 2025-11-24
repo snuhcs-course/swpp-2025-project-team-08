@@ -4,6 +4,7 @@ import com.example.itda.data.model.AuthRequest
 import com.example.itda.data.model.AuthResponse
 import com.example.itda.data.model.PreferenceRequestList
 import com.example.itda.data.model.ProfileRequest
+import com.example.itda.data.model.RefreshTokenRequest
 import com.example.itda.data.model.User
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,6 +20,9 @@ interface AuthAPI {
 
     @POST("auth/logout")
     suspend fun logout()
+
+    @POST("auth/refresh")
+    suspend fun refreshToken(@Body request: RefreshTokenRequest): AuthResponse
 
     @GET("my-profile")
     suspend fun getProfile(): User

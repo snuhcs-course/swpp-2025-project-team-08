@@ -44,9 +44,8 @@ class AuthViewModelTest {
 
     @Before
     fun setup() = runBlocking {
-        val isLoggedInFlow = MutableStateFlow(false)
-        Mockito.`when`(authRepository.isLoggedInFlow).thenReturn(isLoggedInFlow)
         Mockito.`when`(authRepository.getSavedEmail()).thenReturn(null)
+        Mockito.`when`(authRepository.getRefreshToken()).thenReturn(null)
         Mockito.`when`(programRepository.getExamples()).thenReturn(Result.success(emptyList()))
 
         viewModel = AuthViewModel(authRepository, programRepository)
@@ -56,9 +55,9 @@ class AuthViewModelTest {
 
     @Test
     fun init_loadsLoggedInState() = runTest {
-        val isLoggedInFlow = MutableStateFlow(true)
-        Mockito.`when`(authRepository.isLoggedInFlow).thenReturn(isLoggedInFlow)
         Mockito.`when`(authRepository.getSavedEmail()).thenReturn(null)
+        Mockito.`when`(authRepository.getRefreshToken()).thenReturn("fake-refresh-token")
+        Mockito.`when`(authRepository.refreshToken()).thenReturn(Result.success(Unit))
         Mockito.`when`(programRepository.getExamples()).thenReturn(Result.success(emptyList()))
 
         val vm = AuthViewModel(authRepository, programRepository)
@@ -69,9 +68,8 @@ class AuthViewModelTest {
 
     @Test
     fun init_loadsSavedEmail() = runTest {
-        val isLoggedInFlow = MutableStateFlow(false)
-        Mockito.`when`(authRepository.isLoggedInFlow).thenReturn(isLoggedInFlow)
         Mockito.`when`(authRepository.getSavedEmail()).thenReturn("saved@test.com")
+        Mockito.`when`(authRepository.getRefreshToken()).thenReturn(null)
         Mockito.`when`(programRepository.getExamples()).thenReturn(Result.success(emptyList()))
 
         val vm = AuthViewModel(authRepository, programRepository)
@@ -87,9 +85,8 @@ class AuthViewModelTest {
 
     @Test
     fun init_noSavedEmail() = runTest {
-        val isLoggedInFlow = MutableStateFlow(false)
-        Mockito.`when`(authRepository.isLoggedInFlow).thenReturn(isLoggedInFlow)
         Mockito.`when`(authRepository.getSavedEmail()).thenReturn(null)
+        Mockito.`when`(authRepository.getRefreshToken()).thenReturn(null)
         Mockito.`when`(programRepository.getExamples()).thenReturn(Result.success(emptyList()))
 
         val vm = AuthViewModel(authRepository, programRepository)

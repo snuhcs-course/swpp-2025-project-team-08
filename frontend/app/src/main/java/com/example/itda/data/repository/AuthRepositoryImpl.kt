@@ -4,6 +4,7 @@ import com.example.itda.data.model.AuthRequest
 import com.example.itda.data.model.PreferenceRequestList
 import com.example.itda.data.model.ProfileRequest
 import com.example.itda.data.model.ProfileUpdateRequest
+import com.example.itda.data.model.RefreshTokenRequest
 import com.example.itda.data.model.User
 import com.example.itda.data.source.local.PrefDataSource
 import com.example.itda.data.source.remote.RetrofitInstance
@@ -48,6 +49,26 @@ class AuthRepositoryImpl @Inject constructor(
         // 서버 로그아웃 실패해도 로컬 데이터는 삭제
         runCatching { api.logout() }
         pref.clear()
+    }
+
+    override suspend fun getRefreshToken(): String? {
+        return pref.getRefreshToken()
+    }
+
+    override suspend fun refreshToken(): Result<Unit> = runCatching {
+        val refreshToken = pref.getRefreshToken()
+            ?: throw Exception("No refresh token available")
+
+        val res = api.refreshToken(
+            RefreshTokenRequest(refreshToken)
+        )
+
+        pref.saveTokens(
+            access = res.accessToken,
+            refresh = res.refreshToken,
+            type = res.tokenType,
+            expires = res.expiresIn
+        )
     }
 
     override suspend fun getProfile(): Result<User> = runCatching {
