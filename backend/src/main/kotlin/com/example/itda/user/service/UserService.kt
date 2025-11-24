@@ -9,6 +9,7 @@ import com.example.itda.program.persistence.enums.BookmarkSortType
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
 import com.example.itda.user.LogInInvalidPasswordException
+import com.example.itda.user.RefreshTokenException
 import com.example.itda.user.SignUpBadPasswordException
 import com.example.itda.user.SignUpEmailConflictException
 import com.example.itda.user.SignUpInvalidEmailException
@@ -48,6 +49,23 @@ class UserService(
         val id = UserAccessTokenUtil.validateAccessTokenGetUserId(accessToken) ?: throw AuthenticateException()
         val user = userRepository.findByIdOrNull(id) ?: throw AuthenticateException()
         return User.fromEntity(user)
+    }
+
+    @Transactional
+    fun refresh(refreshToken: String): AuthResponse {
+        val id = UserAccessTokenUtil.validateAccessTokenGetUserId(refreshToken) ?: throw RefreshTokenException()
+        userRepository.findByIdOrNull(id) ?: throw AuthenticateException()
+
+        val newAccessToken = UserAccessTokenUtil.generateAccessToken(id)
+        val newRefreshToken = UserAccessTokenUtil.generateRefreshToken(id)
+        val expiresIn = UserAccessTokenUtil.getAccessTokenExpirationSeconds()
+
+        return AuthResponse(
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken,
+            tokenType = "Bearer",
+            expiresIn = expiresIn,
+        )
     }
 
     @Transactional

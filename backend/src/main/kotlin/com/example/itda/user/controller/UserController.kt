@@ -24,6 +24,14 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
 ) {
+    @PostMapping("/auth/refresh")
+    fun refresh(
+        @RequestBody request: RefreshRequest,
+    ): ResponseEntity<AuthResponse> {
+        val response = userService.refresh(request.refreshToken)
+        return ResponseEntity.ok(response)
+    }
+
     @PostMapping("/auth/signup")
     fun signUp(
         @RequestBody request: AuthRequest,
@@ -83,6 +91,10 @@ class UserController(
 data class AuthRequest(
     val email: String,
     val password: String,
+)
+
+data class RefreshRequest(
+    val refreshToken: String,
 )
 
 data class AuthResponse(
