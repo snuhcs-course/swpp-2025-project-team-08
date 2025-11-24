@@ -14,6 +14,11 @@ class AuthenticateException : UserException(
     message = "Authenticate failed",
 )
 
+class RefreshTokenException : UserException(
+    code = HttpStatus.UNAUTHORIZED,
+    message = "RefreshToken is expired",
+)
+
 class SignUpInvalidEmailException : UserException(
     code = HttpStatus.BAD_REQUEST,
     message = "Invalid email format",
