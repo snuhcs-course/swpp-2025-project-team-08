@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
@@ -27,6 +26,8 @@ import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.home.components.HomeHeader
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +40,7 @@ fun HomeScreen(
     onRefresh: () -> Unit,
     onLoadNext: () -> Unit,
     onRefreshProfile: () -> Unit,
+    scrollToTopEventFlow: Flow<Unit>,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
@@ -73,12 +75,24 @@ fun HomeScreen(
             }
     }
 
+    LaunchedEffect(Unit) {
+        scrollToTopEventFlow.collect {
 
-    LaunchedEffect(ui.feedItems) {
-        if (ui.feedItems.isNotEmpty() && ui.currentPage == 0) {
-            listState.animateScrollToItem(0)
+            // 딜레이시켜 UI 갱신 안정화 시간을 확보
+            delay(200)
+
+            val index = listState.firstVisibleItemIndex
+            val offset = listState.firstVisibleItemScrollOffset
+
+
+            if (index != 0 || offset != 0) {
+
+                listState.animateScrollToItem(0)
+
+            }
         }
     }
+
 
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -148,6 +162,7 @@ fun HomeScreen(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 private fun PreviewHomeScreen() {
@@ -159,6 +174,7 @@ private fun PreviewHomeScreen() {
         onRefresh = {},
         onLoadNext = {},
         onRefreshProfile = {},
+        scrollToTopEventFlow = ,
         onFeedBookmarkClick = {}
     )
-}
+}*/

@@ -142,4 +142,5 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.2.1")
 
     implementation("com.google.accompanist:accompanist-flowlayout:0.32.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
 }

@@ -18,16 +18,20 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
-    savedStateHandle: SavedStateHandle
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 
     data class FeedUiState(
         val feed: ProgramDetailResponse = DummyData.dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
         val isBookmarked : Boolean = false,
+
         val isLoading: Boolean = false,
         val generalError : String? = null,
     )
+
+    private val _hasBookmarkChanged = MutableStateFlow(false)
+    val hasBookmarkChanged: StateFlow<Boolean> = _hasBookmarkChanged.asStateFlow()
 
 
     private val _feedUi = MutableStateFlow(FeedUiState())
@@ -80,18 +84,20 @@ class FeedViewModel @Inject constructor(
         viewModelScope.launch {
 
             val isBookmarked = feedUi.value.isBookmarked
-            val updateIsBookmarked = !isBookmarked
-            _feedUi.update {
-                it.copy(
-                    isBookmarked = updateIsBookmarked,
-                )
-            }
 
 
             val apiCall = if(isBookmarked)
                 programRepository.unbookmarkProgram(programId = feedUi.value.feed.id)
             else
                 programRepository.bookmarkProgram(feedUi.value.feed.id)
+
+
+            val updateIsBookmarked = !isBookmarked
+            _feedUi.update {
+                it.copy(
+                    isBookmarked = updateIsBookmarked,
+                )
+            }
 
             apiCall
                 .onFailure { exception ->
@@ -102,6 +108,7 @@ class FeedViewModel @Inject constructor(
                             isBookmarked = feedUi.value.isBookmarked,
                         )
                     }
+                    _hasBookmarkChanged.update { false }
                 }
                 .onSuccess { response ->
                     _feedUi.update {
@@ -109,9 +116,14 @@ class FeedViewModel @Inject constructor(
                             generalError = null,
                         )
                     }
+                    val info = Pair(feedUi.value.feed.id, updateIsBookmarked)
+                    savedStateHandle["bookmark_change_info"] = info
+                    _hasBookmarkChanged.update { true }
                 }
         }
     }
+
+
 
     fun applicationProgram(feedID: Int) {
         // TOOD - Repository 연결해서 program 바로 신청
