@@ -14,6 +14,7 @@ fun FeedRoute(
     vm: FeedViewModel = hiltViewModel()
 ) {
     val ui by vm.feedUi.collectAsState() // ViewModel의 UI 상태를 구독
+
     LaunchedEffect(key1 = feedId) {
         vm.getFeedItem(feedId)
         vm.checkBookmarkStatus(feedId)
@@ -21,6 +22,8 @@ fun FeedRoute(
     FeedScreen(
         ui = ui, // FeedScreen에 UI 상태를 통째로 전달
         onBack = onBack,
-        onBookmarkClicked = vm::onBookmarkClicked
+        onBookmarkClicked = vm::onBookmarkClicked,
+        toggleLike = vm::toggleLike,
+        toggleDislike = vm::toggleDisLike,
     )
 }

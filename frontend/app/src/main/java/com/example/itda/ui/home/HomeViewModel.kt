@@ -313,5 +313,26 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    
+    fun feedDisLike(programId : Int) {
+        viewModelScope.launch {
+            val apiCall = programRepository.likeDislikeProgram(programId = programId)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _homeUi.update {
+                        it.copy(
+                            generalError = null,
+                        )
+                    }
+                }
+        }
+    }
 }

@@ -58,6 +58,7 @@ fun FeedList(
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (ProgramResponse) -> Unit,
     onItemDismissed : (ProgramResponse) -> Unit = {},
+    onItemDislike : (Int) -> Unit = {},
     onItemBookmarkClicked : (Int) -> Unit,
     isPaginating : Boolean = false
 ) {
@@ -100,6 +101,7 @@ fun FeedList(
                                     itemVisible = false
                                     delay(300L)
                                     onItemDismissed(item)
+                                    onItemDislike(item.id) // TODO - dislike 하면 자동으로 아예 배제된다면 이대로
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(

@@ -1,5 +1,6 @@
 package com.example.itda.data.repository
 
+import coil.network.HttpException
 import com.example.itda.data.model.DummyData
 import com.example.itda.data.model.PageResponse
 import com.example.itda.data.model.Program
@@ -68,11 +69,57 @@ class ProgramRepositoryImpl @Inject constructor(
     }
 
     override suspend fun bookmarkProgram(programId: Int): Result<Unit> = runCatching {
-        api.bookmarkProgram(programId)
+        val response = api.bookmarkProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
     }
 
     override suspend fun unbookmarkProgram(programId: Int): Result<Unit> = runCatching  {
-        api.unbookmarkProgram(programId)
+        val response = api.unbookmarkProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+
+    override suspend fun likeLikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.likeLikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+    override suspend fun unlikeLikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.unlikeLikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+    override suspend fun likeDislikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.likeDislikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+    override suspend fun unlikeDislikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.unlikeDislikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
     }
 
     override suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>> {
