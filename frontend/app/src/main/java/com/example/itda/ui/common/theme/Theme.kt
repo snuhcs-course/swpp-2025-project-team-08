@@ -14,13 +14,13 @@ private val DarkColorScheme = darkColorScheme(
     // Primary colors - 다크모드에서는 어두운 청록
     primary = Primary40,                    // 버튼 배경
     onPrimary = Neutral100,                 // 버튼 텍스트
-    primaryContainer = Primary30,           // 카드 배경 (어두운 청록)
+    primaryContainer = Primary20,           // 카드 배경 (어두운 청록)
     onPrimaryContainer = Neutral95,         // 카드 내 텍스트 (밝게)
 
     // Secondary colors - 섹션 제목 등에 사용
     secondary = Primary50,
     onSecondary = Neutral100,
-    secondaryContainer = Primary40,         // 섹션 제목 배경 (중간 청록)
+    secondaryContainer = Primary30,         // 섹션 제목 배경 (중간 청록)
     onSecondaryContainer = Neutral95,       // 섹션 제목 텍스트 (밝게)
 
     // Tertiary colors - 아이콘 등에 사용
@@ -34,7 +34,7 @@ private val DarkColorScheme = darkColorScheme(
     onBackground = Neutral95,               // 배경 위 텍스트 (밝게)
     surface = Neutral20,                    // TopAppBar 등
     onSurface = Neutral95,                  // 일반 텍스트 (밝게)
-    surfaceVariant = Primary20,             // 아이콘 배경 (어두운 청록)
+    surfaceVariant = Primary10,             // 아이콘 배경 (어두운 청록)
     onSurfaceVariant = Neutral80,           // 보조 텍스트 (밝게)
 
     // Borders & Outlines
