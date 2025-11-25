@@ -2,6 +2,7 @@ package com.example.itda.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.itda.data.model.ProfileUpdateRequest
 import com.example.itda.data.repository.AuthRepository
 import com.example.itda.data.source.remote.ApiErrorParser
 import com.example.itda.ui.common.enums.EducationLevel
@@ -193,8 +194,7 @@ class PersonalInfoViewModel @Inject constructor(
             )
         }
 
-        // Builder 구현
-        val requestResult = com.example.itda.data.model.ProfileUpdateRequest.builder()
+        val requestResult = ProfileUpdateRequest.builder()
             .name(ui.name)
             .birthDate(ui.birthDate)
             .gender(ui.gender.ifBlank { null })

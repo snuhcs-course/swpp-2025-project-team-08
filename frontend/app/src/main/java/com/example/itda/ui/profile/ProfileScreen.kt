@@ -1,7 +1,6 @@
 package com.example.itda.ui.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +52,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import com.example.itda.ui.common.theme.*
 import androidx.compose.runtime.LaunchedEffect
+import com.example.itda.ui.profile.component.ProfileInfoItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,85 +196,3 @@ fun ProfileScreen(
         }
     }
 }
-
-@Composable
-fun ProfileInfoItem(
-    label: String,
-    value: String,
-    highlight: Boolean = false,
-    isLast: Boolean = false
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 15.scaledSp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Normal
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-
-        if (highlight) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = YellowSecondary.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(4.dp)
-                    )
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    text = value.ifEmpty { "-" },
-                    fontSize = 15.scaledSp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-        } else {
-            Text(
-                text = value.ifEmpty { "-" },
-                fontSize = 15.scaledSp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-
-        if (!isLast) {
-            Spacer(modifier = Modifier.height(10.dp))
-        }
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ProfileScreenPreview() {
-//    MaterialTheme {
-//        ProfileScreen(
-//            ui = ProfileViewModel.ProfileUiState(
-//                user = com.example.itda.data.source.remote.ProfileResponse(
-//                    id = "1",
-//                    email = "test@example.com",
-//                    name = "백일",
-//                    birthDate = "1949-01-01",
-//                    gender = "남성",
-//                    address = "서울 노원구 동일로216길 92",
-//                    postcode = "01754",
-//                    maritalStatus = "미혼",
-//                    educationLevel = "대졸",
-//                    householdSize = 4,
-//                    householdIncome = 500,
-//                    employmentStatus = "재직자",
-//                    tags = listOf("태그1", "태그2", "태그3")
-//                ),
-//                isLoading = false,
-//                generalError = null
-//            ),
-//            onSettingClick = {},
-//            onPersonalInfoClick = {},
-//            onRefresh = {}
-//        )
-//    }
-//}
