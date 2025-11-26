@@ -29,9 +29,7 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
         """,
         nativeQuery = true,
     )
-    fun findAllByUserInfo(
-        userId: String,
-    ): List<ProgramEntity>
+    fun findAllByUserInfo(userId: String): List<ProgramEntity>
 
     @Query(
         """

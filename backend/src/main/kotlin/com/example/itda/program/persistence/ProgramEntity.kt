@@ -7,10 +7,12 @@ import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.program.persistence.enums.OperatingEntityType
 import com.example.itda.program.persistence.enums.ProgramCategory
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -27,7 +29,7 @@ class ProgramEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Long? = null,
+    var id: Long,
     @Column(name = "uuid", nullable = false, unique = true, length = 255)
     var uuid: String,
     @Enumerated(EnumType.STRING)
@@ -93,8 +95,18 @@ class ProgramEntity(
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var embedding: FloatArray,
-    @OneToMany(mappedBy = "program")
+    @OneToMany(
+        mappedBy = "program",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
     var bookmarks: MutableSet<BookmarkEntity> = mutableSetOf(),
-    @OneToMany(mappedBy = "program")
+    @OneToMany(
+        mappedBy = "program",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
     var programLikes: MutableSet<ProgramLikeEntity> = mutableSetOf(),
 )

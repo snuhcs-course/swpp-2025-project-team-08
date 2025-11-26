@@ -1,125 +1,232 @@
 package com.example.itda.feedCache.service
 
 import com.example.itda.feedCache.persistence.FeedCacheEntity
+import com.example.itda.feedCache.persistence.FeedCacheItem
 import com.example.itda.feedCache.persistence.FeedCacheRepository
+import com.example.itda.program.EmbeddingException
 import com.example.itda.program.config.AppConstants
+import com.example.itda.program.persistence.BookmarkRepository
+import com.example.itda.program.persistence.ProgramLikeRepository
 import com.example.itda.program.persistence.ProgramRepository
+import com.example.itda.program.persistence.enums.ProgramCategory
 import com.example.itda.user.UserNotFoundException
 import com.example.itda.user.persistence.UserRepository
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
+import kotlin.math.roundToInt
+import kotlin.text.get
 
-private const val CACHE_EXPIRY_HOURS: Long = 1
-private const val W_U = 0.3f
-private const val W_L = 0.2f
-private const val W_B = 0.2f
-private const val W_S = 0.3f
 private const val EMBEDDING_DIMENSION = AppConstants.EMBEDDING_DIMENSION
-private const val TOP_N_PROGRAMS = 500
+private const val RECENT_PROGRAM_LIMIT = AppConstants.CACHE_RECENT_PROGRAM_LIMIT
+private const val W_U = AppConstants.CACHE_W_U
+private const val W_L = AppConstants.CACHE_W_L
+private const val W_B = AppConstants.CACHE_W_B
+private const val W_S = AppConstants.CACHE_W_S
+
+private const val ALL = "ALL"
 
 @Service
 class FeedCacheService(
     private val feedCacheRepository: FeedCacheRepository,
     private val userRepository: UserRepository,
     private val programRepository: ProgramRepository,
+    private val likeRepository: ProgramLikeRepository,
+    private val bookmarkRepository: BookmarkRepository,
 ) {
-    fun getUserRecommendedProgramIds(userId: String): List<Long> {
+    @Transactional
+    fun getUserFeedCache(
+        userId: String,
+        category: ProgramCategory?,
+    ): List<FeedCacheItem> {
+        val key = category?.name ?: ALL
         val cache = feedCacheRepository.findByUserId(userId)
 
-        val isCacheExpired = cache == null || cache.updatedAt.plus(CACHE_EXPIRY_HOURS, ChronoUnit.HOURS).isBefore(OffsetDateTime.now())
-
-        if (isCacheExpired) {
-            return generateAndCacheUserFeed(userId)
-        }
-
-        return cache!!.programIds.toList()
+        return cache
+            ?.takeUnless { it.isExpired }
+            ?.categoryFeeds?.get(key)
+            ?: generateFeedCache(userId)[key]
+            ?: emptyList()
     }
 
-    // 캐시 테이블 갱신(생성)
-    fun generateAndCacheUserFeed(userId: String): List<Long> {
+    @Transactional
+    fun generateFeedCache(userId: String): Map<String, List<FeedCacheItem>> {
         val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        val vVector = calculateVActor(userId)
+        val programs = programRepository.findAllByUserInfo(userId)
 
-        val allPrograms = programRepository.findAll()
+        val userEmbedding = userEntity.embedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
+        val likesEmbedding = getLikesEmbedding(userId)
+        val bookmarksEmbedding = getBookmarksEmbedding(userId)
+        val seeLessEmbedding = getSeeLessEmbedding(userId)
 
-        val likesEmbedding = userEntity.likesEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
-        val bookmarksEmbedding = userEntity.bookmarksEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
+        val preferenceEmbedding =
+            getPreferenceEmbedding(userEmbedding, likesEmbedding, bookmarksEmbedding, seeLessEmbedding)
+        val preferenceWithoutSeeLessEmbedding =
+            getPreferenceWithoutSeeLessEmbedding(userEmbedding, likesEmbedding, bookmarksEmbedding)
 
-        val rankedResult =
-            allPrograms
-                .mapNotNull { program ->
-                    val programEmbedding = program.embedding
-                    val programId = program.id ?: return@mapNotNull null
+        val categoryFeeds = getEmptyCategoryFeeds()
 
-                    // 1. V x Program Score (랭킹 점수) 계산
-                    var vScore = 0f
-                    for (i in 0 until EMBEDDING_DIMENSION) {
-                        vScore += vVector[i] * programEmbedding[i]
-                    }
+        val feedPairs =
+            programs.map { program ->
+                val programId = program.id
+                val programEmbedding = program.embedding
 
-                    // 2. Liked Score (SL) 및 Bookmarked Score (SB) 계산
-                    var sL = 0f
-                    var sB = 0f
-                    for (i in 0 until EMBEDDING_DIMENSION) {
-                        sL += programEmbedding[i] * (likesEmbedding[i] * W_L)
-                        sB += programEmbedding[i] * (bookmarksEmbedding[i] * W_B)
-                    }
+                val score = dotProduct(programEmbedding, preferenceEmbedding)
 
-                    // 3. 비율 (Ratio) 계산: L 비율 or 0
-                    val slSbSum = sL + sB
-                    val ratio =
-                        if (slSbSum > 0) {
-                            sL / slSbSum
-                        } else {
-                            0.0f
-                        }
+                val denominator = dotProduct(programEmbedding, preferenceWithoutSeeLessEmbedding)
+                val multiplier = if (denominator != 0f) (100f / denominator) else 0f
 
-                    Triple(vScore, programId, ratio)
-                }
-                .sortedByDescending { it.first }
+                val likeContribution =
+                    (W_L * dotProduct(programEmbedding, likesEmbedding) * multiplier).roundToInt()
+                val bookmarkContribution =
+                    (W_B * dotProduct(programEmbedding, bookmarksEmbedding) * multiplier).roundToInt()
 
-        val topNResult = rankedResult.take(TOP_N_PROGRAMS)
+                Pair(FeedCacheItem(programId, score, likeContribution, bookmarkContribution), program.category)
+            }.sortedByDescending { it.first.score }
 
-        val topNProgramIds = LongArray(topNResult.size) { i -> topNResult[i].second }
-        val topNProgramRatios = FloatArray(topNResult.size) { i -> topNResult[i].third }
+        feedPairs.forEach { pair ->
+            val feedCacheItem = pair.first
+            val category = pair.second
 
-        var existingCache = feedCacheRepository.findByUserId(userId)
-
-        if (existingCache != null) {
-            existingCache.programIds = topNProgramIds
-            existingCache.likeRatios = topNProgramRatios
-            existingCache.updatedAt = OffsetDateTime.now()
-        } else {
-            existingCache =
-                FeedCacheEntity(
-                    user = userEntity,
-                    programIds = topNProgramIds,
-                    likeRatios = topNProgramRatios,
-                    updatedAt = OffsetDateTime.now(),
-                )
+            categoryFeeds[ALL]?.add(feedCacheItem)
+            categoryFeeds[category.name]?.add(feedCacheItem)
         }
 
-        feedCacheRepository.save(existingCache)
+        val feedCache = feedCacheRepository.findByUserId(userId) ?: FeedCacheEntity(user = userEntity)
+        feedCache.categoryFeeds = categoryFeeds.mapValues { it.value.toList() }.toMap()
+        feedCache.updatedAt = OffsetDateTime.now()
 
-        return topNProgramIds.toList()
+        feedCacheRepository.save(feedCache)
+
+        return feedCache.categoryFeeds
     }
 
-    fun calculateVActor(userId: String): FloatArray {
-        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        val userEmbedding = userEntity.userEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
-        val likesEmbedding = userEntity.likesEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
-        val bookmarksEmbedding = userEntity.bookmarksEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
-        val seeLessEmbedding = userEntity.seeLessEmbedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
+    @Transactional(readOnly = true)
+    fun getLikesEmbedding(userId: String): FloatArray {
+        val embeddings =
+            likeRepository.findRecentEmbeddingsByUserIdAndLikeStatus(
+                userId,
+                true,
+                PageRequest.of(0, RECENT_PROGRAM_LIMIT),
+            )
 
-        val vVector = FloatArray(EMBEDDING_DIMENSION) { 0f }
+        if (embeddings.isEmpty()) {
+            return FloatArray(EMBEDDING_DIMENSION) { 0f }
+        }
+
+        return calculateAverageVector(embeddings)
+    }
+
+    @Transactional(readOnly = true)
+    fun getBookmarksEmbedding(userId: String): FloatArray {
+        val embeddings =
+            bookmarkRepository.findRecentEmbeddingsByUserId(
+                userId,
+                PageRequest.of(0, RECENT_PROGRAM_LIMIT),
+            )
+
+        if (embeddings.isEmpty()) {
+            return FloatArray(EMBEDDING_DIMENSION) { 0f }
+        }
+
+        return calculateAverageVector(embeddings)
+    }
+
+    @Transactional(readOnly = true)
+    fun getSeeLessEmbedding(userId: String): FloatArray {
+        val embeddings =
+            likeRepository.findRecentEmbeddingsByUserIdAndLikeStatus(
+                userId,
+                false,
+                PageRequest.of(0, RECENT_PROGRAM_LIMIT),
+            )
+
+        if (embeddings.isEmpty()) {
+            return FloatArray(EMBEDDING_DIMENSION) { 0f }
+        }
+
+        return calculateAverageVector(embeddings)
+    }
+
+    fun getPreferenceEmbedding(
+        userEmbedding: FloatArray,
+        likesEmbedding: FloatArray,
+        bookmarksEmbedding: FloatArray,
+        seeLessEmbedding: FloatArray,
+    ): FloatArray {
+        val embedding = FloatArray(EMBEDDING_DIMENSION) { 0f }
+
         for (i in 0 until EMBEDDING_DIMENSION) {
-            vVector[i] += (userEmbedding[i] * W_U)
-            vVector[i] += (likesEmbedding[i] * W_L)
-            vVector[i] += (bookmarksEmbedding[i] * W_B)
-            vVector[i] -= (seeLessEmbedding[i] * W_S)
+            embedding[i] += (userEmbedding[i] * W_U)
+            embedding[i] += (likesEmbedding[i] * W_L)
+            embedding[i] += (bookmarksEmbedding[i] * W_B)
+            embedding[i] -= (seeLessEmbedding[i] * W_S)
         }
-        return vVector
+
+        return embedding
+    }
+
+    fun getPreferenceWithoutSeeLessEmbedding(
+        userEmbedding: FloatArray,
+        likesEmbedding: FloatArray,
+        bookmarksEmbedding: FloatArray,
+    ): FloatArray {
+        val embedding = FloatArray(EMBEDDING_DIMENSION) { 0f }
+
+        for (i in 0 until EMBEDDING_DIMENSION) {
+            embedding[i] += (userEmbedding[i] * W_U)
+            embedding[i] += (likesEmbedding[i] * W_L)
+            embedding[i] += (bookmarksEmbedding[i] * W_B)
+        }
+
+        return embedding
+    }
+
+    fun getEmptyCategoryFeeds(): MutableMap<String, MutableList<FeedCacheItem>> {
+        val categoryFeeds = mutableMapOf<String, MutableList<FeedCacheItem>>()
+
+        categoryFeeds[ALL] = mutableListOf()
+
+        ProgramCategory.entries.forEach { category ->
+            categoryFeeds[category.name] = mutableListOf()
+        }
+
+        return categoryFeeds
+    }
+
+    fun dotProduct(
+        vector1: FloatArray,
+        vector2: FloatArray,
+    ): Float {
+        if (vector1.size != EMBEDDING_DIMENSION || vector2.size != EMBEDDING_DIMENSION) {
+            throw EmbeddingException()
+        }
+
+        var result = 0f
+
+        for (i in 0 until EMBEDDING_DIMENSION) {
+            result += (vector1[i] * vector2[i])
+        }
+
+        return result
+    }
+
+    fun calculateAverageVector(vectors: List<FloatArray>): FloatArray {
+        val result = FloatArray(EMBEDDING_DIMENSION) { 0f }
+
+        for (vector in vectors) {
+            for (i in 0 until EMBEDDING_DIMENSION) {
+                result[i] += vector[i]
+            }
+        }
+
+        val count = vectors.size.toFloat()
+        for (i in 0 until EMBEDDING_DIMENSION) {
+            result[i] /= count
+        }
+
+        return result
     }
 }

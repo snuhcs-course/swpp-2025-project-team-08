@@ -60,10 +60,6 @@ class UserEntity(
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var embedding: FloatArray? = null,
-    @Column(name = "user_embedding")
-    @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = AppConstants.EMBEDDING_DIMENSION)
-    var userEmbedding: FloatArray? = null,
     @Column(name = "liked_embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)

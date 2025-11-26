@@ -1,5 +1,6 @@
 package com.example.itda.feedCache.persistence
 
+import com.example.itda.program.config.AppConstants
 import com.example.itda.user.persistence.UserEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -24,15 +25,15 @@ class FeedCacheEntity(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     val user: UserEntity,
-    @Column(name = "program_ids", nullable = false)
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    var programIds: LongArray,
-    @Column(name = "like_ratios", nullable = false)
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    var likeRatios: FloatArray,
+    @Column(name = "category_feeds", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    var categoryFeeds: Map<String, List<FeedCacheItem>> = mapOf(),
     @Column(
         name = "updated_at",
         columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP",
     )
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
-)
+) {
+    val isExpired: Boolean
+        get() = updatedAt.plusHours(AppConstants.CACHE_EXPIRY_HOURS).isBefore(OffsetDateTime.now())
+}
