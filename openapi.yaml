@@ -866,11 +866,25 @@ components:
           type: string
           description: '운영 주체'
           example: '서울특별시'
+        likeStatus:
+          type: string
+          nullable: true
+          description: "사용자의 좋아요/싫어요 상태. 상호작용이 없으면 null 반환."
+          example: "LIKED"
+          enum:
+            - "LIKED"
+            - "DISLIKED"
+        isBookmarked:
+          type: boolean
+          description: "사용자의 북마크 여부"
+          example: true
+
     ProgramSummaryResponse:
       type: object
       properties:
         id:
           type: integer
+          format: int64
           example: 1234
         title:
           type: string
@@ -882,6 +896,13 @@ components:
           type: string
           example: "서울특별시"
           description: "운영 주체"
+        operatingEntityType:
+          type: string
+          example: "local"
+          description: "운영 주체 타입"
+          enum:
+            - central
+            - local
         category:
           type: string
           example: "cash"
@@ -898,7 +919,7 @@ components:
         categoryValue:
           type: string
           example: "빈곤 완화"
-          description: "프로그램 카테고리 값"
+          description: "프로그램 카테고리 값 (한글)"
           enum:
             - "빈곤 완화"
             - "보건, 의료"
@@ -908,6 +929,23 @@ components:
             - "사회, 여가문화 활동"
             - "주거 지원"
             - "기타"
+        likeStatus:
+          type: string
+          nullable: true
+          description: "사용자의 좋아요/싫어요 상태. 상호작용이 없으면 null 반환."
+          example: "LIKED"
+          enum:
+            - "LIKED"
+            - "DISLIKED"
+        isBookmarked:
+          type: boolean
+          description: "사용자의 북마크 여부"
+          example: true
+        reason:
+          type: string
+          nullable: true
+          description: "추천 사유 (추천 목록이 아니거나 사유가 없으면 null)"
+          example: "Recommended based on your likes"
     ProgramCategoryResponse:
       type: object
       properties:
