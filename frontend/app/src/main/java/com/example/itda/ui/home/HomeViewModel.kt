@@ -67,6 +67,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun clearGeneralError() {
+        _homeUi.update { it.copy(generalError = null) }
+    }
+
+
 
     fun refreshHomeData() {
         viewModelScope.launch {
@@ -279,9 +284,6 @@ class HomeViewModel @Inject constructor(
                 homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
 
-            // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
-            _homeUi.update { it.copy(bookmarkPrograms = updatedBookmarkPrograms) }
-
 
             // 3. API 호출
             val apiCall = if(isBookmarked)
@@ -308,6 +310,7 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             generalError = null,
                             isLoadingBookmark = false,
+                            bookmarkPrograms = updatedBookmarkPrograms
                         )
                     }
 

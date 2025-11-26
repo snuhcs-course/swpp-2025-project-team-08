@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.theme.GreenPrimary
 import com.example.itda.ui.common.theme.GreenSecondary
 import com.example.itda.ui.common.theme.Neutral40
@@ -27,6 +26,7 @@ import com.example.itda.ui.common.theme.Neutral90
 import com.example.itda.ui.common.theme.Primary40
 import com.example.itda.ui.common.theme.Primary90
 import com.example.itda.ui.common.theme.RedPrimary
+import com.example.itda.ui.common.theme.scaledSp
 
 enum class StatusType {
     PRIMARY, // 파랑
@@ -74,7 +74,7 @@ fun StatusTag(
         }
         Text(
             text = text,
-            fontSize = 12.sp,
+            fontSize = 12.scaledSp,
             fontWeight = FontWeight.SemiBold,
             color = primaryColor
         )

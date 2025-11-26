@@ -17,12 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.itda.ui.common.theme.scaledSp
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Home : BottomNavItem("home", Icons.Default.Home, "홈")
@@ -48,7 +48,7 @@ fun BottomNavBar(navController: NavController) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label, Modifier.width(24.dp)) },
-                label = { Text(text = item.label, fontSize = 10.sp, lineHeight = 10.sp) },
+                label = { Text(text = item.label, fontSize = 10.scaledSp, lineHeight = 10.scaledSp) },
                 selected = currentDestination.isCurrentRoute(item.route),
                 onClick = {
                     if (item.route == "home" && currentDestination.isCurrentRoute(item.route)) {

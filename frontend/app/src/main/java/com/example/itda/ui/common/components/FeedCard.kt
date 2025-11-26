@@ -113,7 +113,7 @@ fun FeedCard(
                             lineHeight = 16.scaledSp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
+                        Row {
                             for (category in categories) {
                                 Text(
                                     text = category, // 카테고리

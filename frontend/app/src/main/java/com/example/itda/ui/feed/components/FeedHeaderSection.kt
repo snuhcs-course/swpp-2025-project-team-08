@@ -127,30 +127,28 @@ fun LikeButtonRow(
     isLiked: Boolean = true,
     toggleDisLike: () -> Unit = {},
     isDisliked: Boolean = true,
-    modifier: Modifier = Modifier // 💡 Modifier 인자를 추가하여 재사용성을 높였습니다.
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(2.dp), // 버튼 사이에 간격을 줍니다.
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // --- 1. 좋아요 버튼 ---
+        // 좋아요 버튼
         IconButton(onClick = toggleLike) {
             Icon(
-                // isLiked 상태에 따라 아이콘 모양(Filled/Outlined) 및 색상 변경
                 imageVector = if (isLiked) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
                 contentDescription = if (isLiked) "좋아요 취소" else "좋아요",
-                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface // 좋아요 상태일 때 색상 강조
+                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
         }
 
-        // --- 2. 싫어요 버튼 ---
+        // 싫어요 버튼
         IconButton(onClick = toggleDisLike) {
             Icon(
-                // isDisliked 상태에 따라 아이콘 모양(Filled/Outlined) 및 색상 변경
                 imageVector = if (isDisliked) Icons.Filled.ThumbDown else Icons.Outlined.ThumbDown,
                 contentDescription = if (isDisliked) "싫어요 취소" else "싫어요",
-                tint = if (isDisliked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface // 싫어요 상태일 때 색상 강조
+                tint = if (isDisliked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -159,7 +157,6 @@ fun LikeButtonRow(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewFeedHeaderSection() {
-    // 미리보기를 위한 더미 함수
     FeedHeaderSection(
         title = "title",
         endDate = "",

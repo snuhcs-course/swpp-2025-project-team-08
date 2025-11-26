@@ -38,6 +38,9 @@ class FeedViewModel @Inject constructor(
     private val _feedUi = MutableStateFlow(FeedUiState())
     val feedUi: StateFlow<FeedViewModel.FeedUiState> = _feedUi.asStateFlow()
 
+    fun clearGeneralError() {
+        _feedUi.update { it.copy(generalError = null) }
+    }
 
     fun getFeedItem(feedId: Int) {
         viewModelScope.launch {
@@ -69,40 +72,17 @@ class FeedViewModel @Inject constructor(
                 }
         }
     }
-/*
-    fun checkBookmarkStatus(programId: Int) {
-        viewModelScope.launch {
-            programRepository.getAllUserBookmarks()
-                .onFailure { exception ->
-                    val apiError = ApiErrorParser.parseError(exception)
-                    _feedUi.update { it.copy(generalError = "북마크 상태 확인 실패: ${apiError.message}") }
-                }
-                .onSuccess { bookmarks ->
-                    val isBookmarked = bookmarks.any { it.id == programId }
-                    _feedUi.update { it.copy(isBookmarked = isBookmarked) }
-                }
-        }
-    }*/
-
 
     fun onBookmarkClicked() {
         viewModelScope.launch {
 
             val isBookmarked = feedUi.value.isBookmarked
-
+            val updateIsBookmarked = !isBookmarked
 
             val apiCall = if(isBookmarked)
                 programRepository.unbookmarkProgram(programId = feedUi.value.feed.id)
             else
-                programRepository.bookmarkProgram(feedUi.value.feed.id)
-
-
-            val updateIsBookmarked = !isBookmarked
-            _feedUi.update {
-                it.copy(
-                    isBookmarked = updateIsBookmarked,
-                )
-            }
+                programRepository.bookmarkProgram(programId = feedUi.value.feed.id)
 
             apiCall
                 .onFailure { exception ->
@@ -119,6 +99,7 @@ class FeedViewModel @Inject constructor(
                     _feedUi.update {
                         it.copy(
                             generalError = null,
+                            isBookmarked = updateIsBookmarked
                         )
                     }
                     val info = Pair(feedUi.value.feed.id, updateIsBookmarked)
@@ -146,7 +127,8 @@ class FeedViewModel @Inject constructor(
                         )
                     }
                 }
-                .onSuccess { response ->
+                .onSuccess { likeResponse ->
+
                     _feedUi.update {
                         it.copy(
                             generalError = null,

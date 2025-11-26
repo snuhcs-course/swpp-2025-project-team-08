@@ -158,10 +158,15 @@ fun BottomApplyButton(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    pressedElevation = 4.dp,
+                    disabledElevation = 0.dp
+                ),
                 enabled = true
             ) {
                 Text(
-                    text = "신청하러가기",
+                    text = "정책 사이트 보러가기",
                     color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 16.scaledSp,
                     modifier = Modifier
