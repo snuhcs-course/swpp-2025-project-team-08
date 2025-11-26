@@ -240,17 +240,25 @@ class ProgramService(
         userId: String,
         programId: Long,
     ) {
-        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
-        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        if (programEntity.bookmarks.any { it.user.id == userEntity.id }) {
+        if (bookmarkRepository.existsByUserIdAndProgramId(userId, programId)) {
             return
         }
-        val bookmarkEntity =
-            bookmarkRepository.save(
-                BookmarkEntity(program = programEntity, user = userEntity, createdAt = OffsetDateTime.now()),
-            )
-        programEntity.bookmarks.add(bookmarkEntity)
-        userEntity.bookmarks.add(bookmarkEntity)
+
+        val userEntity =
+            userRepository.findByIdOrNull(userId)
+                ?: throw UserNotFoundException()
+
+        val programEntity =
+            programRepository.findByIdOrNull(programId)
+                ?: throw ProgramNotFoundException()
+
+        bookmarkRepository.save(
+            BookmarkEntity(
+                program = programEntity,
+                user = userEntity,
+                createdAt = OffsetDateTime.now(),
+            ),
+        )
     }
 
     @Transactional
@@ -258,12 +266,11 @@ class ProgramService(
         userId: String,
         programId: Long,
     ) {
-        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
-        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        val bookmarkToDelete = programEntity.bookmarks.find { it.user.id == userEntity.id } ?: return
-        programEntity.bookmarks.remove(bookmarkToDelete)
-        userEntity.bookmarks.remove(bookmarkToDelete)
-        bookmarkRepository.delete(bookmarkToDelete)
+        val bookmark = bookmarkRepository.findByUserIdAndProgramId(userId, programId)
+
+        if (bookmark != null) {
+            bookmarkRepository.delete(bookmark)
+        }
     }
 
     @Transactional
@@ -304,10 +311,10 @@ class ProgramService(
         userId: String,
         programId: Long,
     ) {
-        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
-        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        val programLikeToDelete = programEntity.programLikes.find { it.user.id == userEntity.id } ?: return
-        programEntity.programLikes.remove(programLikeToDelete)
-        programLikeRepository.delete(programLikeToDelete)
+        val likeToDelete = programLikeRepository.findByUserIdAndProgramId(userId, programId)
+
+        if (likeToDelete != null) {
+            programLikeRepository.delete(likeToDelete)
+        }
     }
 }

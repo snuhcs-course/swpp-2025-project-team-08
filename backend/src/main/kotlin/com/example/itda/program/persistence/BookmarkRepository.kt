@@ -69,4 +69,9 @@ interface BookmarkRepository : JpaRepository<BookmarkEntity, Long> {
         userId: String,
         programId: Long,
     ): Boolean
+
+    fun findByUserIdAndProgramId(
+        userId: String,
+        programId: Long,
+    ): BookmarkEntity?
 }

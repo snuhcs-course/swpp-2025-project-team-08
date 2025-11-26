@@ -1,11 +1,9 @@
 package com.example.itda.program.persistence
 
 import com.example.itda.program.persistence.enums.ProgramCategory
-import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
@@ -75,10 +73,4 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
         @Param("category") category: ProgramCategory?,
         pageable: Pageable,
     ): Page<ProgramEntity>
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT p FROM ProgramEntity p WHERE p.id = :id")
-    fun findByIdWithWriteLock(
-        @Param("id") id: Long,
-    ): ProgramEntity?
 }
