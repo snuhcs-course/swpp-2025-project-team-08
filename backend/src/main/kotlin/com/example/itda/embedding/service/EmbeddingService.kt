@@ -27,4 +27,11 @@ class EmbeddingService(
             .bodyToMono<EmbeddingResponse>()
             .block()
     }
+
+    fun getEmbedding(text: String): FloatArray? {
+        val request = EmbeddingRequest(text)
+        val response = getEmbedding(request)
+
+        return response?.embedding?.toFloatArray()
+    }
 }

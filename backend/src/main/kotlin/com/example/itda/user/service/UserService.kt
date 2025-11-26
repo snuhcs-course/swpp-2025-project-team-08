@@ -1,7 +1,6 @@
 package com.example.itda.user.service
 
-import com.example.itda.program.ProgramNotFoundException
-import com.example.itda.program.config.AppConstants
+import com.example.itda.embedding.service.EmbeddingService
 import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.BookmarkRepository
 import com.example.itda.program.persistence.ProgramExampleRepository
@@ -20,7 +19,6 @@ import com.example.itda.user.controller.PreferenceRequest
 import com.example.itda.user.controller.ProfileRequest
 import com.example.itda.user.controller.User
 import com.example.itda.user.persistence.TagEntity
-import com.example.itda.user.persistence.TagRepository
 import com.example.itda.user.persistence.UserEntity
 import com.example.itda.user.persistence.UserRepository
 import com.example.itda.utils.PageResponse
@@ -32,6 +30,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import kotlin.collections.addAll
@@ -40,9 +39,9 @@ import kotlin.text.clear
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val tagRepository: TagRepository,
     private val programExampleRepository: ProgramExampleRepository,
     private val bookmarkRepository: BookmarkRepository,
+    private val embeddingService: EmbeddingService,
 ) {
     @Transactional
     fun authenticate(accessToken: String): User {
@@ -168,7 +167,54 @@ class UserService(
             userEntity.tags.addAll(tagEntities)
         }
 
+        val userText = generateUserText(userEntity)
+        val embedding = embeddingService.getEmbedding(userText)
+
+        userEntity.embedding = embedding
+
         userRepository.save(userEntity)
+    }
+
+    fun generateUserText(userEntity: UserEntity): String {
+        val sb = StringBuilder()
+
+        val age =
+            userEntity.birthDate?.let {
+                Period.between(it, LocalDate.now()).years
+            } ?: 0
+
+        val genderStr = userEntity.gender?.value ?: "사람"
+
+        sb.append("저는 ${age}세 ${genderStr}입니다. ")
+
+        userEntity.address?.let {
+            sb.append("저는 ${it}에 거주하고 있습니다. ")
+        }
+
+        userEntity.employmentStatus?.let {
+            sb.append("저의 고용 상태는 ${it.value}입니다. ")
+        }
+
+        userEntity.maritalStatus?.let {
+            sb.append("저의 결혼 상태는 ${it.value}입니다. ")
+        }
+
+        userEntity.householdSize?.let {
+            sb.append("저는 ${it}인 가구입니다. ")
+        }
+
+        userEntity.householdIncome?.let {
+            sb.append("가구 소득은 연 ${it}만원입니다. ")
+        }
+
+        if (userEntity.tags.isNotEmpty()) {
+            val interests = userEntity.tags.joinToString(", ") { it.name }
+            sb.append("저는 $interests 분야에 관심이 있습니다. ")
+        }
+
+        sb.append("저는 제 상황에 맞는 정부 지원금과 복지 혜택, 공공 지원 프로그램을 찾고 있습니다.")
+
+        return sb.toString().trim()
     }
 
     @Transactional
@@ -176,22 +222,6 @@ class UserService(
         userId: String,
         request: List<PreferenceRequest>,
     ) {
-        val preferenceEmbedding = FloatArray(AppConstants.EMBEDDING_DIMENSION) { 0.0f }
-        val scoreSum = request.sumOf { r -> r.score }
-
-        request.forEach { r ->
-            val programEntity = programExampleRepository.findByIdOrNull(r.id) ?: throw ProgramNotFoundException()
-            val embedding = programEntity.embedding
-            val weight = r.score.toFloat() / scoreSum
-
-            for (i in embedding.indices) {
-                preferenceEmbedding[i] += (embedding[i] * weight)
-            }
-        }
-
-        val userEntity: UserEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        userEntity.embedding = preferenceEmbedding
-        userRepository.save(userEntity)
     }
 
     @Transactional
