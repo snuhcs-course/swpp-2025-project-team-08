@@ -2,7 +2,7 @@ package com.example.itda.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Program(
+/*data class Program(
     val id: Int,             // 프로그램 고유 ID
     val title: String,       // 프로그램 제목
     val categories: List<Category>,    // 프로그램 카테고리
@@ -16,7 +16,7 @@ data class Program(
     val logo: Int,             // 로고 ID TODO - logoUrl로 변경 필요 // 이건 그냥 program에 포함되어있어도 무방할 url
     val isEligible: Boolean,    // 신청 대상자 여부. 이것도 relation 필요할듯
 
-)
+)*/
 
 data class ProgramPageResponse(
     @SerializedName("content")
@@ -38,7 +38,8 @@ data class ProgramPageResponse(
     val isFirst: Boolean,
 
     @SerializedName("isLast")
-    val isLast: Boolean
+    val isLast: Boolean,
+
 )
 
 data class ProgramResponse(
@@ -49,6 +50,9 @@ data class ProgramResponse(
     val operatingEntityType : String,
     val category : String,
     val categoryValue: String,
+    val likeStatus : String?, // LIKED, DISLIKED, null
+    val isBookmarked : Boolean,
+    val reason : String?,
 )
 
 data class ProgramDetailResponse(
@@ -79,6 +83,8 @@ data class ProgramDetailResponse(
     val createdAt: String?,
     val operatingEntity: String,
     val operatingEntityType : String,
+    val likeStatus : String?, // LIKED, DISLIKED, null
+    val isBookmarked : Boolean,
 )
 
 //data class ProgramSummaryResponse(

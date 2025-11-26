@@ -32,16 +32,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.navigation.LoadingScreen
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.delay
-import com.example.itda.ui.common.theme.*
 
 @Composable
 fun FeedSummaryCard(
@@ -150,19 +148,30 @@ fun FeedSummaryCard(
                     visible = !isLoading,
                     enter = fadeIn(animationSpec = tween(durationMillis = 1500)) // 1초 동안 페이드인
                 ) {
-                    Text(
-                        modifier = Modifier.padding(12.dp),
-                        text = buildAnnotatedString {
-                            withStyle(style = currentStyle) {
-                                append(content) // 👈 인자로 받은 content를 여기에 넣습니다.
-                            }
-                        },
-                        style = TextStyle(
-                            fontSize = 16.scaledSp,
-                            lineHeight = 20.scaledSp,
-                            textAlign = TextAlign.Left,
+                    MarkdownText(
+                            modifier = Modifier.padding(12.dp),
+                            markdown = content,
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 16.scaledSp,
+                                lineHeight = 20.scaledSp,
+                                textAlign = TextAlign.Left,
+                            ),
+                            // text = buildAnnotatedString { ... } 부분을 제거합니다.
                         )
-                    )
+//                    Text(
+//                        modifier = Modifier.padding(12.dp),
+//                        text = buildAnnotatedString {
+//                            withStyle(style = currentStyle) {
+//                                append(content) // 👈 인자로 받은 content를 여기에 넣습니다.
+//                            }
+//                        },
+//                        style = TextStyle(
+//                            fontSize = 16.scaledSp,
+//                            lineHeight = 20.scaledSp,
+//                            textAlign = TextAlign.Left,
+//                        )
+//                    )
 //                    if (!isSweepFinished) {
 //                        // Markdown 텍스트를 AnnotatedString으로 변환하여 Sweep 적용
 //

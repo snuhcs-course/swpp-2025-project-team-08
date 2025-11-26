@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -36,7 +37,7 @@ import com.example.itda.ui.navigation.LoadingScreen
 @SuppressLint("QueryPermissionsNeeded")
 @Composable
 fun FeedScreen(
-    ui: FeedViewModel.FeedUiState, // UiState를 인자로 받음
+    ui: FeedViewModel.FeedUiState,
     onBack: () -> Unit,
     onBookmarkClicked: () -> Unit,
     toggleLike: () -> Unit = {},
@@ -50,46 +51,16 @@ fun FeedScreen(
     val context = LocalContext.current
 
     var url = ""
-    if(ui.feed.applyUrl.toBoolean()) {
-        url = ui.feed.applyUrl.toString()
-    }
-    else {
-        url = ui.feed.referenceUrl.toString()
+    if (ui.feed.applyUrl.isNullOrBlank()) {
+        url = ui.feed.referenceUrl.orEmpty()
+    } else {
+        url = ui.feed.applyUrl
     }
 
     BaseScreen(
         title = " ",
         onBack = onBack,
         topBarVisible = true,
-        bottomBar = {
-            if(!ui.isLoading && url.toBoolean()) {
-                Button(
-                    onClick = {  /* feed.link (신청 페이지) 로 이동 */
-                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        // 안전을 위해 resolveActivity를 사용하여 처리 가능한 앱이 있는지 확인 후 실행하는 것이 좋습니다.
-                        if (intent.resolveActivity(context.packageManager) != null) {
-                            context.startActivity(intent)
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    enabled = true
-                ) {
-                    Text(
-                        text = "신청하러가기",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 16.scaledSp
-                    )
-                }
-            }
-
-        }
     ) { paddingValues ->
 
         if(ui.isLoading) {
@@ -109,10 +80,8 @@ fun FeedScreen(
                     title = ui.feed.title,
                     endDate = ui.feed.applyEndAt ?: "",
                     tags = listOf(ui.feed.categoryValue),
-                    isEligible = false, // TODO - ui.isEligible
                     isBookmarked = ui.isBookmarked,
                     onBookmarkClicked = onBookmarkClicked,
-
                     toggleLike = toggleLike,
                     isLiked = ui.isLiked,
                     toggleDisLike = toggleDislike,
@@ -146,11 +115,60 @@ fun FeedScreen(
                     details = ui.feed.details
                 )
 
-                Spacer(Modifier.height(60.dp)) // 하단 버튼 여유 공간
+                Spacer(Modifier.height(12.dp))
+
+                BottomApplyButton(
+                    url = url,
+                    context = context
+                )
+                Spacer(Modifier.height(12.dp))
             }
         }
 
     }
+}
+
+@SuppressLint("QueryPermissionsNeeded")
+@Composable
+fun BottomApplyButton(
+    url : String = "",
+    context: android.content.Context,
+) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+        ) {
+            Button(
+                onClick = {
+                    var finalUrl = url
+                    val bokjiroUrl = "https://www.bokjiro.go.kr/"
+
+                    if (finalUrl.isBlank()) {
+                        finalUrl = bokjiroUrl
+                    }
+                    val intent = Intent ( Intent . ACTION_VIEW , finalUrl.toUri() )
+
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                enabled = true
+            ) {
+                Text(
+                    text = "신청하러가기",
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    fontSize = 16.scaledSp,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                )
+            }
+        }
 }
 
 //@Preview(showBackground = true)

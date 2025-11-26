@@ -154,7 +154,7 @@ fun FeedList(
                                     }
                                 }
                             )
-                            .background(MaterialTheme.colorScheme.surface) // FeedCard 배경색
+                            .background(MaterialTheme.colorScheme.background) // FeedCard 배경색
                     ) {
                         // 10. 실제 컨텐츠 (기존 FeedCard)
                         FeedCard(
@@ -164,6 +164,7 @@ fun FeedList(
                             department = item.operatingEntity,
                             content = item.preview,
                             isBookmarked = item.id in bookmarkPrograms,
+                            reason = item.reason,
                             logo =
                                 if (item.operatingEntityType == "central")
                                     R.drawable.gov_logo

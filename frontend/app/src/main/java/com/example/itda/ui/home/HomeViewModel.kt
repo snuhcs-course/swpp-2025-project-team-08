@@ -29,9 +29,11 @@ class HomeViewModel @Inject constructor(
     data class HomeUiState(
         val userId: String = "", // 사용자 정보
         val username: String = "", // 사용자 정보
+
         val categories: List<Category> = dummyCategories, // 필터 카테고리
         val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
         val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+
         val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
         val isLastPage: Boolean = false,        // 마지막 페이지 여부
         val totalPages: Int = 0,                // 전체 페이지 수

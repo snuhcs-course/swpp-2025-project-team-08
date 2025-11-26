@@ -1,6 +1,7 @@
 package com.example.itda.ui.feed
 
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,7 +18,6 @@ fun FeedRoute(
 
     LaunchedEffect(key1 = feedId) {
         vm.getFeedItem(feedId)
-        vm.checkBookmarkStatus(feedId)
     }
     FeedScreen(
         ui = ui, // FeedScreen에 UI 상태를 통째로 전달

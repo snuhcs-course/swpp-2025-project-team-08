@@ -59,13 +59,17 @@ class FeedViewModel @Inject constructor(
                     _feedUi.update {
                         it.copy(
                             feed = feedItem,
+                            isBookmarked = feedItem.isBookmarked,
+                            isLiked = feedItem.likeStatus == "LIKED",
+                            isDisliked = feedItem.likeStatus == "DISLIKED",
                             isLoading = false
                         )
                     }
+
                 }
         }
     }
-
+/*
     fun checkBookmarkStatus(programId: Int) {
         viewModelScope.launch {
             programRepository.getAllUserBookmarks()
@@ -78,7 +82,7 @@ class FeedViewModel @Inject constructor(
                     _feedUi.update { it.copy(isBookmarked = isBookmarked) }
                 }
         }
-    }
+    }*/
 
 
     fun onBookmarkClicked() {
@@ -172,7 +176,7 @@ class FeedViewModel @Inject constructor(
                         )
                     }
                 }
-                .onSuccess { response ->
+                .onSuccess { disklikeResponse ->
                     _feedUi.update {
                         it.copy(
                             generalError = null,

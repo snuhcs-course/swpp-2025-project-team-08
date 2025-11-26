@@ -1,10 +1,8 @@
 package com.example.itda.data.model
 
-import com.example.itda.R
-
 object DummyData {
-    val dummyPrograms = listOf<Program>(
-        /*
+    /*val dummyPrograms = listOf<Program>(
+        *//*
         Program(
             id = 1,
             title = "AI 해커톤 2025",
@@ -65,8 +63,8 @@ object DummyData {
             start_date = "2025-10-20",
             end_date = "2025-10-25"
         ),
-        */
-    )
+        *//*
+    )*/
 
 //    val dummyCategories = listOf<Category>(
 //        Category(0,  "전체"),
@@ -81,7 +79,7 @@ object DummyData {
 //    )
 
 
-    val dummyFeedItems = listOf<Program>(
+    /*val dummyFeedItems = listOf<Program>(
         Program(
             id = 1,
             title = "AI 해커톤 2025",
@@ -181,7 +179,7 @@ object DummyData {
             logo = R.drawable.gov_logo,
             isEligible = true
         ),
-    )
+    )*/
 
 
     val dummyUser = listOf<User>(
@@ -244,6 +242,8 @@ object DummyData {
         applyEndAt = "",
         createdAt = "",
         operatingEntity = "",
-        operatingEntityType = ""
+        operatingEntityType = "",
+        likeStatus = null, // LIKED, DISLIKED, null
+        isBookmarked = false,
     )
 }

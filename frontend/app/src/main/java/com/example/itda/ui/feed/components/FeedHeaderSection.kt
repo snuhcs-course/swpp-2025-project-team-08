@@ -42,8 +42,7 @@ enum class isLiked {
 fun FeedHeaderSection(
     title: String,
     endDate: String,
-    tags: List<String>, // TODO - 지금은 category 이름을 String 으로 하나만 받아오지만 여러개 카테고리로 바뀌면 List 를 잘 활용할 수 있을 것
-    isEligible: Boolean,
+    tags: List<String>,
     isBookmarked: Boolean,
     onBookmarkClicked : () -> Unit,
     toggleLike: () -> Unit = {},
@@ -111,8 +110,6 @@ fun FeedHeaderSection(
                 tags.map { tag ->
                     StatusTag(tag, StatusType.PRIMARY)
                 }
-                if (isEligible) // TODO - 지금은 전부 true. 일단 false 로 바꿔두겠습니다;..
-                    StatusTag("신청 대상자", StatusType.POSITIVE)
             }
             LikeButtonRow(
                 toggleLike = toggleLike,
@@ -167,7 +164,6 @@ private fun PreviewFeedHeaderSection() {
         title = "title",
         endDate = "",
         tags = listOf(""),
-        isEligible= false,
         isBookmarked = false,
         onBookmarkClicked = {}
     )
