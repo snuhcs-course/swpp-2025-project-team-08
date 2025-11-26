@@ -30,9 +30,10 @@ class ProgramController(
 
     @GetMapping("/programs/{id}")
     fun getProgram(
+        @AuthUser user: User,
         @PathVariable id: Long,
     ): ProgramResponse {
-        return programService.getProgram(id)
+        return programService.getProgram(user, id)
     }
 
     @GetMapping("/programs/categories")
@@ -54,20 +55,22 @@ class ProgramController(
 
     @GetMapping("/programs/search/latest")
     fun searchLatestPrograms(
+        @AuthUser user: User,
         @RequestParam("query") searchTerm: String,
         @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchLatestPrograms(searchTerm, category, pageable)
+        return programService.searchLatestPrograms(user, searchTerm, category, pageable)
     }
 
     @GetMapping("/programs/search/rank")
     fun searchProgramsByRank(
+        @AuthUser user: User,
         @RequestParam("query") searchTerm: String,
         @RequestParam(required = false) category: ProgramCategory?,
         pageable: Pageable,
     ): PageResponse<ProgramSummaryResponse> {
-        return programService.searchProgramsByRank(searchTerm, category, pageable)
+        return programService.searchProgramsByRank(user, searchTerm, category, pageable)
     }
 
     @PostMapping("/programs/{programId}/bookmark")
@@ -89,7 +92,7 @@ class ProgramController(
     }
 
     @PostMapping("/programs/{programId}/like")
-    fun likeProgrma(
+    fun likeProgram(
         @PathVariable programId: Long,
         @RequestParam("type") isLike: Boolean,
         @AuthUser user: User,

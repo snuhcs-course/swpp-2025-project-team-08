@@ -60,6 +60,18 @@ class UserEntity(
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = AppConstants.EMBEDDING_DIMENSION)
     var embedding: FloatArray? = null,
+    @Column(name = "liked_embedding")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = AppConstants.EMBEDDING_DIMENSION)
+    var likesEmbedding: FloatArray? = null,
+    @Column(name = "bookmarked_embedding")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = AppConstants.EMBEDDING_DIMENSION)
+    var bookmarksEmbedding: FloatArray? = null,
+    @Column(name = "seeless_embedding")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = AppConstants.EMBEDDING_DIMENSION)
+    var seeLessEmbedding: FloatArray? = null,
     @OneToMany(
         mappedBy = "user",
         cascade = [CascadeType.ALL],

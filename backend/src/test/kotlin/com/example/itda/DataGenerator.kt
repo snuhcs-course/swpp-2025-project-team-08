@@ -77,6 +77,7 @@ class DataGenerator(
     ): ProgramEntity {
         val entity =
             ProgramEntity(
+                id = 0L,
                 uuid = UUID.randomUUID().toString(),
                 title = title,
                 summary = "Summary for $title",
