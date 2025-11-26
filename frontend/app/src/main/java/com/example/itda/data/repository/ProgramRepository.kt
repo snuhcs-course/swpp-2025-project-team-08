@@ -39,4 +39,11 @@ interface ProgramRepository {
 
     suspend fun unbookmarkProgram(programId: Int): Result<Unit>
 
+
+    suspend fun likeLikeProgram(programId: Int): Result<Unit>
+
+    suspend fun unlikeLikeProgram(programId: Int): Result<Unit>
+    suspend fun likeDislikeProgram(programId: Int): Result<Unit>
+
+    suspend fun unlikeDislikeProgram(programId: Int): Result<Unit>
 }

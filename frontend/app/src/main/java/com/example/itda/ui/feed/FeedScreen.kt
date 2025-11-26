@@ -38,7 +38,9 @@ import com.example.itda.ui.navigation.LoadingScreen
 fun FeedScreen(
     ui: FeedViewModel.FeedUiState, // UiState를 인자로 받음
     onBack: () -> Unit,
-    onBookmarkClicked: () -> Unit
+    onBookmarkClicked: () -> Unit,
+    toggleLike: () -> Unit = {},
+    toggleDislike: () -> Unit = {},
 ) {
 //    val feedViewModel : FeedViewModel = hiltViewModel()
 
@@ -109,7 +111,12 @@ fun FeedScreen(
                     tags = listOf(ui.feed.categoryValue),
                     isEligible = false, // TODO - ui.isEligible
                     isBookmarked = ui.isBookmarked,
-                    onBookmarkClicked = onBookmarkClicked
+                    onBookmarkClicked = onBookmarkClicked,
+
+                    toggleLike = toggleLike,
+                    isLiked = ui.isLiked,
+                    toggleDisLike = toggleDislike,
+                    isDisliked = ui.isDisliked,
                 )
 
                 Spacer(Modifier.height(16.dp))
