@@ -5,14 +5,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.itda.ui.common.theme.scaledSp
+import androidx.compose.ui.unit.sp
 import com.example.itda.ui.profile.SettingsViewModel
 
 @Composable
@@ -44,19 +39,20 @@ fun FontSizeOption(
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(onClick = onClick)
+            .height(72.dp)
             .padding(vertical = 12.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = fontSize.displayName,
-            fontSize = (14 * fontSize.scale).scaledSp,
+            fontSize = (14 * fontSize.scale * fontSize.scale * fontSize.scale).sp,
             color = if (isSelected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
 
-        if (isSelected) {
+        /*if (isSelected) {
             Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 imageVector = Icons.Default.Check,
@@ -64,6 +60,6 @@ fun FontSizeOption(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp)
             )
-        }
+        }*/
     }
 }

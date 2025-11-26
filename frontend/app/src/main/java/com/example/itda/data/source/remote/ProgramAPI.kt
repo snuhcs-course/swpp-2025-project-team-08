@@ -92,7 +92,7 @@ interface ProgramAPI {
      * /programs/{id}/unlike?type=true (POST)
      * bookmark the program
      */
-    @POST("programs/{id}/like?type=true")
+    @POST("programs/{id}/unlike?type=true")
     suspend fun unlikeLikeProgram(@Path("id") id: Int): retrofit2.Response<Unit>
 
     /**

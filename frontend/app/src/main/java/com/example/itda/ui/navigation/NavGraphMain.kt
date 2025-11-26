@@ -26,6 +26,7 @@ import com.example.itda.ui.profile.ProfileRoute
 import com.example.itda.ui.profile.SettingsRoute
 import com.example.itda.ui.profile.component.settingNavGraph
 import com.example.itda.ui.search.SearchRoute
+import com.example.itda.ui.search.SearchViewModel
 
 // Bottom Navigation 탭의 경로 목록을 정의합니다.
 private val MainTabRoutes = listOf(
@@ -62,7 +63,7 @@ fun NavGraphBuilder.mainGraph(
                                     backStackEntry.savedStateHandle["refresh_home"] = false
                                 }
                             }
-                            // 💡 북마크 변경 결과 감지 및 처리
+                            // 북마크 변경 결과 감지 및 처리
                             LaunchedEffect(backStackEntry) {
                                 // Pair<Int, Boolean> 형태의 데이터를 관찰합니다. (ID, 최종 상태)
                                 backStackEntry.savedStateHandle.getLiveData<Pair<Int, Boolean>>("bookmark_change_info").observe(
@@ -81,10 +82,27 @@ fun NavGraphBuilder.mainGraph(
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
-                        "search" -> SearchRoute(
-                            onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
-                            modifier = Modifier.padding(innerPadding)
-                         )
+                        "search" -> {
+                            val searchViewModel: SearchViewModel = hiltViewModel(backStackEntry)
+
+                            // 북마크 변경 결과 감지 및 처리
+                            LaunchedEffect(backStackEntry) {
+                                // Pair<Int, Boolean> 형태의 데이터를 관찰합니다. (ID, 최종 상태)
+                                backStackEntry.savedStateHandle.getLiveData<Pair<Int, Boolean>>("bookmark_change_info").observe(
+                                    backStackEntry
+                                ) { info ->
+                                    if (info != null) {
+                                        val (id, isBookmarked) = info
+                                        searchViewModel.updateBookmarkStatusInList(id, isBookmarked)
+                                        backStackEntry.savedStateHandle.remove<Pair<Int, Boolean>>("bookmark_change_info")
+                                    }
+                                }
+                            }
+                            SearchRoute(
+                                onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
                         "bookmark" -> BookmarkRoute(
                             onFeedClick = { feedId -> navController.navigate("feed/$feedId") },
                             modifier = Modifier.padding(innerPadding)

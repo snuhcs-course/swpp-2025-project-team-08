@@ -42,8 +42,7 @@ enum class isLiked {
 fun FeedHeaderSection(
     title: String,
     endDate: String,
-    tags: List<String>, // TODO - 지금은 category 이름을 String 으로 하나만 받아오지만 여러개 카테고리로 바뀌면 List 를 잘 활용할 수 있을 것
-    isEligible: Boolean,
+    tags: List<String>,
     isBookmarked: Boolean,
     onBookmarkClicked : () -> Unit,
     toggleLike: () -> Unit = {},
@@ -111,8 +110,6 @@ fun FeedHeaderSection(
                 tags.map { tag ->
                     StatusTag(tag, StatusType.PRIMARY)
                 }
-                if (isEligible) // TODO - 지금은 전부 true. 일단 false 로 바꿔두겠습니다;..
-                    StatusTag("신청 대상자", StatusType.POSITIVE)
             }
             LikeButtonRow(
                 toggleLike = toggleLike,
@@ -130,30 +127,28 @@ fun LikeButtonRow(
     isLiked: Boolean = true,
     toggleDisLike: () -> Unit = {},
     isDisliked: Boolean = true,
-    modifier: Modifier = Modifier // 💡 Modifier 인자를 추가하여 재사용성을 높였습니다.
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(2.dp), // 버튼 사이에 간격을 줍니다.
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // --- 1. 좋아요 버튼 ---
+        // 좋아요 버튼
         IconButton(onClick = toggleLike) {
             Icon(
-                // isLiked 상태에 따라 아이콘 모양(Filled/Outlined) 및 색상 변경
                 imageVector = if (isLiked) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
                 contentDescription = if (isLiked) "좋아요 취소" else "좋아요",
-                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface // 좋아요 상태일 때 색상 강조
+                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
         }
 
-        // --- 2. 싫어요 버튼 ---
+        // 싫어요 버튼
         IconButton(onClick = toggleDisLike) {
             Icon(
-                // isDisliked 상태에 따라 아이콘 모양(Filled/Outlined) 및 색상 변경
                 imageVector = if (isDisliked) Icons.Filled.ThumbDown else Icons.Outlined.ThumbDown,
                 contentDescription = if (isDisliked) "싫어요 취소" else "싫어요",
-                tint = if (isDisliked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface // 싫어요 상태일 때 색상 강조
+                tint = if (isDisliked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -162,12 +157,10 @@ fun LikeButtonRow(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewFeedHeaderSection() {
-    // 미리보기를 위한 더미 함수
     FeedHeaderSection(
         title = "title",
         endDate = "",
         tags = listOf(""),
-        isEligible= false,
         isBookmarked = false,
         onBookmarkClicked = {}
     )

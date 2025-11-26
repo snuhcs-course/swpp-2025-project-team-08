@@ -1,9 +1,7 @@
 package com.example.itda.data.repository
 
 import coil.network.HttpException
-import com.example.itda.data.model.DummyData
 import com.example.itda.data.model.PageResponse
-import com.example.itda.data.model.Program
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
@@ -29,11 +27,6 @@ class ProgramRepositoryImpl @Inject constructor(
 
     override suspend fun getExampleDetails(exampleId: Int): Result<ProgramDetailResponse> = runCatching {
         api.getExampleDetails(exampleId)
-    }
-
-    // TODO - 임시 함수. User에 맞는 program list를 전부 불러오는 함수. 현재는 dummyFeedList 불러오기
-    override fun getFeedList(): List<Program> {
-        return DummyData.dummyFeedItems
     }
 
     override suspend fun searchByRank(

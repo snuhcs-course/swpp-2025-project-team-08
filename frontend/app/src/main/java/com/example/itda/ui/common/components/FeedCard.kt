@@ -1,7 +1,9 @@
 package com.example.itda.ui.common.components
 
 //import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,12 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.R
 import com.example.itda.data.model.dummyCategories
-import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.common.theme.scaledSp
 
 @Composable
 fun FeedCard(
@@ -34,16 +36,14 @@ fun FeedCard(
     title: String,          // 프로그램 제목
     categories: List<String>,       // 프로그램 카테고리
     department: String,     // 주관 부서
-    link: String? = null,           // 관련 링크 (URL)
     content: String,        // 프로그램 설명 (text)
     // start_date: String ? = null,     // 시작 날짜 (ISO 포맷 문자열로 전달)
     // end_date: String ? = null,       // 종료 날짜
 
     isBookmarked : Boolean = false,     // 즐겨찾기 여부
+    reason : String? = null, // 추천 이유
     logo: Int = R.drawable.gov_logo,    // 로고 ID?
-    // TODO - coil library 를 활용해 url 을 받아와 붙여넣는 방법도 고민중
     // logoUrl : String ? = null
-    isEligible: Boolean = true,    // 신청 대상자 여부
     onClick: () -> Unit,
     onBookmarkClicked : () -> Unit,
 
@@ -64,6 +64,31 @@ fun FeedCard(
 
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            if(reason != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                ) {
+                    Text(
+                        text = reason,
+                        // 폰트 스타일: bodySmall, 얇은 두께
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.tertiary
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             // 상단 섹션: 로고, 기관명, 카테고리, 즐겨찾기 아이콘
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -88,7 +113,7 @@ fun FeedCard(
                             lineHeight = 16.scaledSp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Row { //TODO - category 이렇게 담지말고 status tag 등으로  담는 방식
+                        Row {
                             for (category in categories) {
                                 Text(
                                     text = category, // 카테고리
@@ -158,7 +183,6 @@ fun PreviewFeedItem() {
                 department = "행정안전부",
                 content = "25만원 받을 수 있음",
                 isBookmarked = true, // 즐겨찾기 설정됨
-                isEligible = true, // 신청 대상자 O
                 logo = R.drawable.gov_logo,
                 onClick = { },
                 onBookmarkClicked = {},

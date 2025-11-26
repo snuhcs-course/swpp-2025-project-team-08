@@ -25,6 +25,7 @@ fun SearchRoute(
         onClearAllRecentSearches = viewModel::onClearAllRecentSearches,
         onSortTypeChange = viewModel::onSortTypeChange,
         onCategorySelected = viewModel::onCategorySelected,
+        onFeedBookmarkClicked = viewModel::onFeedBookmarkClicked,
         modifier = modifier
     )
 }

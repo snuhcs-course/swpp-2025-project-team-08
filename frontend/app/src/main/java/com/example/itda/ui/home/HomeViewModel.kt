@@ -29,9 +29,11 @@ class HomeViewModel @Inject constructor(
     data class HomeUiState(
         val userId: String = "", // 사용자 정보
         val username: String = "", // 사용자 정보
+
         val categories: List<Category> = dummyCategories, // 필터 카테고리
         val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
         val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+
         val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
         val isLastPage: Boolean = false,        // 마지막 페이지 여부
         val totalPages: Int = 0,                // 전체 페이지 수
@@ -64,6 +66,11 @@ class HomeViewModel @Inject constructor(
             initBookmarkList()
         }
     }
+
+    fun clearGeneralError() {
+        _homeUi.update { it.copy(generalError = null) }
+    }
+
 
 
     fun refreshHomeData() {
@@ -277,9 +284,6 @@ class HomeViewModel @Inject constructor(
                 homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
 
-            // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
-            _homeUi.update { it.copy(bookmarkPrograms = updatedBookmarkPrograms) }
-
 
             // 3. API 호출
             val apiCall = if(isBookmarked)
@@ -301,11 +305,12 @@ class HomeViewModel @Inject constructor(
 
                 }
                 .onSuccess { response ->
-                    // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
+                    // 5. API 성공
                     _homeUi.update {
                         it.copy(
                             generalError = null,
                             isLoadingBookmark = false,
+                            bookmarkPrograms = updatedBookmarkPrograms
                         )
                     }
 
