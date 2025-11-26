@@ -305,7 +305,7 @@ class HomeViewModel @Inject constructor(
 
                 }
                 .onSuccess { response ->
-                    // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
+                    // 5. API 성공
                     _homeUi.update {
                         it.copy(
                             generalError = null,

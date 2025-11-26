@@ -23,11 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
-import com.example.itda.ui.common.theme.*
 import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.home.components.ProgramFilterRow
 import com.example.itda.ui.navigation.LoadingScreen
@@ -49,6 +47,7 @@ fun SearchScreen(
     onClearAllRecentSearches: () -> Unit,
     onSortTypeChange: (SearchViewModel.SortType) -> Unit,
     onCategorySelected: (Category) -> Unit,
+    onFeedBookmarkClicked : (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -212,13 +211,14 @@ fun SearchScreen(
                     else if (uiState.searchResults.isNotEmpty()) {
                         FeedList(
                             items = uiState.searchResults,
-                            bookmarkPrograms = emptyList<Int>(), // TODO - ui 애 bookmarkprograms 추가하고  homeviewmodel 과 동일한 로직으로 불러와서 넣어주기
+                            bookmarkPrograms = uiState.bookmarkPrograms,
                             listState = listState,
                             onItemClick = { feed -> onFeedClick(feed.id) },
                             onItemBookmarkClicked = { id ->
-                                // onFeedBookmarkClicked(id)
+                                onFeedBookmarkClicked(id)
                             },
-                            isPaginating = uiState.isPaginating
+                            isPaginating = uiState.isPaginating,
+                            dismissable = false
                         )
                     }
                     else if (uiState.generalError != null) {

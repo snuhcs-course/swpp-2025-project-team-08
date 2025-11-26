@@ -57,6 +57,7 @@ fun FeedList(
     bookmarkPrograms : List<Int>,
     listState: LazyListState = rememberLazyListState(),
     onItemClick: (ProgramResponse) -> Unit,
+    dismissable : Boolean = true,
     onItemDismissed : (ProgramResponse) -> Unit = {},
     onItemDislike : (Int) -> Unit = {},
     onItemBookmarkClicked : (Int) -> Unit,
@@ -79,118 +80,142 @@ fun FeedList(
             val dismissButtonWidthPx = with(LocalDensity.current) { dismissButtonWidth.toPx() }
             val offsetX = remember { Animatable(0f) }
 
-            AnimatedVisibility(
-                visible = itemVisible, // 스와이프 안됐을 때만 보임
-                exit = shrinkVertically(
-                    animationSpec = tween(durationMillis = 300),
-                    shrinkTowards = Alignment.Top
-                ) + fadeOut(animationSpec = tween(durationMillis = 300)),
-            ) {
-                Box(modifier = Modifier
-                    .fillMaxSize()) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(Color.Transparent) // 뒷배경 색상
-                            .padding(horizontal = 16.dp),
-                        contentAlignment = Alignment.CenterEnd,
-                    ) {
-                        Button(
-                            onClick = {
-                                scope.launch {
-                                    itemVisible = false
-                                    delay(300L)
-                                    onItemDismissed(item)
-                                    onItemDislike(item.id) // TODO - dislike 하면 자동으로 아예 배제된다면 이대로
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = MaterialTheme.colorScheme.errorContainer
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp),
+            if(dismissable) {
+                AnimatedVisibility(
+                    visible = itemVisible, // 스와이프 안됐을 때만 보임
+                    exit = shrinkVertically(
+                        animationSpec = tween(durationMillis = 300),
+                        shrinkTowards = Alignment.Top
+                    ) + fadeOut(animationSpec = tween(durationMillis = 300)),
+                ) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(Color.Transparent) // 뒷배경 색상
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.CenterEnd,
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = "관심없음",
-                                    fontWeight = FontWeight.Bold,
-                                )
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "관심없음",
-                                )
-                            }
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .offset { IntOffset(offsetX.value.roundToInt(), 0) } // 스와이프 위치 적용
-                            .draggable(
-                                orientation = Orientation.Horizontal,
-                                state = rememberDraggableState { delta ->
-                                    // 스와이프 중 offset 업데이트
+                            Button(
+                                onClick = {
                                     scope.launch {
-                                        // 왼쪽으로만 스와이프, 최대는 버튼 너비만큼
-                                        val newOffset =
-                                            (offsetX.value + delta).coerceIn(-dismissButtonWidthPx, 0f)
-                                        offsetX.snapTo(newOffset)
+                                        itemVisible = false
+                                        delay(300L)
+                                        onItemDismissed(item)
+                                        onItemDislike(item.id) // TODO - dislike 하면 자동으로 아예 배제된다면 이대로
                                     }
                                 },
-                                onDragStopped = {
-                                    // [요구사항 1, 2] 스와이프 멈췄을 때 고정
-                                    scope.launch {
-                                        if (offsetX.value < -dismissButtonWidthPx / 2) {
-                                            // 절반 이상 밀었으면: 버튼 너비만큼 밀어서 고정
-                                            offsetX.animateTo(-dismissButtonWidthPx, tween(100))
-                                        } else {
-                                            // 절반 미만 밀었으면: 제자리로 복귀
-                                            offsetX.animateTo(0f, tween(100))
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Transparent,
+                                    contentColor = MaterialTheme.colorScheme.errorContainer
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp),
+                                contentPadding = PaddingValues(horizontal = 8.dp),
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = "관심없음",
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "관심없음",
+                                    )
+                                }
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset { IntOffset(offsetX.value.roundToInt(), 0) } // 스와이프 위치 적용
+                                .draggable(
+                                    orientation = Orientation.Horizontal,
+                                    state = rememberDraggableState { delta ->
+                                        // 스와이프 중 offset 업데이트
+                                        scope.launch {
+                                            // 왼쪽으로만 스와이프, 최대는 버튼 너비만큼
+                                            val newOffset =
+                                                (offsetX.value + delta).coerceIn(
+                                                    -dismissButtonWidthPx,
+                                                    0f
+                                                )
+                                            offsetX.snapTo(newOffset)
                                         }
+                                    },
+                                    onDragStopped = {
+                                        // [요구사항 1, 2] 스와이프 멈췄을 때 고정
+                                        scope.launch {
+                                            if (offsetX.value < -dismissButtonWidthPx / 2) {
+                                                // 절반 이상 밀었으면: 버튼 너비만큼 밀어서 고정
+                                                offsetX.animateTo(-dismissButtonWidthPx, tween(100))
+                                            } else {
+                                                // 절반 미만 밀었으면: 제자리로 복귀
+                                                offsetX.animateTo(0f, tween(100))
+                                            }
+                                        }
+                                    }
+                                )
+                                .background(MaterialTheme.colorScheme.background) // FeedCard 배경색
+                        ) {
+                            // 10. 실제 컨텐츠 (기존 FeedCard)
+                            FeedCard(
+                                id = item.id,
+                                title = item.title,
+                                categories = listOf(item.categoryValue),
+                                department = item.operatingEntity,
+                                content = item.preview,
+                                isBookmarked = item.id in bookmarkPrograms,
+                                reason = item.reason,
+                                logo =
+                                    if (item.operatingEntityType == "central")
+                                        R.drawable.gov_logo
+                                    else
+                                        R.drawable.local,
+                                onClick = {
+                                    // 스와이프된 상태에서는 클릭 시 원위치
+                                    if (offsetX.value != 0f) {
+                                        scope.launch { offsetX.animateTo(0f) }
+                                    } else {
+                                        onItemClick(item)
+                                    }
+                                },
+                                onBookmarkClicked = { onItemBookmarkClicked(item.id) },
+                                onDismissRequest = {
+                                    scope.launch {
+                                        itemVisible = false
+                                        delay(300L)
+                                        onItemDismissed(item)
+                                        // dismissState.dismiss(SwipeToDismissBoxValue.EndToStart)
                                     }
                                 }
                             )
-                            .background(MaterialTheme.colorScheme.background) // FeedCard 배경색
-                    ) {
-                        // 10. 실제 컨텐츠 (기존 FeedCard)
-                        FeedCard(
-                            id = item.id,
-                            title = item.title,
-                            categories = listOf(item.categoryValue),
-                            department = item.operatingEntity,
-                            content = item.preview,
-                            isBookmarked = item.id in bookmarkPrograms,
-                            reason = item.reason,
-                            logo =
-                                if (item.operatingEntityType == "central")
-                                    R.drawable.gov_logo
-                                else
-                                    R.drawable.local,
-                            onClick = {
-                                // 스와이프된 상태에서는 클릭 시 원위치
-                                if (offsetX.value != 0f) {
-                                    scope.launch { offsetX.animateTo(0f) }
-                                } else {
-                                    onItemClick(item)
-                                }
-                            },
-                            onBookmarkClicked = { onItemBookmarkClicked(item.id) },
-                            onDismissRequest = {
-                                scope.launch {
-                                    itemVisible = false
-                                    delay(300L)
-                                    onItemDismissed(item)
-                                    // dismissState.dismiss(SwipeToDismissBoxValue.EndToStart)
-                                }
-                            }
-                        )
+                        }
                     }
-                }
 
+                }
+            }
+            else {
+                FeedCard(
+                    id = item.id,
+                    title = item.title,
+                    categories = listOf(item.categoryValue),
+                    department = item.operatingEntity,
+                    content = item.preview,
+                    isBookmarked = item.id in bookmarkPrograms,
+                    reason = item.reason,
+                    logo =
+                        if (item.operatingEntityType == "central")
+                            R.drawable.gov_logo
+                        else
+                            R.drawable.local,
+                    onClick = { onItemClick(item) },
+                    onBookmarkClicked = { onItemBookmarkClicked(item.id) },
+                    onDismissRequest = {}
+                )
             }
 
         }
