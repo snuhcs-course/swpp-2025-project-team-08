@@ -18,16 +18,21 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
-    savedStateHandle: SavedStateHandle
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 
     data class FeedUiState(
         val feed: ProgramDetailResponse = DummyData.dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
         val isBookmarked : Boolean = false,
+        val isLiked : Boolean = false,
+        val isDisliked : Boolean = false,
         val isLoading: Boolean = false,
         val generalError : String? = null,
     )
+
+    private val _hasBookmarkChanged = MutableStateFlow(false)
+    val hasBookmarkChanged: StateFlow<Boolean> = _hasBookmarkChanged.asStateFlow()
 
 
     private val _feedUi = MutableStateFlow(FeedUiState())
@@ -80,18 +85,20 @@ class FeedViewModel @Inject constructor(
         viewModelScope.launch {
 
             val isBookmarked = feedUi.value.isBookmarked
-            val updateIsBookmarked = !isBookmarked
-            _feedUi.update {
-                it.copy(
-                    isBookmarked = updateIsBookmarked,
-                )
-            }
 
 
             val apiCall = if(isBookmarked)
                 programRepository.unbookmarkProgram(programId = feedUi.value.feed.id)
             else
                 programRepository.bookmarkProgram(feedUi.value.feed.id)
+
+
+            val updateIsBookmarked = !isBookmarked
+            _feedUi.update {
+                it.copy(
+                    isBookmarked = updateIsBookmarked,
+                )
+            }
 
             apiCall
                 .onFailure { exception ->
@@ -102,6 +109,7 @@ class FeedViewModel @Inject constructor(
                             isBookmarked = feedUi.value.isBookmarked,
                         )
                     }
+                    _hasBookmarkChanged.update { false }
                 }
                 .onSuccess { response ->
                     _feedUi.update {
@@ -109,8 +117,75 @@ class FeedViewModel @Inject constructor(
                             generalError = null,
                         )
                     }
+                    val info = Pair(feedUi.value.feed.id, updateIsBookmarked)
+                    savedStateHandle["bookmark_change_info"] = info
+                    _hasBookmarkChanged.update { true }
                 }
         }
+    }
+
+    fun toggleLike() {
+
+        viewModelScope.launch {
+            val isLiked = feedUi.value.isLiked
+            val apiCall = if(isLiked)
+                programRepository.unlikeLikeProgram(programId = feedUi.value.feed.id)
+            else
+                programRepository.likeLikeProgram(programId = feedUi.value.feed.id)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _feedUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _feedUi.update {
+                        it.copy(
+                            generalError = null,
+                            isLiked = !isLiked,
+                            isDisliked = false, // TODO - 만약 api 에서 자동으로 isLiked 상태 변경시키지 않으면 여기서도 api 호출해야되네..
+                        )
+                    }
+                }
+        }
+    }
+
+
+    fun toggleDisLike() {
+        viewModelScope.launch {
+            val isDisliked = feedUi.value.isDisliked
+            val apiCall = if(isDisliked)
+                programRepository.unlikeDislikeProgram(programId = feedUi.value.feed.id)
+            else
+                programRepository.likeDislikeProgram(programId = feedUi.value.feed.id)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _feedUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _feedUi.update {
+                        it.copy(
+                            generalError = null,
+                            isDisliked = !isDisliked,
+                            isLiked = false // TODO - 만약 api 에서 자동으로 isLiked 상태 변경시키지 않으면 여기서도 api 호출해야되네..
+                        )
+                    }
+                }
+        }
+    }
+
+    fun checkLikeStatus() {
+        // TODO -  like dislike 상태 받아오는 api 완성되면 연결시킬것. launchedEffect 로 feedscreen 들어갈 때마다 호출해서 feedUi의 isLiked/isDisliked 에 반영
     }
 
     fun applicationProgram(feedID: Int) {

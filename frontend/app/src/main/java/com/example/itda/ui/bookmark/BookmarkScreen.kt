@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.itda.data.model.Category
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.theme.scaledSp
@@ -274,8 +273,8 @@ private fun EmptyBookmarkState() {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "원하는 정책을 북마크하시면\\n여기에 표시됩니다.",
-                    fontSize = 14.scaledSp,
+                    text = "원하는 정책을 북마크하시면\n여기에 표시됩니다.",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

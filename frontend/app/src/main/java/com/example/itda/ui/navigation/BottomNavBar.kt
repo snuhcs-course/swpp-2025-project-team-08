@@ -51,6 +51,14 @@ fun BottomNavBar(navController: NavController) {
                 label = { Text(text = item.label, fontSize = 10.sp, lineHeight = 10.sp) },
                 selected = currentDestination.isCurrentRoute(item.route),
                 onClick = {
+                    if (item.route == "home" && currentDestination.isCurrentRoute(item.route)) {
+                        try {
+                            navController.getBackStackEntry("home")
+                                .savedStateHandle["refresh_home"] = true
+                        } catch (e: Exception) {
+                            // 무시
+                        }
+                    }
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
