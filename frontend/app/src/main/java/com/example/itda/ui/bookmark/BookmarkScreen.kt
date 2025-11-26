@@ -172,7 +172,7 @@ fun BookmarkSortRow(
                 text = sortOption.display,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                fontSize = 14.sp,
+                fontSize = 14.scaledSp,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onSortSelected(sortOption) }
@@ -264,7 +264,7 @@ private fun EmptyBookmarkState() {
 
                 Text(
                     text = "북마크된 정책이 없습니다",
-                    fontSize = 18.sp,
+                    fontSize = 18.scaledSp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
@@ -278,7 +278,7 @@ private fun EmptyBookmarkState() {
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 20.scaledSp
                 )
             }
         }
