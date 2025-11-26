@@ -274,7 +274,7 @@ private fun EmptyBookmarkState() {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "원하는 정책을 북마크하시면\\n여기에 표시됩니다.",
+                    text = "원하는 정책을 북마크하시면\n여기에 표시됩니다.",
                     fontSize = 14.scaledSp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
