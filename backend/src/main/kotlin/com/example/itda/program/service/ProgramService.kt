@@ -272,21 +272,31 @@ class ProgramService(
         programId: Long,
         isLike: Boolean,
     ) {
-        val programEntity = programRepository.findByIdWithWriteLock(programId) ?: throw ProgramNotFoundException()
-        val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        if (programEntity.programLikes.any { it.user.id == userEntity.id }) {
-            return
-        }
-        val programLikeEntity =
-            programLikeRepository.save(
+        val existingLike = programLikeRepository.findByUserIdAndProgramId(userId, programId)
+
+        if (existingLike != null) {
+            if (existingLike.isLike != isLike) {
+                existingLike.isLike = isLike
+            }
+        } else {
+            val userEntity =
+                userRepository.findByIdOrNull(userId)
+                    ?: throw UserNotFoundException()
+
+            val programEntity =
+                programRepository.findByIdOrNull(programId)
+                    ?: throw ProgramNotFoundException()
+
+            val newLike =
                 ProgramLikeEntity(
                     program = programEntity,
                     user = userEntity,
                     isLike = isLike,
                     createdAt = OffsetDateTime.now(),
-                ),
-            )
-        programEntity.programLikes.add(programLikeEntity)
+                )
+
+            programLikeRepository.save(newLike)
+        }
     }
 
     @Transactional
