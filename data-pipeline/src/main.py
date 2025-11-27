@@ -4,6 +4,7 @@ import argparse
 
 from datetime import datetime, timezone
 from pathlib import Path
+from pydoc import apropos
 from typing import Any, Dict, List
 from urllib.parse import quote_plus
 
@@ -147,16 +148,16 @@ def do_vectorize(args):
     ) as f_out, embedding_path_ts.open("w", encoding="utf-8") as f_out_ts, tqdm(
         total=total_bytes, desc="Vectorize", unit="B", unit_scale=True
     ) as pbar:
-        text_batch = []
+        program_batch = []
         uuid_batch = []
 
         for line in f_in:
             program = json.loads(line)
-            text_batch.append(program["details"])
+            program_batch.append(program)
             uuid_batch.append(program["uuid"])
 
-            if len(text_batch) >= batch_size:
-                vector_batch = vectorizer.run(text_batch)
+            if len(program_batch) >= batch_size:
+                vector_batch = vectorizer.run(program_batch)
 
                 if len(vector_batch) == len(uuid_batch):
                     for uuid, vector in zip(uuid_batch, vector_batch):
@@ -166,13 +167,13 @@ def do_vectorize(args):
                         f_out_ts.write(json_string)
 
                     count += len(vector_batch)
-                    text_batch = []
+                    program_batch = []
                     uuid_batch = []
 
             pbar.update(len(line.encode("utf-8")))
 
-        if text_batch and uuid_batch:
-            vector_batch = vectorizer.run(text_batch)
+        if program_batch and uuid_batch:
+            vector_batch = vectorizer.run(program_batch)
 
             if len(vector_batch) == len(uuid_batch):
                 for uuid, vector in zip(uuid_batch, vector_batch):
@@ -182,7 +183,7 @@ def do_vectorize(args):
                     f_out_ts.write(json_string)
 
                 count += len(vector_batch)
-                text_batch = []
+                program_batch = []
                 uuid_batch = []
 
     print(f"Total {count} programs are vectorized.\n")

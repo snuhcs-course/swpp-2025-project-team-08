@@ -113,7 +113,9 @@ class BokjiroLoader(Loader):
         programs = []
 
         for uuid in uuids:
-            response = self.session.get(BOKJIRO_PROGRAM_ENDPOINT.format(uuid))
+            endpoint = BOKJIRO_PROGRAM_ENDPOINT.format(uuid)
+
+            response = self.session.get(endpoint)
             response.raise_for_status()
             time.sleep(1)
 
@@ -133,6 +135,7 @@ class BokjiroLoader(Loader):
             program = json.loads(data_json["initValue"]["dmWlfareInfo"])
 
             program["program_operating_entity"] = operating
+            program["reference_url"] = endpoint
 
             programs.append(program)
 
@@ -264,12 +267,15 @@ class Subsidy24Loader(Loader):
         programs = []
 
         for uuid in uuids:
-            response = requests.get(SUBSIDY24_PROGRAM_ENDPOINT.format(uuid), timeout=10)
+            endpoint = SUBSIDY24_PROGRAM_ENDPOINT.format(uuid)
+
+            response = requests.get(endpoint, timeout=10)
             time.sleep(1)
             response.raise_for_status()
 
             program = self._trim(response)
             program["uuid"] = uuid
+            program["reference_url"] = endpoint
 
             programs.append(program)
 

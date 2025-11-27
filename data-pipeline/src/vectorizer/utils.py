@@ -1,9 +1,3 @@
-from typing import List
-
-import numpy.typing as NDArray
-from sentence_transformers import SentenceTransformer
-import torch
-
 from typing import Dict, Any
 
 GENDER_MAP = {"MALE": "남성", "FEMALE": "여성"}
@@ -54,7 +48,9 @@ def generate_program_text(program: Dict[str, Any]) -> str:
     raw_summary = program.get("summary", "")
     summary = raw_summary.replace("\n-", ". ").replace("-", "").strip()
 
-    parts.append(f"[{category_kr}] {title}. {preview}.")
+    parts.append(f"[{category_kr}] {title}. {preview}. {summary}")
+
+    parts.append("지원 대상 요건은 다음과 같습니다.")
 
     if region := program.get("eligibility_region"):
         parts.append(f"지원 대상 거주지는 {region}입니다.")
@@ -104,22 +100,3 @@ def generate_program_text(program: Dict[str, Any]) -> str:
         parts.append(f"지원 대상 가구 소득은 {min_inc}만원 이상입니다.")
 
     return " ".join(parts).strip()
-
-
-class Vectorizer:
-    def __init__(self):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"(Vectorizer) Using device: {self.device}")
-
-        self.model = SentenceTransformer("BAAI/bge-m3", device=self.device)
-
-    def run(self, programs: List[Dict[str, Any]]) -> NDArray:
-        texts = [generate_program_text(program) for program in programs]
-
-        vectors = self.model.encode(
-            texts,
-            normalize_embeddings=True,
-            show_progress_bar=False,
-        )
-
-        return vectors

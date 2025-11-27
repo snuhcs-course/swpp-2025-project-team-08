@@ -19,6 +19,7 @@ class PostgresManager:
             max_size=max_pool_size,
             kwargs={"row_factory": dict_row},
         )
+
         self.insert_sql = """
             INSERT INTO program_pending (
                 uuid, title, preview, summary, details, application_method, 
@@ -54,7 +55,8 @@ class PostgresManager:
                     try:
                         cur.execute(self.insert_sql, program)
                         inserted_count += cur.rowcount
-                    except Exception:
+                    except Exception as e:
+                        print(e)
                         with self.failure_path.open("a", encoding="utf-8") as f_out:
                             json_string = json.dumps(program, ensure_ascii=False) + "\n"
                             f_out.write(json_string)
