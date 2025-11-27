@@ -3,10 +3,12 @@ package com.example.itda.ui.profile.component
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.profile.SettingScreen
 import com.example.itda.ui.profile.SettingsViewModel
 import com.example.itda.ui.profile.component.FAQScreen
@@ -16,12 +18,29 @@ import com.example.itda.ui.profile.component.LegalDocumentScreen
 import com.example.itda.ui.profile.component.LegalDocumentFactory
 
 fun NavGraphBuilder.settingNavGraph(
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel
 ) {
     // 설정 메인 화면
     composable(route = "setting") {
         val viewModel: SettingsViewModel = hiltViewModel()
         val uiState by viewModel.settingsUi.collectAsState()
+        val isLogoutSuccess by viewModel.isLogoutSuccess.collectAsState()
+
+        // 로그아웃 성공 시 AuthViewModel 상태 업데이트 및 로그인 화면으로 이동
+        LaunchedEffect(isLogoutSuccess) {
+            if (isLogoutSuccess) {
+                // AuthViewModel의 로그인 상태를 false로 설정
+                authViewModel.setLoggedOut()
+                // 로그인 화면으로 이동
+                navController.navigate("login") {
+                    popUpTo("setting") { inclusive = true }
+                    popUpTo("main_graph") { inclusive = true }
+                }
+                // 로그아웃 상태 리셋
+                viewModel.resetLogoutState()
+            }
+        }
 
         SettingScreen(
             ui = uiState,
@@ -31,13 +50,7 @@ fun NavGraphBuilder.settingNavGraph(
             },
             toggleDarkMode = viewModel::toggleDarkMode,
             onFontSizeChange = viewModel::setFontSize,
-            onLogout = {
-                viewModel.logout()
-                // 로그아웃 후 로그인 화면으로 이동
-                navController.navigate("login") {
-                    popUpTo("setting") { inclusive = true }
-                }
-            }
+            onLogout = viewModel::logout
         )
     }
 

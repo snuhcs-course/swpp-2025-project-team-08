@@ -173,7 +173,9 @@ class AuthViewModel @Inject constructor(
             )
         }
     }
-
+    fun setLoggedOut() {
+        _isLoggedIn.value = false
+    }
     fun onSignUpConfirmChange(v: String) {
         _signUpUi.update { it.copy(confirmPassword = v, confirmPasswordError = null, generalError = null) }
     }

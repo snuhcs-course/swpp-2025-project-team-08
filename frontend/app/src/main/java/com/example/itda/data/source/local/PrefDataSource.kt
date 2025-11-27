@@ -1,6 +1,7 @@
 package com.example.itda.data.source.local
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -102,7 +103,10 @@ class PrefDataSource @Inject constructor(
         return token
     }
 
-    suspend fun getRefreshToken(): String? = refreshTokenFlow.firstOrNull()
+    suspend fun getRefreshToken(): String? {
+        val token = refreshTokenFlow.firstOrNull()
+        return token
+    }
 
     // 👇 User 캐시 가져오기
     suspend fun getUserCache(): String? = userCacheFlow.firstOrNull()
@@ -145,6 +149,8 @@ class PrefDataSource @Inject constructor(
 
     // 전체 삭제 (로그아웃)
     suspend fun clear() {
-        context.dataStore.edit { it.clear() }
+        context.dataStore.edit {
+            it.clear()
+        }
     }
 }
