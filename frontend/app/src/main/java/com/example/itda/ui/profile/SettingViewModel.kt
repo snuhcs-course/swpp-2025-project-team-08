@@ -35,6 +35,9 @@ class SettingsViewModel @Inject constructor(
     private val _settingsUi = MutableStateFlow(SettingsUiState())
     val settingsUi: StateFlow<SettingsUiState> = _settingsUi.asStateFlow()
 
+    private val _isLogoutSuccess = MutableStateFlow(false)
+    val isLogoutSuccess: StateFlow<Boolean> = _isLogoutSuccess.asStateFlow()
+
     init {
         loadSettings()
     }
@@ -73,6 +76,11 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            _isLogoutSuccess.value = true
         }
+    }
+
+    fun resetLogoutState() {
+        _isLogoutSuccess.value = false
     }
 }

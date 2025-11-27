@@ -1,5 +1,6 @@
 package com.example.itda.data.repository
 
+import android.util.Log
 import com.example.itda.data.model.AuthRequest
 import com.example.itda.data.model.PreferenceRequestList
 import com.example.itda.data.model.ProfileRequest
@@ -10,12 +11,19 @@ import com.example.itda.data.source.local.PrefDataSource
 import com.example.itda.data.source.remote.RetrofitInstance
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val pref: PrefDataSource
 ) : AuthRepository {
     private val api = RetrofitInstance.authAPI
+
+    private var isLoggingOut = false
+    private val logoutMutex = Mutex()
 
     override val isLoggedInFlow: Flow<Boolean> = pref.accessTokenFlow.map {
         !it.isNullOrBlank()
@@ -24,6 +32,11 @@ class AuthRepositoryImpl @Inject constructor(
     override fun isLoggedIn(): Flow<Boolean> = pref.isLoggedIn()
 
     override suspend fun login(email: String, password: String): Result<Unit> = runCatching {
+        logoutMutex.withLock {
+            // 로그인 하면 토큰 발급 가능
+            isLoggingOut = false
+        }
+
         val res = api.login(AuthRequest(email, password))
 
         pref.saveTokens(
@@ -35,6 +48,11 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signup(email: String, password: String): Result<Unit> = runCatching {
+        logoutMutex.withLock {
+            // 회원가입 하면 토큰 발급 가능
+            isLoggingOut = false
+        }
+
         val res = api.signup(AuthRequest(email, password))
 
         pref.saveTokens(
@@ -46,22 +64,40 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): Result<Unit> = runCatching {
-        // 서버 로그아웃 실패해도 로컬 데이터는 삭제
-        runCatching { api.logout() }
-        pref.clear()
+        logoutMutex.withLock {
+            isLoggingOut = true
+
+            // 서버 로그아웃 실패해도 로컬 데이터는 삭제
+            runCatching { api.logout() }
+            pref.clear()
+        }
     }
 
     override suspend fun getRefreshToken(): String? {
+        // 로그아웃 중이면 null 반환
+        if (isLoggingOut) {
+            return null
+        }
         return pref.getRefreshToken()
     }
 
     override suspend fun refreshToken(): Result<Unit> = runCatching {
+        // 로그아웃 중이면 토큰 갱신하지 않음
+        if (isLoggingOut) {
+            throw Exception("Logout in progress")
+        }
+
         val refreshToken = pref.getRefreshToken()
             ?: throw Exception("No refresh token available")
 
         val res = api.refreshToken(
             RefreshTokenRequest(refreshToken)
         )
+
+        // 토큰 저장 전에 다시 한번 로그아웃 상태 확인
+        if (isLoggingOut) {
+            throw Exception("Logout in progress")
+        }
 
         pref.saveTokens(
             access = res.accessToken,

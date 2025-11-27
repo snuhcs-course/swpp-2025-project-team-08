@@ -169,8 +169,10 @@ fun NavGraphBuilder.mainGraph(
                 }
             )
         }
-
-        settingNavGraph(navController)
+        settingNavGraph(
+            navController = navController,
+            authViewModel = authViewModel
+        )
     }
 }
 
