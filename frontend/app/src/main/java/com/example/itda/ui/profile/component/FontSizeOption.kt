@@ -40,13 +40,13 @@ fun FontSizeOption(
             )
             .clickable(onClick = onClick)
             .height(72.dp)
-            .padding(vertical = 12.dp, horizontal = 8.dp),
+            .padding(vertical = 10.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = fontSize.displayName,
-            fontSize = (14 * fontSize.scale * fontSize.scale * fontSize.scale).sp,
+            fontSize = (14 * fontSize.scale * fontSize.scale).sp,
             color = if (isSelected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
