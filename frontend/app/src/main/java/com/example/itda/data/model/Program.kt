@@ -50,9 +50,9 @@ data class ProgramResponse(
     val operatingEntityType : String,
     val category : String,
     val categoryValue: String,
-    val likeStatus : String?, // LIKED, DISLIKED, null
-    val isBookmarked : Boolean,
-    val reason : String?,
+    val likeStatus : String? = null, // LIKED, DISLIKED, null
+    val isBookmarked : Boolean =  false,
+    val reason : String? = null,
 )
 
 data class ProgramDetailResponse(
