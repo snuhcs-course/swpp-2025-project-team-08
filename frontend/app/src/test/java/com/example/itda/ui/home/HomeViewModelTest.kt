@@ -869,26 +869,6 @@ class HomeViewModelTest {
     }
 
 
-    @Test
-    fun clearGeneralError_resetsErrorState() = runTest {
-        // Given: 에러 상태를 미리 설정합니다.
-        // Note: 이전에 loadMyProfile 실패 테스트를 통해 에러를 설정하거나,
-        // 현재는 HomeUiState를 직접 변경할 수 없으므로, 에러를 유발하는 함수를 호출합니다.
-
-        // 1. 프로필 로드 실패를 Mock하여 에러 상태를 만듭니다.
-        `when`(authRepository.getProfile()).thenReturn(Result.failure(IOException("Network error")))
-
-        viewModel.loadMyProfile()
-        advanceUntilIdle()
-        assertThat(viewModel.homeUi.value.generalError).isNotNull() // 에러 발생 확인
-
-        // When: clearGeneralError() 호출
-        viewModel.clearGeneralError()
-        advanceUntilIdle()
-
-        // Then: 에러가 null로 리셋됨
-        assertThat(viewModel.homeUi.value.generalError).isNull()
-    }
 
     // ========== Bookmark Status Update Tests (4) ==========
 

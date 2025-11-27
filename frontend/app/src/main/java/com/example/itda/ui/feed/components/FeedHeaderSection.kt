@@ -111,12 +111,14 @@ fun FeedHeaderSection(
                     StatusTag(tag, StatusType.PRIMARY)
                 }
             }
-            LikeButtonRow(
-                toggleLike = toggleLike,
-                isLiked = isLiked,
-                toggleDisLike = toggleDisLike,
-                isDisliked = isDisliked,
-            )
+            if(!isExample) {
+                LikeButtonRow(
+                    toggleLike = toggleLike,
+                    isLiked = isLiked,
+                    toggleDisLike = toggleDisLike,
+                    isDisliked = isDisliked,
+                )
+            }
         }
     }
 }

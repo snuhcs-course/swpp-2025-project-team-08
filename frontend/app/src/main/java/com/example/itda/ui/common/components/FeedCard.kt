@@ -158,7 +158,6 @@ fun FeedCard(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                //if (isEligible) StatusTag("신청 대상자", StatusType.POSITIVE) // 신청 대상자 버튼
             }
 
             Spacer(modifier = Modifier.height(8.dp))

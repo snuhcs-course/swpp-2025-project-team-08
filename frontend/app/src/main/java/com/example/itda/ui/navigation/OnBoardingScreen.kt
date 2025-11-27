@@ -44,9 +44,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.itda.R
-import com.example.itda.ui.common.theme.Neutral100
 import com.example.itda.ui.common.theme.Neutral30
-import com.example.itda.ui.common.theme.Neutral80
 import com.example.itda.ui.common.theme.Primary50
 import com.example.itda.ui.common.theme.scaledSp
 
@@ -97,6 +95,7 @@ fun OnBoardingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .padding(vertical = 32.dp)
     ) {
         with(density) {
             // 2. 🚀 Box 컴포저블 전체
