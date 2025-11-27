@@ -75,15 +75,18 @@ fun FeedCard(
                         )
                 ) {
                     Text(
-                        text = reason,
-                        // 폰트 스타일: bodySmall, 얇은 두께
+                        text =
+                            if("bookmark" in reason)
+                                "⭐ 북마크한 정책들과 비슷해요."
+                            else
+                                "♥️ 비슷한 정책을 좋아하셨어요!",
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.tertiary
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
