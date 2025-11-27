@@ -38,4 +38,40 @@ interface BookmarkRepository : JpaRepository<BookmarkEntity, Long> {
         @Param("user") user: UserEntity,
         pageable: Pageable,
     ): Page<BookmarkEntity>
+
+    @Query(
+        """
+        SELECT b.program.id
+        FROM BookmarkEntity b
+        WHERE b.user.id = :userId
+        AND b.program.id IN :programIds""",
+    )
+    fun findBookmarkedProgramIds(
+        userId: String,
+        programIds: List<Long>,
+    ): List<Long>
+
+    @Query(
+        """
+        SELECT p.embedding 
+        FROM BookmarkEntity b 
+        JOIN b.program p 
+        WHERE b.user.id = :userId 
+        ORDER BY b.createdAt DESC
+    """,
+    )
+    fun findRecentEmbeddingsByUserId(
+        userId: String,
+        pageable: Pageable,
+    ): List<FloatArray>
+
+    fun existsByUserIdAndProgramId(
+        userId: String,
+        programId: Long,
+    ): Boolean
+
+    fun findByUserIdAndProgramId(
+        userId: String,
+        programId: Long,
+    ): BookmarkEntity?
 }

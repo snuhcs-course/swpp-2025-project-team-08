@@ -94,7 +94,11 @@ class ProgramTest(
         val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
 
         dataGenerator.saveProgram("Cash Program", FloatArray(testEmbeddingDimension), category = ProgramCategory.CASH)
-        dataGenerator.saveProgram("Health Program", FloatArray(testEmbeddingDimension), category = ProgramCategory.HEALTH)
+        dataGenerator.saveProgram(
+            "Health Program",
+            FloatArray(testEmbeddingDimension),
+            category = ProgramCategory.HEALTH,
+        )
 
         mockMvc.perform(
             get("/api/v1/programs")
@@ -114,11 +118,15 @@ class ProgramTest(
     @Test
     @Transactional
     fun `getProgram API는 유효한 ID로 프로그램 상세 정보를 반환해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("getDetail")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
         val program = dataGenerator.saveProgram("Detail Test Program", FloatArray(testEmbeddingDimension))
         val programId = program.id
 
         mockMvc.perform(
             get("/api/v1/programs/{id}", programId)
+                .header("Authorization", "Bearer $token") // <--- ADD THIS
                 .contentType(MediaType.APPLICATION_JSON),
         )
             .andExpect(status().isOk)
@@ -177,12 +185,24 @@ class ProgramTest(
     @Test
     @Transactional
     fun `searchLatestPrograms API는 검색어와 카테고리 필터로 최신순 프로그램 목록을 반환해야 한다`() {
-        dataGenerator.saveProgram("Job Searching Service", FloatArray(testEmbeddingDimension), category = ProgramCategory.EMPLOYMENT)
-        dataGenerator.saveProgram("Employment Support", FloatArray(testEmbeddingDimension), category = ProgramCategory.EMPLOYMENT)
+        val testEmail = dataGenerator.generateUniqueEmail("searchLatest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        dataGenerator.saveProgram(
+            "Job Searching Service",
+            FloatArray(testEmbeddingDimension),
+            category = ProgramCategory.EMPLOYMENT,
+        )
+        dataGenerator.saveProgram(
+            "Employment Support",
+            FloatArray(testEmbeddingDimension),
+            category = ProgramCategory.EMPLOYMENT,
+        )
         dataGenerator.saveProgram("Housing Aid", FloatArray(testEmbeddingDimension), category = ProgramCategory.HOUSING)
 
         mockMvc.perform(
             get("/api/v1/programs/search/latest")
+                .header("Authorization", "Bearer $token") // <--- 2. Add this line!
                 .param("query", "Employment")
                 .param("category", "EMPLOYMENT")
                 .param("page", "0")
@@ -197,11 +217,19 @@ class ProgramTest(
     @Test
     @Transactional
     fun `searchProgramsByRank API는 검색어와 카테고리 필터로 랭크순 프로그램 목록을 반환해야 한다`() {
-        dataGenerator.saveProgram("Health Checkup", FloatArray(testEmbeddingDimension), category = ProgramCategory.HEALTH)
+        val testEmail = dataGenerator.generateUniqueEmail("searchRank")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        dataGenerator.saveProgram(
+            "Health Checkup",
+            FloatArray(testEmbeddingDimension),
+            category = ProgramCategory.HEALTH,
+        )
         dataGenerator.saveProgram("Care Service", FloatArray(testEmbeddingDimension), category = ProgramCategory.CARE)
 
         mockMvc.perform(
             get("/api/v1/programs/search/rank")
+                .header("Authorization", "Bearer $token") // <--- 2. Add this line!
                 .param("query", "Service")
                 .param("page", "0")
                 .param("size", "10")
@@ -210,19 +238,22 @@ class ProgramTest(
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content.length()").value(1))
     }
-
     // --- Exceptions ---
 
     @Test
     @Transactional
     fun `getProgram API는 존재하지 않는 ID로 요청 시 ProgramNotFoundException을 반환해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("notFoundTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
         val nonExistentId = 99999L
 
         mockMvc.perform(
             get("/api/v1/programs/{id}", nonExistentId)
+                .header("Authorization", "Bearer $token") // <--- ADD THIS
                 .contentType(MediaType.APPLICATION_JSON),
         )
-            .andExpect(status().isNotFound)
+            .andExpect(status().isNotFound) // Now this will pass
             .andExpect(jsonPath("$.message").value("Program not found"))
     }
 }

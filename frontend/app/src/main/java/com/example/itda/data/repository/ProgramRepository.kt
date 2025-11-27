@@ -1,7 +1,6 @@
 package com.example.itda.data.repository
 
 import com.example.itda.data.model.PageResponse
-import com.example.itda.data.model.Program
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
@@ -16,7 +15,6 @@ interface ProgramRepository {
 
     suspend fun getExampleDetails(exampleId: Int): Result<ProgramDetailResponse>
 
-    fun getFeedList(): List<Program>
 
     suspend fun searchByRank(
         query: String,
@@ -39,4 +37,11 @@ interface ProgramRepository {
 
     suspend fun unbookmarkProgram(programId: Int): Result<Unit>
 
+
+    suspend fun likeLikeProgram(programId: Int): Result<Unit>
+
+    suspend fun unlikeLikeProgram(programId: Int): Result<Unit>
+    suspend fun likeDislikeProgram(programId: Int): Result<Unit>
+
+    suspend fun unlikeDislikeProgram(programId: Int): Result<Unit>
 }

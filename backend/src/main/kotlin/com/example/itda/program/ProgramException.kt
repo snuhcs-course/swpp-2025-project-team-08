@@ -13,3 +13,8 @@ class ProgramNotFoundException : ProgramException(
     code = HttpStatus.NOT_FOUND,
     message = "Program not found",
 )
+
+class EmbeddingException : ProgramException(
+    code = HttpStatus.INTERNAL_SERVER_ERROR,
+    message = "Embedding dimension is invalid",
+)

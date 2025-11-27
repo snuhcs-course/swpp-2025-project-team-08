@@ -1,8 +1,7 @@
 package com.example.itda.data.repository
 
-import com.example.itda.data.model.DummyData
+import coil.network.HttpException
 import com.example.itda.data.model.PageResponse
-import com.example.itda.data.model.Program
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
@@ -28,11 +27,6 @@ class ProgramRepositoryImpl @Inject constructor(
 
     override suspend fun getExampleDetails(exampleId: Int): Result<ProgramDetailResponse> = runCatching {
         api.getExampleDetails(exampleId)
-    }
-
-    // TODO - 임시 함수. User에 맞는 program list를 전부 불러오는 함수. 현재는 dummyFeedList 불러오기
-    override fun getFeedList(): List<Program> {
-        return DummyData.dummyFeedItems
     }
 
     override suspend fun searchByRank(
@@ -68,11 +62,57 @@ class ProgramRepositoryImpl @Inject constructor(
     }
 
     override suspend fun bookmarkProgram(programId: Int): Result<Unit> = runCatching {
-        api.bookmarkProgram(programId)
+        val response = api.bookmarkProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
     }
 
     override suspend fun unbookmarkProgram(programId: Int): Result<Unit> = runCatching  {
-        api.unbookmarkProgram(programId)
+        val response = api.unbookmarkProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+
+    override suspend fun likeLikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.likeLikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+    override suspend fun unlikeLikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.unlikeLikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+    override suspend fun likeDislikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.likeDislikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
+    }
+
+    override suspend fun unlikeDislikeProgram(programId: Int): Result<Unit> = runCatching  {
+        val response = api.unlikeDislikeProgram(programId)
+        if (response.isSuccessful) {
+            Unit
+        } else {
+            throw HttpException(response.raw())
+        }
     }
 
     override suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>> {

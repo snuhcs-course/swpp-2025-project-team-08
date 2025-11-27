@@ -7,10 +7,12 @@ import com.example.itda.data.model.PageResponse
 import com.example.itda.data.model.ProgramResponse
 import com.example.itda.data.model.dummyCategories
 import com.example.itda.data.repository.ProgramRepository
+import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +35,7 @@ class SearchViewModel @Inject constructor(
         val isSearching: Boolean = false,
         val hasSearched: Boolean = false,
         val searchResults: List<ProgramResponse> = emptyList(),
+        val bookmarkPrograms : List<Int> = emptyList<Int>(),
         val totalElements: Int = 0,
         val currentPage: Int = 0,
         val sortType: SortType = SortType.RANK,
@@ -202,7 +205,7 @@ class SearchViewModel @Inject constructor(
                 }
 
                 handleSearchResults(response, isLoadMore, page)
-
+                initBookmarkList()
 
 
             } catch (e: Exception) {
@@ -212,6 +215,95 @@ class SearchViewModel @Inject constructor(
                     generalError = "검색 중 오류가 발생했습니다: ${e.message}"
                 )
             }
+        }
+    }
+
+
+
+    fun updateBookmarkStatusInList(feedId: Int, isBookmarked: Boolean) {
+        _uiState.update { currentState ->
+            val currentBookmarks = currentState.bookmarkPrograms
+            val newBookmarks = if (isBookmarked) {
+                (currentBookmarks + feedId).distinct() // 북마크 설정 및 중복 방지
+            } else {
+                currentBookmarks - feedId // 북마크 해제
+            }
+            currentState.copy(
+                bookmarkPrograms = newBookmarks, // UI 상태의 북마크 목록을 업데이트
+            )
+        }
+    }
+
+    fun initBookmarkList() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(
+                isSearching = true,
+                bookmarkPrograms = emptyList()
+            ) }
+
+            val allBookmarkPrograms = programRepository.getAllUserBookmarks()
+            allBookmarkPrograms
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _uiState.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            isSearching = false,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _uiState.update {
+                        it.copy(
+                            // generalError = null,
+                            bookmarkPrograms = response.map { it.id },
+                            isSearching = false,
+                        )
+                    }
+                }
+        }
+    }
+
+    fun onFeedBookmarkClicked(id: Int) {
+        viewModelScope.launch {
+
+            // 1. UI 에서 즉시 북마크 상태를 토글합니다.
+            val isBookmarked = id in uiState.value.bookmarkPrograms
+            val updatedBookmarkPrograms = if (isBookmarked) {
+                uiState.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+            } else {
+                uiState.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+            }
+
+
+            // 3. API 호출
+            val apiCall = if(isBookmarked)
+                programRepository.unbookmarkProgram(id)
+            else
+                programRepository.bookmarkProgram(id)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    // 4. API 실패 시, UI 상태를 원래대로 되돌립니다.
+                    _uiState.update {
+                        it.copy(
+                            generalError = apiError.message,
+                            bookmarkPrograms = uiState.value.bookmarkPrograms,
+                        )
+                    }
+
+                }
+                .onSuccess { response ->
+                    // 5. API 성공
+                    _uiState.update {
+                        it.copy(
+                            generalError = null,
+                            bookmarkPrograms = updatedBookmarkPrograms
+                        )
+                    }
+
+                }
         }
     }
 }

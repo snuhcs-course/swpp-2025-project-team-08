@@ -13,18 +13,37 @@ data class ProgramSummaryResponse(
     val operatingEntityType: String,
     val category: String,
     val categoryValue: String,
+    val likeStatus: String?,
+    val isBookmarked: Boolean,
+    val reason: String?,
 ) {
     companion object {
-        fun fromEntity(entity: ProgramEntity): ProgramSummaryResponse =
-            ProgramSummaryResponse(
-                id = entity.id!!,
+        fun fromEntity(
+            entity: ProgramEntity,
+            isBookmarked: Boolean = false,
+            likeStatus: Boolean? = null,
+            reason: String? = null,
+        ): ProgramSummaryResponse {
+            val likeStatusString =
+                when (likeStatus) {
+                    true -> "LIKED"
+                    false -> "DISLIKED"
+                    null -> null
+                }
+
+            return ProgramSummaryResponse(
+                id = entity.id,
                 title = entity.title,
                 preview = entity.preview,
                 operatingEntity = entity.operatingEntity,
                 operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
+                likeStatus = likeStatusString,
+                isBookmarked = isBookmarked,
+                reason = reason,
             )
+        }
 
         fun fromEntity(entity: ProgramExampleEntity): ProgramSummaryResponse =
             ProgramSummaryResponse(
@@ -35,6 +54,9 @@ data class ProgramSummaryResponse(
                 operatingEntityType = entity.operatingEntityType.toString().lowercase(),
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
+                likeStatus = null,
+                isBookmarked = false,
+                reason = null,
             )
     }
 }
@@ -67,11 +89,24 @@ data class ProgramResponse(
     val createdAt: OffsetDateTime?,
     val operatingEntity: String,
     val operatingEntityType: String,
+    val likeStatus: String? = null,
+    val isBookmarked: Boolean = false,
 ) {
     companion object {
-        fun fromEntity(entity: ProgramEntity): ProgramResponse =
-            ProgramResponse(
-                id = entity.id!!,
+        fun fromEntity(
+            entity: ProgramEntity,
+            likeStatus: Boolean?,
+            isBookmarked: Boolean,
+        ): ProgramResponse {
+            val likeStatusString =
+                when (likeStatus) {
+                    true -> "LIKED"
+                    false -> "DISLIKED"
+                    null -> null
+                }
+
+            return ProgramResponse(
+                id = entity.id,
                 uuid = entity.uuid,
                 category = entity.category.toString().lowercase(),
                 categoryValue = entity.category.value,
@@ -98,7 +133,10 @@ data class ProgramResponse(
                 createdAt = entity.createdAt,
                 operatingEntity = entity.operatingEntity,
                 operatingEntityType = entity.operatingEntityType.toString().lowercase(),
+                likeStatus = likeStatusString,
+                isBookmarked = isBookmarked,
             )
+        }
 
         fun fromEntity(entity: ProgramExampleEntity): ProgramResponse =
             ProgramResponse(

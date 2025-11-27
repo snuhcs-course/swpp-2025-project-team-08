@@ -38,10 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.itda.ui.common.theme.scaledSp
 import com.example.itda.ui.navigation.LoadingScreen
 import kotlinx.coroutines.delay
-import com.example.itda.ui.common.theme.*
 
 @Composable
 fun FeedSummaryCard(
@@ -80,7 +79,7 @@ fun FeedSummaryCard(
     val textGradientAnimatable = remember { Animatable(-1000f) }
     // 컴포저블이 처음 로드될 때 로딩을 시뮬레이션하고, 일정 시간 후 해제합니다.
     LaunchedEffect(Unit) {
-        delay(1000) // 1초 로딩 시뮬레이션
+        delay(300) // 0.3초 로딩 시뮬레이션
         isLoading = false
         // 로딩이 끝난 후, 텍스트 스윕 애니메이션 실행
         textGradientAnimatable.animateTo(
@@ -105,7 +104,6 @@ fun FeedSummaryCard(
         end = Offset(textGradientAnimatable.value + 200f, textGradientAnimatable.value + 200f)
     )
 
-    // 조건부 스타일: Sweep이 끝났는지에 따라 Brush 또는 Color를 사용합니다.
     val currentStyle = if (isSweepFinished) {
 
         SpanStyle(MaterialTheme.colorScheme.onSurface)
@@ -118,8 +116,8 @@ fun FeedSummaryCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                width = 2.dp, // 테두리 두께를 살짝 굵게 설정
-                brush = animatedGradient, // 정의된 그라데이션 브러시 적용
+                width = 2.dp,
+                brush = animatedGradient,
                 shape = RoundedCornerShape(12.dp)
             ),
         shape = RoundedCornerShape(12.dp),
@@ -148,40 +146,20 @@ fun FeedSummaryCard(
             else {
                 AnimatedVisibility(
                     visible = !isLoading,
-                    enter = fadeIn(animationSpec = tween(durationMillis = 1500)) // 1초 동안 페이드인
+                    enter = fadeIn(animationSpec = tween(durationMillis = 1500))
                 ) {
                     Text(
                         modifier = Modifier.padding(12.dp),
                         text = buildAnnotatedString {
                             withStyle(style = currentStyle) {
                                 append(content) // 👈 인자로 받은 content를 여기에 넣습니다.
-                            }
-                        },
+                            } },
                         style = TextStyle(
                             fontSize = 16.scaledSp,
                             lineHeight = 20.scaledSp,
                             textAlign = TextAlign.Left,
-                        )
+                            )
                     )
-//                    if (!isSweepFinished) {
-//                        // Markdown 텍스트를 AnnotatedString으로 변환하여 Sweep 적용
-//
-//                    }
-                    // 2. Sweep 애니메이션이 끝났을 때 (MarkdownText 사용)
-//                    else {
-//                        MarkdownText(
-//                            modifier = Modifier.padding(12.dp),
-//                            markdown = content, // 👈 인자로 받은 content를 markdown 인자에 넣습니다.
-//                            style = TextStyle(
-//                                color = MaterialTheme.colorScheme.onSurface,
-//                                fontSize = 16.sp,
-//                                lineHeight = 20.sp,
-//                                textAlign = TextAlign.Left,
-//                            ),
-//                            // text = buildAnnotatedString { ... } 부분을 제거합니다.
-//                        )
-//                    }
-
                 }
             }
         }

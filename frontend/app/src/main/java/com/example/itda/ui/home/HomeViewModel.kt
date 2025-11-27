@@ -10,9 +10,12 @@ import com.example.itda.data.repository.ProgramRepository
 import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,26 +29,35 @@ class HomeViewModel @Inject constructor(
     data class HomeUiState(
         val userId: String = "", // 사용자 정보
         val username: String = "", // 사용자 정보
+
         val categories: List<Category> = dummyCategories, // 필터 카테고리
         val selectedCategory: Category = Category("","전체"), // 선택된 카테고리
         val feedItems: List<ProgramResponse> = emptyList(), // 메인 피드 목록 (ProgramRepository에서 가져올 데이터)
+
         val currentPage: Int = 0,               // 현재 페이지 번호 (0부터 시작)
         val isLastPage: Boolean = false,        // 마지막 페이지 여부
         val totalPages: Int = 0,                // 전체 페이지 수
         val totalElements : Int = 0,             // 전체 정책 수
+        val bookmarkPrograms : List<Int> = emptyList<Int>(),
+
         val isPaginating : Boolean = false,
         val isLoading: Boolean = false,
+        val isRefreshing: Boolean = false,
         val isLoadingBookmark : Boolean = false,
+
         val loadDataCount : Int = 0,
         val loadProfileCount : Int = 0,
         val loadNextCount : Int = 0,
-        val isRefreshing: Boolean = false,
+
         val generalError: String? = null,
-        val bookmarkPrograms : List<Int> = emptyList<Int>()
+
     )
 
     private val _homeUi = MutableStateFlow(HomeUiState())
     val homeUi: StateFlow<HomeUiState> = _homeUi.asStateFlow()
+
+    private val _scrollToTopEvent = Channel<Unit>(Channel.BUFFERED)
+    val scrollToTopEvent = _scrollToTopEvent.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -55,13 +67,33 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun clearGeneralError() {
+        _homeUi.update { it.copy(generalError = null) }
+    }
+
+
 
     fun refreshHomeData() {
         viewModelScope.launch {
-            _homeUi.update { it.copy(isRefreshing = true) }
-            loadHomeData() // TODO - 그냥 load 가 아니라 메트릭을 조정해서 더 나은 결과 / 더 넓은 추천범위로 load 하는 방식 고민중
-            initBookmarkList()
-            _homeUi.update { it.copy(isRefreshing = false) }
+
+            if(homeUi.value.isRefreshing == false) {
+                _homeUi.update { it.copy(isRefreshing = true) }
+                try {
+                    // 이 두 함수가 SUSPEND 함수여야만 다음 줄로 넘어가기 전에 대기합니다.
+                    loadHomeData()
+                    initBookmarkList()
+
+                    // 데이터 로드가 성공적으로 완료된 후에만 스크롤 이벤트 전송
+                    _scrollToTopEvent.send(Unit)
+                    delay(300)
+
+                } catch (e: Exception) {
+                    // 에러 처리
+                    _homeUi.update { it.copy(generalError = e.message) }
+                } finally {
+                    _homeUi.update { it.copy(isRefreshing = false) }
+                }
+            }
         }
     }
 
@@ -94,7 +126,7 @@ class HomeViewModel @Inject constructor(
     }
 
     // 홈 화면에 필요한 모든 데이터를 로드
-    private fun loadHomeData() {
+    private suspend fun loadHomeData() {
 
 
         viewModelScope.launch {
@@ -135,6 +167,20 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun updateBookmarkStatusInList(feedId: Int, isBookmarked: Boolean) {
+        _homeUi.update { currentState ->
+            val currentBookmarks = currentState.bookmarkPrograms
+            val newBookmarks = if (isBookmarked) {
+                (currentBookmarks + feedId).distinct() // 북마크 설정 및 중복 방지
+            } else {
+                currentBookmarks - feedId // 북마크 해제
+            }
+            currentState.copy(
+                bookmarkPrograms = newBookmarks, // UI 상태의 북마크 목록을 업데이트
+            )
         }
     }
 
@@ -187,7 +233,7 @@ class HomeViewModel @Inject constructor(
             )
         }
 
-        loadHomeData()
+        refreshHomeData()
     }
 
     fun initBookmarkList() {
@@ -233,13 +279,10 @@ class HomeViewModel @Inject constructor(
             // 1. UI 에서 즉시 북마크 상태를 토글합니다.
             val isBookmarked = id in homeUi.value.bookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
-                homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+                _homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
             } else {
-                homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+                _homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
-
-            // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백을 제공
-            _homeUi.update { it.copy(bookmarkPrograms = updatedBookmarkPrograms) }
 
 
             // 3. API 호출
@@ -259,13 +302,39 @@ class HomeViewModel @Inject constructor(
                             bookmarkPrograms = homeUi.value.bookmarkPrograms,
                         )
                     }
+
                 }
                 .onSuccess { response ->
-                    // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
+                    // 5. API 성공
                     _homeUi.update {
                         it.copy(
                             generalError = null,
                             isLoadingBookmark = false,
+                            bookmarkPrograms = updatedBookmarkPrograms
+                        )
+                    }
+
+                }
+        }
+    }
+
+    fun feedDisLike(programId : Int) {
+        viewModelScope.launch {
+            val apiCall = programRepository.likeDislikeProgram(programId = programId)
+
+            apiCall
+                .onFailure { exception ->
+                    val apiError = ApiErrorParser.parseError(exception)
+                    _homeUi.update {
+                        it.copy(
+                            generalError = apiError.message,
+                        )
+                    }
+                }
+                .onSuccess { response ->
+                    _homeUi.update {
+                        it.copy(
+                            generalError = null,
                         )
                     }
                 }

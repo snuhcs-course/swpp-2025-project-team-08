@@ -8,6 +8,7 @@ import com.example.itda.data.model.ProgramResponse
 import com.example.itda.data.repository.ProgramRepository
 import com.example.itda.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -17,7 +18,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.mockito.kotlin.any
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -37,6 +37,13 @@ class SearchViewModelTest {
 
     @Before
     fun setup() {
+        // NPE 방지를 위해 getAllUserBookmarks에 대한 기본 목킹 추가
+        // SearchViewModel의 onSearch()가 initBookmarkList()를 호출하므로,
+        // 이를 호출하는 모든 테스트가 안정적으로 동작하도록 합니다.
+        runTest {
+            Mockito.`when`(programRepository.getAllUserBookmarks())
+                .thenReturn(Result.success(emptyList()))
+        }
         viewModel = SearchViewModel(programRepository)
     }
 
@@ -686,6 +693,177 @@ class SearchViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.recentSearches).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun initBookmarkList_success_updatesBookmarkPrograms() = runTest {
+        val mockBookmarks = listOf(
+            ProgramResponse(1, "p1", "pv1", "op1", "ot1", "c1", "cv1"),
+            ProgramResponse(5, "p5", "pv5", "op5", "ot5", "c5", "cv5")
+        )
+
+        // Mock the specific call, overriding the one in setup()
+        Mockito.`when`(programRepository.getAllUserBookmarks())
+            .thenReturn(Result.success(mockBookmarks))
+
+        viewModel.initBookmarkList()
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).containsExactly(1, 5)
+            assertThat(state.isSearching).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun initBookmarkList_failure_setsGeneralError() = runTest {
+        val networkException = RuntimeException("Network issue")
+
+        // Mock the specific call, overriding the one in setup()
+        Mockito.`when`(programRepository.getAllUserBookmarks())
+            .thenReturn(Result.failure(networkException))
+
+        viewModel.initBookmarkList()
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.generalError).contains("알 수 없는 오류가 발생했습니다")
+            assertThat(state.isSearching).isFalse()
+            assertThat(state.bookmarkPrograms).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun updateBookmarkStatusInList_updates_correctly() = runTest {
+        // 1. Add ID 1
+        viewModel.updateBookmarkStatusInList(1, true)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).containsExactly(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // 2. Add ID 2
+        viewModel.updateBookmarkStatusInList(2, true)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).containsExactly(1, 2)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // 3. Remove ID 1
+        viewModel.updateBookmarkStatusInList(1, false)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).containsExactly(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // 4. Try to remove non-existent ID 3 (should remain [2])
+        viewModel.updateBookmarkStatusInList(3, false)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).containsExactly(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun onFeedBookmarkClicked_bookmark_success() = runTest {
+        val programId = 100
+
+        // Mock API success for bookmark
+        Mockito.`when`(programRepository.bookmarkProgram(programId)).thenReturn(Result.success(Unit))
+
+        viewModel.onFeedBookmarkClicked(programId)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).contains(programId)
+            assertThat(state.generalError).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Verify API was called
+        Mockito.verify(programRepository).bookmarkProgram(programId)
+        Mockito.verify(programRepository, Mockito.never()).unbookmarkProgram(programId)
+    }
+
+    @Test
+    fun onFeedBookmarkClicked_unbookmark_success() = runTest {
+        val programId = 101
+
+        // Simulating the state having the bookmark initially
+        viewModel.updateBookmarkStatusInList(programId, true)
+
+        // Mock API success for unbookmark
+        Mockito.`when`(programRepository.unbookmarkProgram(programId)).thenReturn(Result.success(Unit))
+
+        viewModel.onFeedBookmarkClicked(programId)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.bookmarkPrograms).doesNotContain(programId)
+            assertThat(state.generalError).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Verify API was called
+        Mockito.verify(programRepository).unbookmarkProgram(programId)
+        Mockito.verify(programRepository, Mockito.never()).bookmarkProgram(programId)
+    }
+
+    @Test
+    fun onFeedBookmarkClicked_bookmark_failure_revertsState() = runTest {
+        val programId = 102
+
+        // Initial state: not bookmarked
+
+        // Mock API failure for bookmark
+        val exception = RuntimeException("Auth error")
+        Mockito.`when`(programRepository.bookmarkProgram(programId)).thenReturn(Result.failure(exception))
+
+        viewModel.onFeedBookmarkClicked(programId)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            // State should revert to not bookmarked (initial state)
+            assertThat(state.bookmarkPrograms).doesNotContain(programId)
+            // Generic RuntimeException은 Unknown Error로 처리됩니다.
+            assertThat(state.generalError).contains("알 수 없는 오류가 발생했습니다")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun onFeedBookmarkClicked_unbookmark_failure_revertsState() = runTest {
+        val programId = 103
+
+        // Initial state: bookmarked
+        viewModel.updateBookmarkStatusInList(programId, true)
+
+        // Mock API failure for unbookmark
+        val exception = RuntimeException("Auth error")
+        Mockito.`when`(programRepository.unbookmarkProgram(programId)).thenReturn(Result.failure(exception))
+
+        viewModel.onFeedBookmarkClicked(programId)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            // State should revert to bookmarked
+            assertThat(state.bookmarkPrograms).contains(programId)
+            // Generic RuntimeException은 Unknown Error로 처리됩니다.
+            assertThat(state.generalError).contains("알 수 없는 오류가 발생했습니다")
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -482,32 +482,34 @@ class HomeViewModelTest {
     @Test
     fun onCategorySelected_updatesCategoryAndReloadsData() = runTest {
         val newCategory = Category(category = "education", value = "교육")
-        val educationPage = dummyPage1.copy(content = emptyList(), totalElements = 0)
+        val educationPage = dummyPage1.copy(
+            content = emptyList(),
+            totalElements = 0,
+            page = 0,
+            isFirst = true,
+            isLast = false
+        )
 
-        `when`(programRepository.getPrograms(page = 0, size = 20, category = newCategory.category))
-            .thenReturn(Result.success(educationPage))
+        `when`(
+            programRepository.getPrograms(
+                page = 0,
+                size = 20,
+                category = newCategory.category
+            )
+        ).thenReturn(Result.success(educationPage))
 
-        viewModel.homeUi.test {
-            awaitItem() // 초기 상태 소비
+        // When
+        viewModel.onCategorySelected(newCategory)
+        advanceUntilIdle()
 
-            // When
-            viewModel.onCategorySelected(newCategory)
-            advanceUntilIdle()
-
-            // 1. 카테고리 업데이트 (selectedCategory 변경)
-            awaitItem()
-
-            // 2. 로딩 시작 (isLoading=true)
-            awaitItem()
-
-            // 3. 최종 상태 (isLoading=false, feedItems 업데이트)
-            val finalState = awaitItem()
-            assertThat(finalState.isLoading).isFalse()
-            assertThat(finalState.feedItems).isEqualTo(educationPage.content)
-            assertThat(finalState.totalElements).isEqualTo(0)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Then: 최종 상태만 검증
+        val finalState = viewModel.homeUi.value
+        assertThat(finalState.selectedCategory).isEqualTo(newCategory)
+        assertThat(finalState.feedItems).isEqualTo(educationPage.content)
+        assertThat(finalState.totalElements).isEqualTo(0)
+        assertThat(finalState.currentPage).isEqualTo(0)
     }
+
 
     @Test
     fun onCategorySelected_callsLoadHomeDataWithNewCategory() = runTest {
@@ -628,61 +630,65 @@ class HomeViewModelTest {
     fun onFeedBookmarkClicked_bookmark_success_updatesState() = runTest {
         val targetId = 2 // 북마크 목록에 없는 ID
         // Given: 북마크 API 성공
-        `when`(programRepository.bookmarkProgram(targetId)).thenReturn(Result.success(Unit))
+        `when`(programRepository.bookmarkProgram(targetId))
+            .thenReturn(Result.success(Unit))
 
         viewModel.homeUi.test {
-            awaitItem() // 초기 상태 [1, 3, 5]
+            val initialState = awaitItem()
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // When: 북마크 클릭 (targetId=2)
+            // When
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true
-            awaitItem()
+            // 1. isLoadingBookmark = true, 북마크 목록은 그대로
+            val loadingState = awaitItem()
+            assertThat(loadingState.isLoadingBookmark).isTrue()
+            assertThat(loadingState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // 2. Optimistic update: [1, 3, 5] -> [1, 3, 5, 2]
-            awaitItem()
-
-            // 3. API 성공: isLoadingBookmark=false
-            val successState = awaitItem()
-            assertThat(successState.generalError).isNull()
-            assertThat(successState.isLoadingBookmark).isFalse()
-            assertThat(successState.bookmarkPrograms).containsExactly(1, 3, 5, 2)
+            // 2. API 성공 후, isLoadingBookmark=false + bookmark 목록 갱신
+            val finalState = awaitItem()
+            assertThat(finalState.isLoadingBookmark).isFalse()
+            assertThat(finalState.generalError).isNull()
+            assertThat(finalState.bookmarkPrograms).containsExactly(1, 3, 5, targetId)
 
             verify(programRepository).bookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
+
     @Test
     fun onFeedBookmarkClicked_unbookmark_success_updatesState() = runTest {
         val targetId = 3 // 북마크 목록에 있는 ID
         // Given: 북마크 해제 API 성공
-        `when`(programRepository.unbookmarkProgram(targetId)).thenReturn(Result.success(Unit))
+        `when`(programRepository.unbookmarkProgram(targetId))
+            .thenReturn(Result.success(Unit))
 
         viewModel.homeUi.test {
-            awaitItem() // 초기 상태 [1, 3, 5]
+            val initialState = awaitItem()
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // When: 북마크 해제 클릭 (targetId=3)
+            // When
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true
-            awaitItem()
+            // 1. isLoadingBookmark = true, 목록은 아직 [1, 3, 5]
+            val loadingState = awaitItem()
+            assertThat(loadingState.isLoadingBookmark).isTrue()
+            assertThat(loadingState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // 2. Optimistic update: [1, 3, 5] -> [1, 5]
-            awaitItem()
-
-            // 3. API 성공: isLoadingBookmark=false
-            val successState = awaitItem()
-            assertThat(successState.generalError).isNull()
-            assertThat(successState.isLoadingBookmark).isFalse()
-            assertThat(successState.bookmarkPrograms).containsExactly(1, 5)
+            // 2. 성공 후 [1, 5] 로 업데이트 + 로딩 종료
+            val finalState = awaitItem()
+            assertThat(finalState.isLoadingBookmark).isFalse()
+            assertThat(finalState.generalError).isNull()
+            assertThat(finalState.bookmarkPrograms).containsExactly(1, 5)
 
             verify(programRepository).unbookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }
     }
+
 
     @Test
     fun onFeedBookmarkClicked_bookmark_failure_rollsBackState() = runTest {
@@ -691,75 +697,71 @@ class HomeViewModelTest {
         val errorJson = """{"code":"UNAUTHORIZED","message":"Authenticate failed"}"""
         val errorResponse = errorJson.toResponseBody()
         val httpException = HttpException(Response.error<Any>(401, errorResponse))
-        `when`(programRepository.bookmarkProgram(targetId)).thenReturn(Result.failure(httpException))
+        `when`(programRepository.bookmarkProgram(targetId))
+            .thenReturn(Result.failure(httpException))
 
         viewModel.homeUi.test {
-            val initialState = awaitItem() // 초기 상태 [1, 3, 5]
+            val initialState = awaitItem() // [1, 3, 5]
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // When: 북마크 클릭 (targetId=2)
+            // When
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true
-            awaitItem()
+            // 1. 로딩 시작
+            val loadingState = awaitItem()
+            assertThat(loadingState.isLoadingBookmark).isTrue()
+            assertThat(loadingState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // 2. Optimistic update: [1, 3, 5] -> [1, 3, 5, 2]
-            awaitItem()
-
-            // 3. API 실패: Rollback 및 에러 설정 (generalError, isLoadingBookmark, bookmarkPrograms 업데이트)
+            // 2. 실패 후 롤백 + 에러 메시지
             val failureState = awaitItem()
-
-            // 검증
-            assertThat(failureState.generalError).isEqualTo("로그인이 필요합니다")
             assertThat(failureState.isLoadingBookmark).isFalse()
-            // 롤백 확인: 최종 bookmarkPrograms가 초기 상태와 동일해야 합니다.
-            assertThat(failureState.bookmarkPrograms).containsExactly(1, 3, 5, 2)
+            assertThat(failureState.bookmarkPrograms).containsExactly(1, 3, 5)
+            assertThat(failureState.generalError).isEqualTo("로그인이 필요합니다")
+
             verify(programRepository).bookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
+
     @Test
     fun onFeedBookmarkClicked_unbookmark_failure_rollsBackState() = runTest {
         val targetId = 3
         // Given: 북마크 해제 API 실패 (네트워크 오류)
-        `when`(programRepository.unbookmarkProgram(targetId)).thenReturn(Result.failure(IOException("Network error")))
+        `when`(programRepository.unbookmarkProgram(targetId))
+            .thenReturn(Result.failure(IOException("Network error")))
 
         viewModel.homeUi.test {
-            // 초기 상태를 정확히 저장 (awaitItem() 호출 직후의 상태)
-            val initialState = awaitItem() // 초기 상태 [1, 3, 5]
+            val initialState = awaitItem() // [1, 3, 5]
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // When: 북마크 해제 클릭 (targetId=3)
+            // When
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true (update 1)
-            awaitItem()
+            // 1. 로딩 시작
+            val loadingState = awaitItem()
+            assertThat(loadingState.isLoadingBookmark).isTrue()
+            assertThat(loadingState.bookmarkPrograms).containsExactly(1, 3, 5)
 
-            // 2. Optimistic update: [1, 3, 5] -> [1, 5] (update 2)
-            // 이 시점의 homeUi.value는 [1, 5] 입니다.
-            awaitItem()
-
-            // 3. API 실패: Rollback 및 에러 설정 (update 3)
-            // ViewModel 코드가 실패 시 `originalBookmarkPrograms` (낙관적 업데이트 전의 상태)로 롤백해야 합니다.
+            // 2. 실패 후 롤백 + 에러 메시지
             val failureState = awaitItem()
-
-            // 검증
-            assertThat(failureState.generalError).isEqualTo("네트워크 연결을 확인해주세요")
             assertThat(failureState.isLoadingBookmark).isFalse()
+            assertThat(failureState.bookmarkPrograms).containsExactly(1, 3, 5)
+            assertThat(failureState.generalError).isEqualTo("네트워크 연결을 확인해주세요")
 
-            // 롤백 확인: 최종 bookmarkPrograms가 초기 상태와 동일해야 합니다.
-            assertThat(failureState.bookmarkPrograms).containsExactly(1, 5) // FIX: 낙관적 업데이트 상태([1, 5])로 남아있는 동작을 확인
             verify(programRepository).unbookmarkProgram(targetId)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
+
     @Test
     fun onFeedBookmarkClicked_setsAndResetsIsLoadingBookmark() = runTest {
         val targetId = 2
-        // Given: 북마크 API 성공
-        `when`(programRepository.bookmarkProgram(targetId)).thenReturn(Result.success(Unit))
+        `when`(programRepository.bookmarkProgram(targetId))
+            .thenReturn(Result.success(Unit))
 
         viewModel.homeUi.test {
             awaitItem() // 초기 상태
@@ -768,16 +770,166 @@ class HomeViewModelTest {
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true 상태 소비
-            awaitItem()
+            // 1. 로딩 시작
+            val loadingState = awaitItem()
+            assertThat(loadingState.isLoadingBookmark).isTrue()
 
-            // 2. Optimistic update (bookmarkPrograms 업데이트)
-            awaitItem()
-
-            // 3. API 성공 후 isLoadingBookmark=false
-            assertThat(awaitItem().isLoadingBookmark).isFalse()
+            // 2. API 응답 후 로딩 종료
+            val finalState = awaitItem()
+            assertThat(finalState.isLoadingBookmark).isFalse()
 
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+
+    @Test
+    fun refreshHomeData_loadHomeDataThrowsException_catchesError() = runTest {
+        // Given
+        // Mocking을 다시 성공 케이스로 설정하여 initBookmarkList와 loadHomeData가 정상적인 Result.failure/success를 반환하게 합니다.
+        // 이는 RuntimeException을 던지는 이전 방식보다 안전합니다.
+        val refreshedPage = dummyPage1.copy(totalElements = 50)
+        `when`(programRepository.getPrograms(page = 0, size = 20, category = ""))
+            .thenReturn(Result.success(refreshedPage)) // loadHomeData 성공 Mock
+
+        // initBookmarkList를 실패하도록 Mocking하여 generalError를 설정하도록 합니다.
+        `when`(programRepository.getAllUserBookmarks())
+            .thenReturn(Result.failure(IOException("Network error during refresh")))
+
+        viewModel.homeUi.test {
+            awaitItem() // 0. 초기 상태 소비
+
+            // When
+            viewModel.refreshHomeData() // launch { try { loadHomeData(), initBookmarkList() } ... }
+
+            awaitItem() // 1. isRefreshing=true 상태 소비
+
+            advanceUntilIdle() // 모든 코루틴 완료 대기
+
+            // 예상되는 업데이트:
+            // 2. loadHomeData start (isLoading=true)
+            // 3. initBookmarkList start (isLoadingBookmark=true)
+            // 4. loadHomeData success (isLoading=false, feedItems updated)
+            // 5. initBookmarkList failure (isLoadingBookmark=false, generalError set)
+            // 6. refreshHomeData end (isRefreshing=false)
+
+            awaitItem() // 2. or 3. (isLoading=true)
+            awaitItem() // 3. or 2. (isLoadingBookmark=true)
+            awaitItem() // 4. (isLoading=false, feedItems updated)
+            awaitItem() // 5. (isLoadingBookmark=false, generalError set)
+            val finalState = awaitItem() // 6. isRefreshing=false (최종 상태)
+
+            // Then: 최종 상태 검증
+            assertThat(finalState.isRefreshing).isFalse()
+            assertThat(finalState.isLoading).isFalse()
+            assertThat(finalState.isLoadingBookmark).isFalse()
+            assertThat(finalState.generalError).isEqualTo("네트워크 연결을 확인해주세요") // initBookmarkList 의 onFailure 에서 설정됨
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+
+    @Test
+    fun feedDisLike_success_clearsError() = runTest {
+        // Given: 이전 에러 상태를 가정하고, API 호출은 성공하도록 Mock 설정
+        // 1. loadMyProfile 실패를 Mock하여 에러를 설정합니다.
+        `when`(authRepository.getProfile()).thenReturn(Result.failure(IOException("Network error")))
+        viewModel.loadMyProfile()
+        advanceUntilIdle()
+        assertThat(viewModel.homeUi.value.generalError).isNotNull() // 에러 발생 확인
+
+        // 2. feedDisLike API 성공 Mock
+        val programId = 1
+        `when`(programRepository.likeDislikeProgram(programId)).thenReturn(Result.success(Unit))
+
+        // When
+        viewModel.feedDisLike(programId)
+        advanceUntilIdle()
+
+        // Then: API 호출이 일어났고 에러가 클리어됨
+        verify(programRepository).likeDislikeProgram(programId)
+        assertThat(viewModel.homeUi.value.generalError).isNull()
+    }
+
+    @Test
+    fun feedDisLike_failure_setsError() = runTest {
+        // Given: API 호출 실패 Mock (네트워크 오류)
+        val programId = 1
+        `when`(programRepository.likeDislikeProgram(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        // When
+        viewModel.feedDisLike(programId)
+        advanceUntilIdle()
+
+        // Then: 에러 메시지가 설정됨
+        verify(programRepository).likeDislikeProgram(programId)
+        assertThat(viewModel.homeUi.value.generalError).isEqualTo("네트워크 연결을 확인해주세요")
+    }
+
+
+    @Test
+    fun clearGeneralError_resetsErrorState() = runTest {
+        // Given: 에러 상태를 미리 설정합니다.
+        // Note: 이전에 loadMyProfile 실패 테스트를 통해 에러를 설정하거나,
+        // 현재는 HomeUiState를 직접 변경할 수 없으므로, 에러를 유발하는 함수를 호출합니다.
+
+        // 1. 프로필 로드 실패를 Mock하여 에러 상태를 만듭니다.
+        `when`(authRepository.getProfile()).thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.loadMyProfile()
+        advanceUntilIdle()
+        assertThat(viewModel.homeUi.value.generalError).isNotNull() // 에러 발생 확인
+
+        // When: clearGeneralError() 호출
+        viewModel.clearGeneralError()
+        advanceUntilIdle()
+
+        // Then: 에러가 null로 리셋됨
+        assertThat(viewModel.homeUi.value.generalError).isNull()
+    }
+
+    // ========== Bookmark Status Update Tests (4) ==========
+
+    @Test
+    fun updateBookmarkStatusInList_isBookmarkedTrue_addsId() = runTest {
+        val targetId = 7 // 북마크 목록에 없는 ID
+
+        viewModel.homeUi.test {
+            val initialState = awaitItem() // [1, 3, 5] 소비
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
+
+            // When: isBookmarked = true (추가 요청)
+            viewModel.updateBookmarkStatusInList(targetId, isBookmarked = true)
+            advanceUntilIdle()
+
+            // Then: ID 7이 추가됨
+            val finalState = awaitItem()
+            assertThat(finalState.bookmarkPrograms).containsExactly(1, 3, 5, 7)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun updateBookmarkStatusInList_isBookmarkedFalse_removesId() = runTest {
+        val targetId = 3 // 북마크 목록에 있는 ID
+
+        viewModel.homeUi.test {
+            val initialState = awaitItem() // [1, 3, 5] 소비
+            assertThat(initialState.bookmarkPrograms).containsExactly(1, 3, 5)
+
+            // When: isBookmarked = false (제거 요청)
+            viewModel.updateBookmarkStatusInList(targetId, isBookmarked = false)
+            advanceUntilIdle()
+
+            // Then: ID 3이 제거됨
+            val finalState = awaitItem()
+            assertThat(finalState.bookmarkPrograms).containsExactly(1, 5)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
 }

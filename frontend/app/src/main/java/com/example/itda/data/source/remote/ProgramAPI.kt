@@ -71,13 +71,42 @@ interface ProgramAPI {
      * bookmark the program
      */
     @POST("programs/{id}/bookmark")
-    suspend fun bookmarkProgram(@Path("id") id: Int): Unit
+    suspend fun bookmarkProgram(@Path("id") id: Int): retrofit2.Response<Unit>
 
     /**
      * /programs/{id}/unbookmark (POST)
      * bookmark the program
      */
     @POST("programs/{id}/unbookmark")
-    suspend fun unbookmarkProgram(@Path("id") id: Int): Unit
+    suspend fun unbookmarkProgram(@Path("id") id: Int): retrofit2.Response<Unit>
+
+
+    /**
+     * /programs/{id}/like?type=true (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/like?type=true")
+    suspend fun likeLikeProgram(@Path("id") id: Int): retrofit2.Response<Unit>
+
+    /**
+     * /programs/{id}/unlike?type=true (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/unlike?type=true")
+    suspend fun unlikeLikeProgram(@Path("id") id: Int): retrofit2.Response<Unit>
+
+    /**
+     * /programs/{id}/like?type=false (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/like?type=false")
+    suspend fun likeDislikeProgram(@Path("id") id: Int): retrofit2.Response<Unit>
+
+    /**
+     * /programs/{id}/unlike?type=false (POST)
+     * bookmark the program
+     */
+    @POST("programs/{id}/unlike?type=false")
+    suspend fun unlikeDislikeProgram(@Path("id") id: Int): retrofit2.Response<Unit>
 }
 

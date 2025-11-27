@@ -1,174 +1,459 @@
-//package com.example.itda.ui.feed
-//
-//import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-//import androidx.lifecycle.SavedStateHandle
-//import app.cash.turbine.test
-//import com.example.itda.data.model.DummyData
-//import com.example.itda.data.model.ProgramDetailResponse
-//import com.example.itda.data.repository.ProgramRepository
-//import com.example.itda.testing.MainDispatcherRule
-//import com.google.common.truth.Truth.assertThat
-//import kotlinx.coroutines.ExperimentalCoroutinesApi
-//import kotlinx.coroutines.test.advanceUntilIdle
-//import kotlinx.coroutines.test.runTest
-//import okhttp3.ResponseBody.Companion.toResponseBody
-//import org.junit.Before
-//import org.junit.Rule
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import org.mockito.Mock
-//import org.mockito.Mockito.`when`
-//import org.mockito.junit.MockitoJUnitRunner
-//import org.mockito.kotlin.any
-//import retrofit2.HttpException
-//import retrofit2.Response
-//import java.io.IOException
-//
-//@OptIn(ExperimentalCoroutinesApi::class)
-//@RunWith(MockitoJUnitRunner::class)
-//class FeedViewModelTest {
-//
-//    @get:Rule
-//    val instantTaskExecutorRule = InstantTaskExecutorRule()
-//
-//    @get:Rule
-//    val mainDispatcherRule = MainDispatcherRule()
-//
-//    @Mock
-//    private lateinit var programRepository: ProgramRepository
-//
-//    private lateinit var viewModel: FeedViewModel
-//
-//    // 테스트용 더미 데이터
-//    private val dummyDetail = ProgramDetailResponse(
-//        id = 101, uuid = "uuid101", category = "cash", categoryValue = "빈곤 완화",
-//        title = "테스트 지원 정책", details = "상세 내용", summary = "요약", preview = "미리보기",
-//        applicationMethod = "온라인", applyUrl = "http://apply.com", referenceUrl = null,
-//        eligibilityMinAge = 65, eligibilityMaxAge = 100, eligibilityMinHousehold = 1,
-//        eligibilityMaxHousehold = 4, eligibilityMinIncome = 0, eligibilityMaxIncome = 5000000,
-//        eligibilityRegion = "전국", eligibilityGender = "무관", eligibilityMaritalStatus = "무관",
-//        eligibilityEducation = "무관", eligibilityEmployment = "무관", applyStartAt = null,
-//        applyEndAt = null, createdAt = null, operatingEntity = "보건복지부", operatingEntityType = "정부"
-//    )
-//
-//    @Before
-//    fun setup() {
-//        // SavedStateHandle은 필요 없으므로 Mock 또는 빈 객체 전달
-//        viewModel = FeedViewModel(programRepository, SavedStateHandle())
-//    }
-//
-//    // ========== Init State Test ==========
-//
-//    @Test
-//    fun init_state_isCorrectlyInitialized() = runTest {
-//        viewModel.feedUi.test {
-//            val initialState = awaitItem()
-//            // 초기 상태는 DummyData의 더미 응답으로 설정됨 (FeedViewModel.kt)
-//            assertThat(initialState.feed).isEqualTo(DummyData.dummyProgramDetailResponse)
-//            assertThat(initialState.isLoading).isFalse()
-//            assertThat(initialState.generalError).isNull()
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//    }
-//
-//    // ========== getFeedItem Tests (Success) ==========
-//
-//    @Test
-//    fun getFeedItem_success_updatesFeedAndSetsLoadingFalse() = runTest {
-//        // Given: Repository Mock 설정 - 성공
-//        `when`(programRepository.getProgramDetails(any())).thenReturn(Result.success(dummyDetail))
-//
-//        viewModel.feedUi.test {
-//            awaitItem() // 초기 상태 소비 (DummyData)
-//
-//            // When: 피드 아이템 로드 시작
-//            viewModel.getFeedItem(feedId = 101)
-//
-//            // 1. 로딩 시작 상태
-//            assertThat(awaitItem().isLoading).isTrue()
-//
-//            // 2. 최종 성공 상태
-//            val successState = awaitItem()
-//            assertThat(successState.isLoading).isFalse()
-//            assertThat(successState.feed.id).isEqualTo(dummyDetail.id)
-//            assertThat(successState.feed.title).isEqualTo(dummyDetail.title)
-//            assertThat(successState.generalError).isNull()
-//
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//    }
-//
-//    // ========== getFeedItem Tests (Failure) ==========
-//
-//    @Test
-//    fun getFeedItem_networkFailure_setsErrorAndLoadingFalse() = runTest {
-//        // Given: Repository Mock 설정 - 네트워크 오류
-//        val ioException = IOException("Network error")
-//        `when`(programRepository.getProgramDetails(any())).thenReturn(Result.failure(ioException))
-//
-//        viewModel.feedUi.test {
-//            awaitItem() // 초기 상태 소비
-//
-//            // When
-//            viewModel.getFeedItem(feedId = 101)
-//
-//            // 1. 로딩 시작 상태
-//            assertThat(awaitItem().isLoading).isTrue()
-//
-//            // 2. 최종 실패 상태
-//            val failureState = awaitItem()
-//            assertThat(failureState.isLoading).isFalse()
-//            // ApiErrorParser의 IOException 처리 결과
-//            assertThat(failureState.generalError).isEqualTo("네트워크 연결을 확인해주세요")
-//            // Feed 데이터는 변경되지 않아야 함 (초기값 유지)
-//            assertThat(failureState.feed).isEqualTo(DummyData.dummyProgramDetailResponse)
-//
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//    }
-//
-//    @Test
-//    fun getFeedItem_http404Failure_setsErrorAndLoadingFalse() = runTest {
-//        // Given: Repository Mock 설정 - 404 Not Found (ApiErrorParser에 정의되지 않은 에러)
-//        val errorJson = """{"code":"NOT_FOUND","message":"Program not found"}"""
-//        val errorResponse = errorJson.toResponseBody()
-//        val httpException = HttpException(Response.error<Any>(404, errorResponse))
-//        `when`(programRepository.getProgramDetails(any())).thenReturn(Result.failure(httpException))
-//
-//        viewModel.feedUi.test {
-//            awaitItem() // 초기 상태 소비
-//
-//            // When
-//            viewModel.getFeedItem(feedId = 101)
-//            advanceUntilIdle()
-//
-//            // 1. 로딩 시작 상태
-//            assertThat(awaitItem().isLoading).isTrue()
-//
-//            // 2. 최종 실패 상태
-//            val failureState = awaitItem()
-//            assertThat(failureState.isLoading).isFalse()
-//            // ApiErrorParser의 Unknown Error 처리 결과
-//            assertThat(failureState.generalError).isEqualTo("알 수 없는 오류가 발생했습니다")
-//            assertThat(failureState.feed).isEqualTo(DummyData.dummyProgramDetailResponse)
-//
-//            cancelAndIgnoreRemainingEvents()
-//        }
-//    }
-//
-//    // ========== Feature Toggle Tests (Placeholder) ==========
-//
-//    @Test
-//    fun toggleBookmark_noImplementation_doesNotThrow() = runTest {
-//        // 현재는 TODO 주석만 있으므로, 실행 시 예외가 발생하지 않는지만 확인
-//        viewModel.toggleBookmark(feedId = 101)
-//        // advanceUntilIdle() // 비동기 작업이 없으므로 필요 없음
-//    }
-//
-//    @Test
-//    fun applicationProgram_noImplementation_doesNotThrow() = runTest {
-//        // 현재는 TODO 주석만 있으므로, 실행 시 예외가 발생하지 않는지만 확인
-//        viewModel.applicationProgram(feedID = 101)
-//        // advanceUntilIdle() // 비동기 작업이 없으므로 필요 없음
-//    }
-//}
+package com.example.itda.ui.feed
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
+import com.example.itda.data.model.ProgramDetailResponse
+import com.example.itda.data.repository.ProgramRepository
+import com.example.itda.testing.MainDispatcherRule
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.verify
+import retrofit2.HttpException
+import retrofit2.Response
+import java.io.IOException
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(MockitoJUnitRunner::class)
+class FeedViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    @Mock
+    private lateinit var programRepository: ProgramRepository
+
+    private lateinit var savedStateHandle: SavedStateHandle
+
+    private lateinit var viewModel: FeedViewModel
+
+    // 공통으로 쓰는 더미 ProgramDetailResponse
+    private fun createProgramDetail(
+        id: Int = 1,
+        isBookmarked: Boolean = false,
+        likeStatus: String? = null
+    ): ProgramDetailResponse {
+        return ProgramDetailResponse(
+            id = id,
+            uuid = "uuid-$id",
+            category = "health",
+            categoryValue = "보건",
+            title = "프로그램 $id",
+            details = "상세 설명",
+            summary = "요약",
+            preview = "미리보기",
+            applicationMethod = "온라인",
+            applyUrl = "https://example.com/apply/$id",
+            referenceUrl = "https://example.com/$id",
+            eligibilityMinAge = 10,
+            eligibilityMaxAge = 60,
+            eligibilityMinHousehold = null,
+            eligibilityMaxHousehold = null,
+            eligibilityMinIncome = null,
+            eligibilityMaxIncome = null,
+            eligibilityRegion = null,
+            eligibilityGender = null,
+            eligibilityMaritalStatus = null,
+            eligibilityEducation = null,
+            eligibilityEmployment = null,
+            applyStartAt = "2025-01-01",
+            applyEndAt = "2025-01-31",
+            createdAt = "2024-12-01",
+            operatingEntity = "보건복지부",
+            operatingEntityType = "central",
+            likeStatus = likeStatus,
+            isBookmarked = isBookmarked
+        )
+    }
+
+    @Before
+    fun setUp() {
+        savedStateHandle = SavedStateHandle()
+        viewModel = FeedViewModel(programRepository, savedStateHandle)
+    }
+
+    // ========== getFeedItem ==========
+
+    @Test
+    fun getFeedItem_success_updatesState() = runTest {
+        val programId = 1
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = true,
+            likeStatus = "LIKED"
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.generalError).isNull()
+        assertThat(state.feed).isEqualTo(detail)
+        assertThat(state.isBookmarked).isTrue()
+        assertThat(state.isLiked).isTrue()
+        assertThat(state.isDisliked).isFalse()
+    }
+
+    @Test
+    fun getFeedItem_failure_setsErrorAndStopsLoading() = runTest {
+        val programId = 1
+        val errorJson = """{"code":"UNAUTHORIZED","message":"Authenticate failed"}"""
+        val errorResponse = errorJson.toResponseBody()
+        val httpException = HttpException(Response.error<Any>(401, errorResponse))
+
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.failure(httpException))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.isLoading).isFalse()
+        // ApiErrorParser.Unauthorized() -> "로그인이 필요합니다"
+        assertThat(state.generalError).isEqualTo("로그인이 필요합니다")
+    }
+
+    @Test
+    fun clearGeneralError_clearsError() = runTest {
+        val programId = 1
+        // 먼저 네트워크 오류를 발생시켜 generalError 를 채운다
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.generalError).isNotNull()
+
+        viewModel.clearGeneralError()
+
+        assertThat(viewModel.feedUi.value.generalError).isNull()
+    }
+
+    // ========== onBookmarkClicked ==========
+
+    @Test
+    fun onBookmarkClicked_bookmark_success_updatesStateAndBookmarkChanged() = runTest {
+        val programId = 10
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.bookmarkProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        // 초기 피드 로드 (북마크 안 된 상태)
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isBookmarked).isFalse()
+
+        viewModel.onBookmarkClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isBookmarked).isTrue()
+        assertThat(viewModel.hasBookmarkChanged.value).isTrue()
+
+        val info = savedStateHandle.get<Pair<Int, Boolean>>("bookmark_change_info")
+        assertThat(info).isEqualTo(Pair(programId, true))
+
+        verify(programRepository).bookmarkProgram(programId)
+    }
+
+    @Test
+    fun onBookmarkClicked_unbookmark_success_updatesStateAndBookmarkChanged() = runTest {
+        val programId = 20
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = true,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.unbookmarkProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isBookmarked).isTrue()
+
+        viewModel.onBookmarkClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isBookmarked).isFalse()
+        assertThat(viewModel.hasBookmarkChanged.value).isTrue()
+
+        val info = savedStateHandle.get<Pair<Int, Boolean>>("bookmark_change_info")
+        assertThat(info).isEqualTo(Pair(programId, false))
+
+        verify(programRepository).unbookmarkProgram(programId)
+    }
+
+    @Test
+    fun onBookmarkClicked_bookmark_failure_setsErrorAndDoesNotChangeBookmark() = runTest {
+        val programId = 30
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.bookmarkProgram(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isBookmarked).isFalse()
+
+        viewModel.onBookmarkClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.isBookmarked).isFalse()
+        assertThat(state.generalError).isEqualTo("네트워크 연결을 확인해주세요")
+        assertThat(viewModel.hasBookmarkChanged.value).isFalse()
+        assertThat(savedStateHandle.get<Pair<Int, Boolean>>("bookmark_change_info")).isNull()
+
+        verify(programRepository).bookmarkProgram(programId)
+    }
+
+    @Test
+    fun onBookmarkClicked_unbookmark_failure_setsErrorAndDoesNotChangeBookmark() = runTest {
+        val programId = 40
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = true,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.unbookmarkProgram(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isBookmarked).isTrue()
+
+        viewModel.onBookmarkClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.isBookmarked).isTrue()
+        assertThat(state.generalError).isEqualTo("네트워크 연결을 확인해주세요")
+        assertThat(viewModel.hasBookmarkChanged.value).isFalse()
+        assertThat(savedStateHandle.get<Pair<Int, Boolean>>("bookmark_change_info")).isNull()
+
+        verify(programRepository).unbookmarkProgram(programId)
+    }
+
+    // ========== toggleLike ==========
+
+    @Test
+    fun toggleLike_like_success_setsLikedAndClearsDislike() = runTest {
+        val programId = 50
+        // 처음에는 DISLIKED 상태로 로드 -> toggleLike 시 likeLikeProgram 호출되고 DISLIKE 해제
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = "DISLIKED"
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.likeLikeProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        val initial = viewModel.feedUi.value
+        assertThat(initial.isLiked).isFalse()
+        assertThat(initial.isDisliked).isTrue()
+
+        viewModel.toggleLike()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isLiked).isTrue()
+        assertThat(state.isDisliked).isFalse()
+
+        verify(programRepository).likeLikeProgram(programId)
+    }
+
+    @Test
+    fun toggleLike_unlike_success_turnsOffLike() = runTest {
+        val programId = 60
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = "LIKED"
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.unlikeLikeProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isLiked).isTrue()
+
+        viewModel.toggleLike()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isLiked).isFalse()
+        assertThat(state.isDisliked).isFalse()
+
+        verify(programRepository).unlikeLikeProgram(programId)
+    }
+
+    @Test
+    fun toggleLike_failure_setsErrorAndKeepsState() = runTest {
+        val programId = 70
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.likeLikeProgram(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        val before = viewModel.feedUi.value
+
+        viewModel.toggleLike()
+        advanceUntilIdle()
+
+        val after = viewModel.feedUi.value
+        assertThat(after.isLiked).isEqualTo(before.isLiked)
+        assertThat(after.isDisliked).isEqualTo(before.isDisliked)
+        assertThat(after.generalError).isEqualTo("네트워크 연결을 확인해주세요")
+
+        verify(programRepository).likeLikeProgram(programId)
+    }
+
+    // ========== toggleDisLike ==========
+
+    @Test
+    fun toggleDisLike_dislike_success_setsDislikedAndClearsLike() = runTest {
+        val programId = 80
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = "LIKED"
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.likeDislikeProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        val initial = viewModel.feedUi.value
+        assertThat(initial.isLiked).isTrue()
+        assertThat(initial.isDisliked).isFalse()
+
+        viewModel.toggleDisLike()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isDisliked).isTrue()
+        assertThat(state.isLiked).isFalse()
+
+        verify(programRepository).likeDislikeProgram(programId)
+    }
+
+    @Test
+    fun toggleDisLike_undislike_success_turnsOffDislike() = runTest {
+        val programId = 90
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = "DISLIKED"
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.unlikeDislikeProgram(programId))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        assertThat(viewModel.feedUi.value.isDisliked).isTrue()
+
+        viewModel.toggleDisLike()
+        advanceUntilIdle()
+
+        val state = viewModel.feedUi.value
+        assertThat(state.generalError).isNull()
+        assertThat(state.isDisliked).isFalse()
+        assertThat(state.isLiked).isFalse()
+
+        verify(programRepository).unlikeDislikeProgram(programId)
+    }
+
+    @Test
+    fun toggleDisLike_failure_setsErrorAndKeepsState() = runTest {
+        val programId = 100
+        val detail = createProgramDetail(
+            id = programId,
+            isBookmarked = false,
+            likeStatus = null
+        )
+        `when`(programRepository.getProgramDetails(programId))
+            .thenReturn(Result.success(detail))
+        `when`(programRepository.likeDislikeProgram(programId))
+            .thenReturn(Result.failure(IOException("Network error")))
+
+        viewModel.getFeedItem(programId)
+        advanceUntilIdle()
+        val before = viewModel.feedUi.value
+
+        viewModel.toggleDisLike()
+        advanceUntilIdle()
+
+        val after = viewModel.feedUi.value
+        assertThat(after.isDisliked).isEqualTo(before.isDisliked)
+        assertThat(after.isLiked).isEqualTo(before.isLiked)
+        assertThat(after.generalError).isEqualTo("네트워크 연결을 확인해주세요")
+
+        verify(programRepository).likeDislikeProgram(programId)
+    }
+
+    // ========== no-op functions ==========
+
+    @Test
+    fun checkLikeStatus_and_applicationProgram_doNotCrash() = runTest {
+        val before = viewModel.feedUi.value
+
+        viewModel.checkLikeStatus()
+        viewModel.applicationProgram(feedID = 123)
+
+        val after = viewModel.feedUi.value
+        assertThat(after).isEqualTo(before)
+    }
+}

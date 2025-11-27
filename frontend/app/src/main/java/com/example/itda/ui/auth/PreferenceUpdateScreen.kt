@@ -155,7 +155,6 @@ fun PreferenceUpdateScreen(
                                     content = program.preview,
                                     isBookmarked = false,
                                     logo = if (program.operatingEntityType == "central") R.drawable.gov_logo else R.drawable.local,
-                                    isEligible = false,
                                     onClick = { onFeedExampleClick(program.id) },
                                     onBookmarkClicked = {},
                                     isExample = true,
@@ -217,7 +216,6 @@ fun PreferenceUpdateScreen(
                                 title = ui.exampleProgramDetail.title,
                                 endDate = ui.exampleProgramDetail.applyEndAt ?: "",
                                 tags = listOf(ui.exampleProgramDetail.categoryValue),
-                                isEligible = false,
                                 isBookmarked = false,
                                 onBookmarkClicked = {},
                                 isExample = true
