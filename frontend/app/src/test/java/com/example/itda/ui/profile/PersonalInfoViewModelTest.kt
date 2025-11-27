@@ -292,4 +292,326 @@ class PersonalInfoViewModelTest {
         assertThat(ui.generalError).contains("네트워크 연결이 불안정합니다")
         assertThat(ui.isLoading).isFalse()
     }
+
+    @Test
+    fun onGenderChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onGenderChange("FEMALE")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.gender).isEqualTo("FEMALE")
+        assertThat(ui.genderError).isNull()
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onAddressChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onAddressChange("부산시 해운대구")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.address).isEqualTo("부산시 해운대구")
+        assertThat(ui.addressError).isNull()
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onPostCodeChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onPostCodeChange("54321")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.postcode).isEqualTo("54321")
+        assertThat(ui.postcodeError).isNull()
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onChange_updatesAddressAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onChange("대전시 유성구")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.address).isEqualTo("대전시 유성구")
+        assertThat(ui.addressError).isNull()
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onMaritalStatusChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onMaritalStatusChange("MARRIED")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.maritalStatus).isEqualTo("MARRIED")
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onEducationChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEducationChange("MASTER")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.education).isEqualTo("MASTER")
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onHouseholdSizeChange_filtersNonDigits_andLimitsTo2Digits() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onHouseholdSizeChange("5abc")
+        assertThat(viewModel.personalInfoUi.value.householdSize).isEqualTo("5")
+
+        viewModel.onHouseholdSizeChange("123")
+        assertThat(viewModel.personalInfoUi.value.householdSize).isEqualTo("12")
+    }
+
+    @Test
+    fun onHouseholdIncomeChange_filtersNonDigits() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onHouseholdIncomeChange("10000abc")
+        assertThat(viewModel.personalInfoUi.value.householdIncome).isEqualTo("10000")
+
+        viewModel.onHouseholdIncomeChange("5000만원")
+        assertThat(viewModel.personalInfoUi.value.householdIncome).isEqualTo("5000")
+    }
+
+    @Test
+    fun onEmploymentStatusChange_updatesStateAndClearsErrors() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEmploymentStatusChange("UNEMPLOYED")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.employmentStatus).isEqualTo("UNEMPLOYED")
+        assertThat(ui.generalError).isNull()
+    }
+
+    @Test
+    fun onTagInputChange_updatesTagInput() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onTagInputChange("새로운태그")
+
+        assertThat(viewModel.personalInfoUi.value.tagInput).isEqualTo("새로운태그")
+    }
+
+    @Test
+    fun onAddTag_addsNewTag_andClearsInput() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onTagInputChange("신규태그")
+        viewModel.onAddTag("신규태그")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.tags).contains("신규태그")
+        assertThat(ui.tagInput).isEmpty()
+    }
+
+    @Test
+    fun onAddTag_ignoresDuplicateTags() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onAddTag("저소득인층")
+        viewModel.onAddTag("저소득인층")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.tags.filter { it == "저소득인층" }).hasSize(1)
+    }
+
+    @Test
+    fun onAddTag_trimsWhitespace() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onAddTag("  공백태그  ")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.tags).contains("공백태그")
+    }
+
+    @Test
+    fun onAddTag_ignoresEmptyString() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        val initialTagsSize = viewModel.personalInfoUi.value.tags.size
+
+        viewModel.onAddTag("")
+        viewModel.onAddTag("   ")
+
+        assertThat(viewModel.personalInfoUi.value.tags).hasSize(initialTagsSize)
+    }
+
+    @Test
+    fun onRemoveTag_removesTag() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onRemoveTag("저소득인층")
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.tags).doesNotContain("저소득인층")
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_onHttpException_400() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        whenever(authRepository.updateProfile(any())).thenReturn(
+            Result.failure(retrofit2.HttpException(
+                retrofit2.Response.error<Any>(400, okhttp3.ResponseBody.create(null, ""))
+            ))
+        )
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("MALE")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("입력하신 정보를 다시 확인해주세요")
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_onHttpException_401() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        whenever(authRepository.updateProfile(any())).thenReturn(
+            Result.failure(retrofit2.HttpException(
+                retrofit2.Response.error<Any>(401, okhttp3.ResponseBody.create(null, ""))
+            ))
+        )
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("MALE")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("로그인이 만료되었습니다")
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_onHttpException_500() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        whenever(authRepository.updateProfile(any())).thenReturn(
+            Result.failure(retrofit2.HttpException(
+                retrofit2.Response.error<Any>(500, okhttp3.ResponseBody.create(null, ""))
+            ))
+        )
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("MALE")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("서버에 일시적인 문제가 발생했습니다")
+    }
+
+    @Test
+    fun submitPersonalInfo_returnsFalse_onUnableToResolveHost() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        whenever(authRepository.updateProfile(any())).thenReturn(
+            Result.failure(RuntimeException("unable to resolve host"))
+        )
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("MALE")
+        viewModel.onAddressChange("서울시 강남구")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isFalse()
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("인터넷 연결을 확인해주세요")
+    }
+
+    @Test
+    fun init_convertsKoreanGenderToServerValue() = runTest {
+        val profileWithKorean = testProfile.copy(gender = "남성")
+        whenever(authRepository.getProfile()).thenReturn(Result.success(profileWithKorean))
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        val ui = viewModel.personalInfoUi.value
+        assertThat(ui.gender).isEqualTo("MALE")
+    }
+
+    @Test
+    fun submitPersonalInfo_withOptionalFieldsAsNull() = runTest {
+        whenever(authRepository.getProfile()).thenReturn(Result.success(testProfile))
+        whenever(authRepository.updateProfile(any())).thenReturn(Result.success(Unit))
+
+        viewModel = PersonalInfoViewModel(authRepository)
+        advanceUntilIdle()
+
+        viewModel.onNameChange("홍길동")
+        viewModel.onBirthDateChange("19900101")
+        viewModel.onGenderChange("MALE")
+        viewModel.onAddressChange("서울시 강남구")
+        viewModel.onPostCodeChange("12345")
+        viewModel.onMaritalStatusChange("")
+        viewModel.onEducationChange("")
+        viewModel.onEmploymentStatusChange("")
+
+        val result = viewModel.submitPersonalInfo()
+
+        assertThat(result).isTrue()
+        verify(authRepository).updateProfile(any())
+    }
 }
