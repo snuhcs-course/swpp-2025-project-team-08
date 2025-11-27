@@ -279,9 +279,9 @@ class HomeViewModel @Inject constructor(
             // 1. UI 에서 즉시 북마크 상태를 토글합니다.
             val isBookmarked = id in homeUi.value.bookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
-                homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
+                _homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
             } else {
-                homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
+                _homeUi.value.bookmarkPrograms + id // 북마크 설정 (리스트에 추가)
             }
 
 
