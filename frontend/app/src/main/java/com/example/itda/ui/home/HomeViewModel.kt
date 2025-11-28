@@ -43,6 +43,7 @@ class HomeViewModel @Inject constructor(
         val isPaginating : Boolean = false,
         val isLoading: Boolean = false,
         val isRefreshing: Boolean = false,
+        val isPullToRefreshing : Boolean = false,
         val isLoadingBookmark : Boolean = false,
 
         val loadDataCount : Int = 0,
@@ -67,11 +68,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun clearGeneralError() {
-        _homeUi.update { it.copy(generalError = null) }
+    fun pullToRefresh() {
+        viewModelScope.launch {
+
+            if(homeUi.value.isRefreshing == false && homeUi.value.isPullToRefreshing == false) {
+                _homeUi.update { it.copy(isPullToRefreshing = true) }
+                try {
+                    // 이 두 함수가 SUSPEND 함수여야만 다음 줄로 넘어가기 전에 대기합니다.
+                    loadHomeData()
+                    initBookmarkList()
+
+                    // 데이터 로드가 성공적으로 완료된 후에만 스크롤 이벤트 전송
+                    _scrollToTopEvent.send(Unit)
+                    delay(300)
+
+                } catch (e: Exception) {
+                    // 에러 처리
+                    _homeUi.update { it.copy(generalError = e.message) }
+                } finally {
+                    _homeUi.update { it.copy(isPullToRefreshing = false) }
+                }
+            }
+        }
     }
-
-
 
     fun refreshHomeData() {
         viewModelScope.launch {

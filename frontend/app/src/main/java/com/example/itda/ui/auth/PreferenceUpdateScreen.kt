@@ -142,8 +142,8 @@ fun PreferenceUpdateScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(640.dp)
-                                    .padding(vertical = 100.dp, horizontal = 18.dp),
+                                    .height(720.dp)
+                                    .padding(vertical = 64.dp, horizontal = 18.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {

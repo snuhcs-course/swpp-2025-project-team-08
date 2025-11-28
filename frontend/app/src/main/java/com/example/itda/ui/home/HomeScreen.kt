@@ -103,7 +103,8 @@ fun HomeScreen(
         topBarVisible = false,
     ) { paddingValues ->
         Column(
-            modifier = modifier) {
+            modifier = modifier
+        ) {
             Spacer(Modifier.height(20.dp).fillMaxWidth())
             HomeHeader(
                 username = ui.username,
@@ -114,6 +115,7 @@ fun HomeScreen(
                 selectedCategoryCount = ui.totalElements,
                 onCategorySelected = onCategorySelected
             )
+
             if(ui.isLoading) {
                 LoadingScreen(
                     text = ""
@@ -121,13 +123,13 @@ fun HomeScreen(
             }
             else {
                 PullToRefreshBox(
-                    isRefreshing = ui.isRefreshing,
+                    isRefreshing = ui.isPullToRefreshing,
                     onRefresh = onRefresh,
                     state = pullToRefreshState,
                     indicator = {
                         Indicator(
                             modifier = Modifier.align(Alignment.TopCenter),
-                            isRefreshing = ui.isRefreshing,
+                            isRefreshing = ui.isPullToRefreshing,
                             containerColor = MaterialTheme.colorScheme.surface,
                             color = MaterialTheme.colorScheme.primary,
                             state = pullToRefreshState
