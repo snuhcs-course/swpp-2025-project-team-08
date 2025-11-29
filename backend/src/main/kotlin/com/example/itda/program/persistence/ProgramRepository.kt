@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param
 
 interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
     @Query(
-        // TODO: Address
         value = """
         SELECT p.*
         FROM program p
@@ -24,6 +23,19 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
         AND (p.eligibility_employment is NULL OR p.eligibility_employment = u.employment_status)
         AND (p.eligibility_min_age IS NULL OR u.birth_date IS NULL OR p.eligibility_min_age <= DATE_PART('year', AGE(CURRENT_DATE, u.birth_date)))
         AND (p.eligibility_max_age IS NULL OR u.birth_date IS NULL OR p.eligibility_max_age >= DATE_PART('year', AGE(CURRENT_DATE, u.birth_date)))
+        
+        LEFT JOIN postcode_mapping pm ON pm.postcode_prefix = SUBSTRING(u.postcode, 1, 3)
+        WHERE (
+            p.operating_entity_type = 'CENTRAL'
+            OR (
+                p.operating_entity_type = 'LOCAL' 
+                AND (
+                    p.eligibility_region = pm.region 
+                    OR 
+                    p.eligibility_region = pm.region_major
+                )
+            )
+        )
         """,
         nativeQuery = true,
     )
