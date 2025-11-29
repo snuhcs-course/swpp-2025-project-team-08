@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
@@ -202,7 +203,7 @@ class ProgramTest(
 
         mockMvc.perform(
             get("/api/v1/programs/search/latest")
-                .header("Authorization", "Bearer $token") // <--- 2. Add this line!
+                .header("Authorization", "Bearer $token")
                 .param("query", "Employment")
                 .param("category", "EMPLOYMENT")
                 .param("page", "0")
@@ -229,7 +230,7 @@ class ProgramTest(
 
         mockMvc.perform(
             get("/api/v1/programs/search/rank")
-                .header("Authorization", "Bearer $token") // <--- 2. Add this line!
+                .header("Authorization", "Bearer $token")
                 .param("query", "Service")
                 .param("page", "0")
                 .param("size", "10")
@@ -237,6 +238,93 @@ class ProgramTest(
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.content.length()").value(1))
+    }
+
+    @Test
+    @Transactional
+    fun `bookmark API는 프로그램에 북마크를 추가해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("bookmarkTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        val program = dataGenerator.saveProgram("Bookmarkable Program", FloatArray(testEmbeddingDimension))
+        val programId = program.id
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/bookmark", programId)
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    @Transactional
+    fun `unbookmark API는 프로그램의 북마크를 제거해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("unbookmarkTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        val program = dataGenerator.saveProgram("Unbookmarkable Program", FloatArray(testEmbeddingDimension))
+        val programId = program.id
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/unbookmark", programId)
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    @Transactional
+    fun `like API는 프로그램에 좋아요를 추가해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("likeTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        val program = dataGenerator.saveProgram("Likeable Program", FloatArray(testEmbeddingDimension))
+        val programId = program.id
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/like", programId)
+                .header("Authorization", "Bearer $token")
+                .param("type", "true")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    @Transactional
+    fun `like API는 프로그램에 싫어요를 추가해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("dislikeTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        val program = dataGenerator.saveProgram("Dislikeable Program", FloatArray(testEmbeddingDimension))
+        val programId = program.id
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/like", programId)
+                .header("Authorization", "Bearer $token")
+                .param("type", "false")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    @Transactional
+    fun `unlike API는 프로그램의 좋아요_싫어요를 제거해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("unlikeTest")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+
+        val program = dataGenerator.saveProgram("Unlikeable Program", FloatArray(testEmbeddingDimension))
+        val programId = program.id
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/unlike", programId)
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
     }
     // --- Exceptions ---
 
@@ -250,10 +338,10 @@ class ProgramTest(
 
         mockMvc.perform(
             get("/api/v1/programs/{id}", nonExistentId)
-                .header("Authorization", "Bearer $token") // <--- ADD THIS
+                .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON),
         )
-            .andExpect(status().isNotFound) // Now this will pass
+            .andExpect(status().isNotFound)
             .andExpect(jsonPath("$.message").value("Program not found"))
     }
 }

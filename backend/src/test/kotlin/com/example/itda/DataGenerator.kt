@@ -83,8 +83,8 @@ class DataGenerator(
                 summary = "Summary for $title",
                 details = "Details for $title",
                 category = category,
-                operatingEntityType = OperatingEntityType.LOCAL,
-                operatingEntity = "Local Entity $title",
+                operatingEntityType = OperatingEntityType.CENTRAL,
+                operatingEntity = "Operating Entity $title",
                 preview = "Preview for $title",
                 embedding = embeddingValues,
             )

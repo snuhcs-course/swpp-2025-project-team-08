@@ -7,6 +7,7 @@ import com.example.itda.program.persistence.enums.Gender
 import com.example.itda.program.persistence.enums.MaritalStatus
 import com.example.itda.user.controller.AuthRequest
 import com.example.itda.user.controller.ProfileRequest
+import com.example.itda.user.controller.RefreshRequest
 import com.example.itda.user.persistence.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeAll
@@ -66,6 +67,27 @@ class UserTest(
         @JvmStatic
         @ServiceConnection
         val connection = postgreSQLContainer
+    }
+
+    @Test
+    fun `refresh api는 성공적으로 accessToken을 갱신해줘야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("refresh")
+        val password = dataGenerator.generatePassword()
+
+        val token = dataGenerator.signUpAndLogIn(testEmail, password)
+
+        val request = RefreshRequest(token)
+        mockMvc.perform(
+            post("/api/v1/auth/refresh")
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)),
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.accessToken").isNotEmpty)
+            .andExpect(jsonPath("$.refreshToken").isNotEmpty)
+            .andExpect(jsonPath("$.tokenType").value("Bearer"))
+            .andExpect(jsonPath("$.expiresIn").isNumber)
     }
 
     @Test
@@ -210,6 +232,45 @@ class UserTest(
 //        val epsilon = 0.0001f
 //        return kotlin.math.abs(this - expected) < epsilon
 //    }
+
+    @Test
+    fun `getBookmarkedPrograms API는 유저 북마크 리스트를 반환해야 한다`() {
+        val testEmail = dataGenerator.generateUniqueEmail("getBookmarks")
+        val token = dataGenerator.signUpAndLogIn(testEmail, dataGenerator.generatePassword())
+        val embedding = FloatArray(TEST_EMBEDDING_DIMENSION)
+
+        val programA = dataGenerator.saveProgram("Program A", embedding)
+        val programB = dataGenerator.saveProgram("Program B", embedding)
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/bookmark", programA.id)
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+
+        mockMvc.perform(
+            post("/api/v1/programs/{programId}/bookmark", programB.id)
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isNoContent)
+
+        mockMvc.perform(
+            get("/api/v1/users/me/bookmarks")
+                .header("Authorization", "Bearer $token")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "LATEST")
+                .contentType(MediaType.APPLICATION_JSON),
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content").isArray)
+            .andExpect(jsonPath("$.content.length()").value(2))
+            .andExpect(jsonPath("$.content[0].title").value("Program B"))
+            .andExpect(jsonPath("$.content[1].title").value("Program A"))
+            .andExpect(jsonPath("$.totalElements").value(2))
+    }
 
     // --- Exceptions -----------------------------------------
 
