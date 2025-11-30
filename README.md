@@ -35,13 +35,11 @@ To solve this problem, **'잇다'** provides personalized policy recommendations
 * **User Acceptance:** Completed User Acceptance Testing (UAT) Documents.
 
 ### Goals achieved
-- Completed elderly-friendly UI/UX with large fonts, intuitive navigation, and simplified workflows
-- Implemented comprehensive search and recommendation features
-- Added accessibility features (font size adjustment, dark mode)
-- Improved recommendation algorithm with user feedback integration
-- Comprehensive error handling across the app
-- Established testing infrastructure for both frontend and backend
 
+* **Testing:** Achieved test coverage goals and validated system stability through Repository testing.
+* **UI/UX Implementation:** Completed consistent page designs (including Profile and Splash screens) and enhanced accessibility with color themes and variable font sizes.
+* **Recommendation Logic Refinement:** Enhanced the recommendation engine by incorporating user interactions (Likes/Bookmarks) and implementing recommendation reasons.
+* **Architecture & Refactoring:** Successfully adopted design patterns and refactored core modules (Auth, Program fetching) to improve code maintainability.
 
 ## Getting Started
 
