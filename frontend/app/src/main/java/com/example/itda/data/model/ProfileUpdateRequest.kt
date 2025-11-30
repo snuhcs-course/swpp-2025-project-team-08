@@ -45,9 +45,6 @@ data class ProfileUpdateRequest private constructor(
         fun employmentStatus(status: String?) = apply { this.employmentStatus = status }
         fun tags(tags: List<String>?) = apply { this.tags = tags }
 
-        /**
-         * 유효성 검사를 수행 -> ProfileUpdateRequest 객체를 생성
-         */
         fun build(): Result<ProfileUpdateRequest> {
             return runCatching {
                 // 필수 항목 검사
@@ -77,7 +74,6 @@ data class ProfileUpdateRequest private constructor(
             }
         }
     }
-
     companion object {
         fun builder() = Builder()
     }

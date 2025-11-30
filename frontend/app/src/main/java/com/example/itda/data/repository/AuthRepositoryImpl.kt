@@ -8,7 +8,7 @@ import com.example.itda.data.model.ProfileUpdateRequest
 import com.example.itda.data.model.RefreshTokenRequest
 import com.example.itda.data.model.User
 import com.example.itda.data.source.local.PrefDataSource
-import com.example.itda.data.source.remote.RetrofitInstance
+import com.example.itda.data.source.remote.AuthAPI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -18,9 +18,9 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val pref: PrefDataSource
+    private val pref: PrefDataSource,
+    private val api: AuthAPI
 ) : AuthRepository {
-    private val api = RetrofitInstance.authAPI
 
     private var isLoggingOut = false
     private val logoutMutex = Mutex()
