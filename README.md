@@ -16,27 +16,23 @@ To solve this problem, **'잇다'** provides personalized policy recommendations
 ### Features implemented
 
 **1. Frontend Implementation**
-
-- **Onboarding Page**: Interactive tutorial guiding elderly users through app features with swipe navigation
-- **Personal Information Input**: Enabled combined personal info input with text fields for easier data entry
-- **Preference Survey**: Replaced sliders with radio buttons for better usability
-- **Profile Page**: Improved profile page design and added comprehensive error handling
-- **Search Functionality**: Implemented keyword search with API integration, category filtering, and result sorting
-- **Accessibility Settings**:
-    - Font Size Adjustment: Users can adjust text size app-wide
-    - Dark Mode: Toggle dark theme for better visibility
-- **"Not Interested" Feature**: Added option to filter out irrelevant policies
-- **Error Handling**: Comprehensive network and general error handling with user-friendly messages
+* **UI/UX Enhancements:** Implemented splash screen, improved page design consistency, and optimized overall UX.
+* **Accessibility:** Complemented color themes and implemented variable font size support for better accessibility.
+* **Profile & Search Features:** Developed profile page design and implemented bookmark functionality within the search screen.
+* **Authentication:** Connected refresh token logic and fixed logout functionality.
+* **Interaction Logic:** Implemented "Like/Dislike" features and resolved logic errors in bookmarking/liking.
+* **Refactoring & Architecture:** Adopted design patterns, refactored authentication modules, optimized program-fetching codes, and performed overall code refactoring (including profile).
 
 **2. Backend Implementation**
-
-- **Keyword Search API**: Implemented search endpoint with keyword matching
-- **User Preference Collection API**: API for collecting and managing user preferences
+* **Recommendation Engine:** Incorporated "likes/unlikes" and "bookmarks" into the recommendation algorithm and added recommendation reasons to the API response.
+* **Performance:** Implemented User Feed Cache for improved performance.
+* **Authentication:** Implemented refresh token handling.
+* **Logic Fixes:** Fixed address matching logic.
 
 **3. Testing**
-
-- **Frontend Testing**: Implemented unit tests and integration tests for ViewModels and Repository interactions
-- **Backend Testing**: Added integration tests for API endpoints and service layer
+* **Test Coverage:** Completed test code to achieve coverage goals and implemented Repository tests.
+* **Test Maintenance:** Fixed `fakeRepository` implementation in Android integration tests.
+* **User Acceptance:** Completed User Acceptance Testing (UAT) Documents.
 
 ### Goals achieved
 - Completed elderly-friendly UI/UX with large fonts, intuitive navigation, and simplified workflows
