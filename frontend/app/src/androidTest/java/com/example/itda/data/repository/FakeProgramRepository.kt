@@ -1,13 +1,13 @@
 package com.example.itda.data.repository
 
-import com.example.itda.data.model.Category
 import com.example.itda.data.model.PageResponse
-import com.example.itda.data.model.Program
 import com.example.itda.data.model.ProgramDetailResponse
 import com.example.itda.data.model.ProgramPageResponse
 import com.example.itda.data.model.ProgramResponse
 
 class FakeProgramRepository : ProgramRepository {
+
+    // --- Program 조회 및 검색 결과 변수 ---
 
     var getProgramsResult: Result<ProgramPageResponse> = Result.success(
         ProgramPageResponse(
@@ -48,7 +48,9 @@ class FakeProgramRepository : ProgramRepository {
             applyEndAt = "2024-12-31",
             createdAt = "2024-01-01T00:00:00",
             operatingEntity = "서울시청",
-            operatingEntityType = "지방자치단체"
+            operatingEntityType = "지방자치단체",
+            likeStatus = null,
+            isBookmarked = false
         )
     )
     var getExamplesResult: Result<List<ProgramResponse>> = Result.success(emptyList())
@@ -80,10 +82,12 @@ class FakeProgramRepository : ProgramRepository {
             applyEndAt = "2024-12-31",
             createdAt = "2024-01-01T00:00:00",
             operatingEntity = "서울시청",
-            operatingEntityType = "지방자치단체"
+            operatingEntityType = "지방자치단체",
+            likeStatus = null,
+            isBookmarked = false
         )
     )
-    var feedListData: List<Program> = emptyList()
+
     var searchByRankResult: PageResponse<ProgramResponse> = PageResponse(
         content = emptyList(),
         totalPages = 0,
@@ -107,13 +111,16 @@ class FakeProgramRepository : ProgramRepository {
         empty = true
     )
 
+    // --- Program 호출 여부 확인 변수 ---
+
     var getProgramsCalled = false
     var getProgramDetailsCalled = false
     var getExamplesCalled = false
     var getExampleDetailsCalled = false
-    var getFeedListCalled = false
     var searchByRankCalled = false
     var searchByLatestCalled = false
+
+    // --- Program 마지막 호출 파라미터 변수 ---
 
     var lastGetProgramsPage: Int? = null
     var lastGetProgramsSize: Int? = null
@@ -128,6 +135,63 @@ class FakeProgramRepository : ProgramRepository {
     var lastSearchByLatestPage: Int? = null
     var lastSearchByLatestSize: Int? = null
     var lastSearchByLatestCategory: String? = null
+
+    // --- Bookmark 관련 결과 변수 ---
+
+    var getUserBookmarkProgramsResult: Result<ProgramPageResponse> = Result.success(
+        ProgramPageResponse(
+            content = emptyList(),
+            totalPages = 0,
+            totalElements = 0,
+            size = 20,
+            page = 0,
+            isFirst = true,
+            isLast = true
+        )
+    )
+    var getAllUserBookmarksResult: Result<List<ProgramResponse>> = Result.success(emptyList())
+    var bookmarkProgramResult: Result<Unit> = Result.success(Unit)
+    var unbookmarkProgramResult: Result<Unit> = Result.success(Unit)
+
+    // --- Bookmark 관련 호출 여부 확인 변수 ---
+
+    var getUserBookmarkProgramsCalled = false
+    var getAllUserBookmarksCalled = false
+    var bookmarkProgramCalled = false
+    var unbookmarkProgramCalled = false
+
+    // --- Bookmark 관련 마지막 호출 파라미터 변수 ---
+
+    var lastGetUserBookmarkProgramsSort: String? = null
+    var lastGetUserBookmarkProgramsPage: Int? = null
+    var lastGetUserBookmarkProgramsSize: Int? = null
+    var lastBookmarkProgramId: Int? = null
+    var lastUnbookmarkProgramId: Int? = null
+
+    // --- Like/Dislike 관련 결과 변수 (추가) ---
+
+    var likeLikeProgramResult: Result<Unit> = Result.success(Unit)
+    var unlikeLikeProgramResult: Result<Unit> = Result.success(Unit)
+    var likeDislikeProgramResult: Result<Unit> = Result.success(Unit)
+    var unlikeDislikeProgramResult: Result<Unit> = Result.success(Unit)
+
+    // --- Like/Dislike 관련 호출 여부 확인 변수 (추가) ---
+
+    var likeLikeProgramCalled = false
+    var unlikeLikeProgramCalled = false
+    var likeDislikeProgramCalled = false
+    var unlikeDislikeProgramCalled = false
+
+    // --- Like/Dislike 관련 마지막 호출 파라미터 변수 (추가) ---
+
+    var lastLikeLikeProgramId: Int? = null
+    var lastUnlikeLikeProgramId: Int? = null
+    var lastLikeDislikeProgramId: Int? = null
+    var lastUnlikeDislikeProgramId: Int? = null
+
+    // ------------------------------------
+    // --- ProgramRepository 구현 시작 ---
+    // ------------------------------------
 
     override suspend fun getPrograms(page: Int, size: Int, category: String): Result<ProgramPageResponse> {
         getProgramsCalled = true
@@ -152,11 +216,6 @@ class FakeProgramRepository : ProgramRepository {
         getExampleDetailsCalled = true
         lastGetExampleDetailsId = exampleId
         return getExampleDetailsResult
-    }
-
-    override fun getFeedList(): List<Program> {
-        getFeedListCalled = true
-        return feedListData
     }
 
     override suspend fun searchByRank(
@@ -187,32 +246,6 @@ class FakeProgramRepository : ProgramRepository {
         return searchByLatestResult
     }
 
-    var getUserBookmarkProgramsResult: Result<ProgramPageResponse> = Result.success(
-        ProgramPageResponse(
-            content = emptyList(),
-            totalPages = 0,
-            totalElements = 0,
-            size = 20,
-            page = 0,
-            isFirst = true,
-            isLast = true
-        )
-    )
-    var getAllUserBookmarksResult: Result<List<ProgramResponse>> = Result.success(emptyList())
-    var bookmarkProgramResult: Result<Unit> = Result.success(Unit)
-    var unbookmarkProgramResult: Result<Unit> = Result.success(Unit)
-
-    var getUserBookmarkProgramsCalled = false
-    var getAllUserBookmarksCalled = false
-    var bookmarkProgramCalled = false
-    var unbookmarkProgramCalled = false
-
-    var lastGetUserBookmarkProgramsSort: String? = null
-    var lastGetUserBookmarkProgramsPage: Int? = null
-    var lastGetUserBookmarkProgramsSize: Int? = null
-    var lastBookmarkProgramId: Int? = null
-    var lastUnbookmarkProgramId: Int? = null
-
     override suspend fun getUserBookmarkPrograms(sort: String, page: Int, size: Int): Result<ProgramPageResponse> {
         getUserBookmarkProgramsCalled = true
         lastGetUserBookmarkProgramsSort = sort
@@ -221,8 +254,12 @@ class FakeProgramRepository : ProgramRepository {
         return getUserBookmarkProgramsResult
     }
 
+    // ProgramRepositoryImpl.kt의 getAllUserBookmarks() 로직을 참고하여 (페이징을 처리하는 로직은 Fake 이므로 단순화)
     override suspend fun getAllUserBookmarks(): Result<List<ProgramResponse>> {
         getAllUserBookmarksCalled = true
+        // 실제 구현에서는 ProgramRepositoryImpl처럼 페이징 로직이 있지만, Fake에서는 단순화하여
+        // 첫 페이지 (page=0)의 결과를 반환하거나, 별도로 설정된 결과를 반환하도록 구현할 수 있습니다.
+        // 여기서는 ProgramRepositoryImpl의 로직을 대체하여 설정된 결과를 반환합니다.
         return getAllUserBookmarksResult
     }
 
@@ -238,7 +275,39 @@ class FakeProgramRepository : ProgramRepository {
         return unbookmarkProgramResult
     }
 
+    // --- Like/Dislike 관련 함수 구현 (추가) ---
+
+    override suspend fun likeLikeProgram(programId: Int): Result<Unit> {
+        likeLikeProgramCalled = true
+        lastLikeLikeProgramId = programId
+        return likeLikeProgramResult
+    }
+
+    override suspend fun unlikeLikeProgram(programId: Int): Result<Unit> {
+        unlikeLikeProgramCalled = true
+        lastUnlikeLikeProgramId = programId
+        return unlikeLikeProgramResult
+    }
+
+    override suspend fun likeDislikeProgram(programId: Int): Result<Unit> {
+        likeDislikeProgramCalled = true
+        lastLikeDislikeProgramId = programId
+        return likeDislikeProgramResult
+    }
+
+    override suspend fun unlikeDislikeProgram(programId: Int): Result<Unit> {
+        unlikeDislikeProgramCalled = true
+        lastUnlikeDislikeProgramId = programId
+        return unlikeDislikeProgramResult
+    }
+
+
+    // --------------------------------
+    // --- 초기화 (reset) 함수 시작 ---
+    // --------------------------------
+
     fun reset() {
+        // 프로그램 결과 초기화
         getProgramsResult = Result.success(
             ProgramPageResponse(
                 content = emptyList(),
@@ -278,7 +347,9 @@ class FakeProgramRepository : ProgramRepository {
                 applyEndAt = "2024-12-31",
                 createdAt = "2024-01-01T00:00:00",
                 operatingEntity = "서울시청",
-                operatingEntityType = "지방자치단체"
+                operatingEntityType = "지방자치단체",
+                likeStatus = null,
+                isBookmarked = false
             )
         )
         getExamplesResult = Result.success(emptyList())
@@ -310,10 +381,11 @@ class FakeProgramRepository : ProgramRepository {
                 applyEndAt = "2024-12-31",
                 createdAt = "2024-01-01T00:00:00",
                 operatingEntity = "서울시청",
-                operatingEntityType = "지방자치단체"
+                operatingEntityType = "지방자치단체",
+                likeStatus = null,
+                isBookmarked = false
             )
         )
-        feedListData = emptyList()
         searchByRankResult = PageResponse(
             content = emptyList(),
             totalPages = 0,
@@ -337,6 +409,7 @@ class FakeProgramRepository : ProgramRepository {
             empty = true
         )
 
+        // 북마크 결과 초기화
         getUserBookmarkProgramsResult = Result.success(
             ProgramPageResponse(
                 content = emptyList(),
@@ -352,18 +425,29 @@ class FakeProgramRepository : ProgramRepository {
         bookmarkProgramResult = Result.success(Unit)
         unbookmarkProgramResult = Result.success(Unit)
 
+        // 좋아요/싫어요 결과 초기화 (추가)
+        likeLikeProgramResult = Result.success(Unit)
+        unlikeLikeProgramResult = Result.success(Unit)
+        likeDislikeProgramResult = Result.success(Unit)
+        unlikeDislikeProgramResult = Result.success(Unit)
+
+        // 호출 여부 초기화
         getProgramsCalled = false
         getProgramDetailsCalled = false
         getExamplesCalled = false
         getExampleDetailsCalled = false
-        getFeedListCalled = false
         searchByRankCalled = false
         searchByLatestCalled = false
         getUserBookmarkProgramsCalled = false
         getAllUserBookmarksCalled = false
         bookmarkProgramCalled = false
         unbookmarkProgramCalled = false
+        likeLikeProgramCalled = false // 추가
+        unlikeLikeProgramCalled = false // 추가
+        likeDislikeProgramCalled = false // 추가
+        unlikeDislikeProgramCalled = false // 추가
 
+        // 마지막 호출 파라미터 초기화
         lastGetProgramsPage = null
         lastGetProgramsSize = null
         lastGetProgramsCategory = null
@@ -382,5 +466,9 @@ class FakeProgramRepository : ProgramRepository {
         lastGetUserBookmarkProgramsSize = null
         lastBookmarkProgramId = null
         lastUnbookmarkProgramId = null
+        lastLikeLikeProgramId = null // 추가
+        lastUnlikeLikeProgramId = null // 추가
+        lastLikeDislikeProgramId = null // 추가
+        lastUnlikeDislikeProgramId = null // 추가
     }
 }
