@@ -1,5 +1,5 @@
 python ./src/main.py \
-    load \
+    all \
     --load-max-page-bokjiro 180 \
     --load-max-page-subsidy24 50 \
     --vectorize-batch-size 32 \
