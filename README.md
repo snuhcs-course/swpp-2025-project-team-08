@@ -11,7 +11,7 @@ To solve this problem, **'잇다'** provides personalized policy recommendations
 
 ### Showcasing demo video
 
-[demo video](https://drive.google.com/file/d/1unlG4Mt3GrJ6agI6av3z36DQfk5TLxlG/view?usp=sharing)
+[demo video](https://youtube.com/shorts/iPXSoZVXLwI?feature=share)
 
 ### Features implemented
 
