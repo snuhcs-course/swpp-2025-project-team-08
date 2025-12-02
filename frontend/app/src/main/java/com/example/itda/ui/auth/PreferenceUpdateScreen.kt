@@ -126,7 +126,7 @@ fun PreferenceUpdateScreen(
 
 
 
-                    // --- 1. Horizontal Pager (정책 카드 뷰어) ---
+                    // Horizontal Pager (정책 카드 뷰어)
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier.weight(1f) // 남은 공간 차지
@@ -158,7 +158,6 @@ fun PreferenceUpdateScreen(
                                     onClick = { onFeedExampleClick(program.id) },
                                     onBookmarkClicked = {},
                                     isExample = true,
-                                    onDismissRequest = {}
                                 )
 
 
@@ -190,7 +189,7 @@ fun PreferenceUpdateScreen(
                             .height(80.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        // --- 3. 내비게이션 및 제출 버튼 섹션 ---
+                        // 내비게이션 및 제출 버튼 섹션
                         PagerNavigation(
                             pagerState = pagerState,
                             pageCount = pageCount,

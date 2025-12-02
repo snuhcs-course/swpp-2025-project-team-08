@@ -218,7 +218,6 @@ fun SearchScreen(
                                 onFeedBookmarkClicked(id)
                             },
                             isPaginating = uiState.isPaginating,
-                            dismissable = false
                         )
                     }
                     else if (uiState.generalError != null) {

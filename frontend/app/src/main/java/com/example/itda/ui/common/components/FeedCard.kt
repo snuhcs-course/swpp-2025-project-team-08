@@ -37,17 +37,11 @@ fun FeedCard(
     categories: List<String>,       // 프로그램 카테고리
     department: String,     // 주관 부서
     content: String,        // 프로그램 설명 (text)
-    // start_date: String ? = null,     // 시작 날짜 (ISO 포맷 문자열로 전달)
-    // end_date: String ? = null,       // 종료 날짜
-
     isBookmarked : Boolean = false,     // 즐겨찾기 여부
     reason : String? = null, // 추천 이유
     logo: Int = R.drawable.gov_logo,    // 로고 ID?
-    // logoUrl : String ? = null
     onClick: () -> Unit,
     onBookmarkClicked : () -> Unit,
-
-    onDismissRequest: () -> Unit, // 관심없음 처리
     isExample : Boolean = false,
 ) {
 
@@ -188,7 +182,6 @@ fun PreviewFeedItem() {
                 logo = R.drawable.gov_logo,
                 onClick = { },
                 onBookmarkClicked = {},
-                onDismissRequest = {}
             )
         }
     }

@@ -102,7 +102,7 @@ class BookmarkViewModel @Inject constructor(
     }
 
     /**
-     * 💡 페이지 0 의 북마크 목록을 로드하고 상태를 초기화합니다. (초기 로드 및 새로고침)
+     * 페이지 0 의 북마크 목록을 로드하고 상태를 초기화합니다. (초기 로드 및 새로고침)
      */
     fun loadBookmarkData(isRefresh: Boolean = false) {
         viewModelScope.launch {
@@ -153,7 +153,7 @@ class BookmarkViewModel @Inject constructor(
     }
 
     /**
-     * 💡 다음 페이지의 북마크 목록을 로드하고 기존 목록에 추가합니다.
+     * 다음 페이지의 북마크 목록을 로드하고 기존 목록에 추가합니다.
      */
     fun loadNextPage() {
         viewModelScope.launch {
@@ -181,8 +181,6 @@ class BookmarkViewModel @Inject constructor(
                 }
                 .onSuccess { response ->
                     val newPrograms = response.content
-//                    val currentPrograms = _uiState.value.allLoadedPrograms
-//                    val currentIds = _uiState.value.bookmarkIds
 
                     _uiState.update { currentState ->
                         val updatedPrograms = currentState.allLoadedPrograms + newPrograms
