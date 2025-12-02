@@ -8,7 +8,6 @@ import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.auth.LoginRoute
 import com.example.itda.ui.auth.OnBoardingRoute
 import com.example.itda.ui.auth.PersonalInfoRoute
-import com.example.itda.ui.auth.PreferenceUpdateRoute
 import com.example.itda.ui.auth.SignUpRoute
 
 fun NavGraphBuilder.authGraph(
@@ -48,20 +47,20 @@ fun NavGraphBuilder.authGraph(
         composable("personal_info") {
             PersonalInfoRoute(
                 onComplete = {
-                    navController.navigate("preference_update") {
+                    navController.navigate("onboarding") {
                         popUpTo("auth_graph") { inclusive = true }
                     }
                 }
             )
         }
-        composable("preference_update") {
+        /*composable("preference_update") {
             PreferenceUpdateRoute(
                 onComplete = {
                     navController.navigate("onboarding") {
                         popUpTo("auth_graph") { inclusive = true }
                     }
                 })
-        }
+        }*/
         composable("onboarding") {
             OnBoardingRoute(
                 onComplete = {
