@@ -12,7 +12,6 @@ import com.example.itda.ui.auth.SignUpRoute
 
 fun NavGraphBuilder.authGraph(
     navController: NavController,
-    authViewModel: AuthViewModel
 ) {
     navigation(
         startDestination = "login",
@@ -53,14 +52,6 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
-        /*composable("preference_update") {
-            PreferenceUpdateRoute(
-                onComplete = {
-                    navController.navigate("onboarding") {
-                        popUpTo("auth_graph") { inclusive = true }
-                    }
-                })
-        }*/
         composable("onboarding") {
             OnBoardingRoute(
                 onComplete = {

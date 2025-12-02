@@ -41,7 +41,7 @@ fun NavGraphBuilder.mainGraph(
         startDestination = MainTabRoutes.first(), // "home"
         route = "main_graph"
     ) {
-        // 1. 메인 탭 화면들 정의
+        // 메인 탭 화면
         MainTabRoutes.forEach { route ->
             composable(route) { backStackEntry ->
                 // MainScaffoldWrapper로 감싸서 BottomBar와 Padding을 제공
@@ -87,7 +87,7 @@ fun NavGraphBuilder.mainGraph(
 
                             // 북마크 변경 결과 감지 및 처리
                             LaunchedEffect(backStackEntry) {
-                                // Pair<Int, Boolean> 형태의 데이터를 관찰합니다. (ID, 최종 상태)
+                                // Pair<Int, Boolean> 형태 데이터 관찰 (ID, 최종 상태)
                                 backStackEntry.savedStateHandle.getLiveData<Pair<Int, Boolean>>("bookmark_change_info").observe(
                                     backStackEntry
                                 ) { info ->
@@ -117,7 +117,7 @@ fun NavGraphBuilder.mainGraph(
             }
         }
 
-        // 2. Bottom Bar가 없는 상세 화면 정의
+        // Bottom Bar가 없는 상세 화면 정의
         composable(
             route = "feed/{feedId}",
             arguments = listOf(navArgument("feedId") { type = NavType.IntType })
@@ -181,14 +181,10 @@ fun MainScaffoldWrapper(
     navController: NavController,
     content: @Composable (paddingValues: PaddingValues) -> Unit
 ) {
-    // 현재 경로를 확인하여 Bottom Bar를 숨길지 결정하는 로직을 추가할 수 있습니다.
-    // 하지만, NavGraphMain에서 Scaffold Wrapper를 사용할 때,
-    // BottomBar가 필요 없는 경로는 Wrapper를 사용하지 않도록 설계하는 것이 더 깔끔합니다.
-    // 여기서는 BottomNavBar가 필요한 탭 화면을 감싸는 역할만 수행합니다.
     Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }, // 👈 BottomNavBar가 여기에 위치
-        containerColor = MaterialTheme.colorScheme.background, // 배경색
-    ) { innerPadding -> // 👈 BottomBar의 높이만큼 계산된 PaddingValues가 innerPadding으로 제공됨
-        content(innerPadding) // 👈 이 innerPadding이 content 람다를 통해 Route로 전달됩니다.
+        bottomBar = { BottomNavBar(navController = navController) },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        content(innerPadding)
     }
 }

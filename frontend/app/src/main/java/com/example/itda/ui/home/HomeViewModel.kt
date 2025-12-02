@@ -25,7 +25,6 @@ class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val programRepository: ProgramRepository,
 ) : ViewModel() {
-    //    val programs = programRepository.getPrograms()
     data class HomeUiState(
         val userId: String = "", // 사용자 정보
         val username: String = "", // 사용자 정보
@@ -74,7 +73,6 @@ class HomeViewModel @Inject constructor(
             if(homeUi.value.isRefreshing == false && homeUi.value.isPullToRefreshing == false) {
                 _homeUi.update { it.copy(isPullToRefreshing = true) }
                 try {
-                    // 이 두 함수가 SUSPEND 함수여야만 다음 줄로 넘어가기 전에 대기합니다.
                     loadHomeData()
                     initBookmarkList()
 
@@ -98,7 +96,6 @@ class HomeViewModel @Inject constructor(
             if(homeUi.value.isRefreshing == false) {
                 _homeUi.update { it.copy(isRefreshing = true) }
                 try {
-                    // 이 두 함수가 SUSPEND 함수여야만 다음 줄로 넘어가기 전에 대기합니다.
                     loadHomeData()
                     initBookmarkList()
 
@@ -173,7 +170,6 @@ class HomeViewModel @Inject constructor(
                 }
             programs
                 .onSuccess { response ->
-                    // 빈 list에 programs 의 categories 에 속하는 category 들의 합집합 집어넣어서 newCategories 구성하기
                     _homeUi.update {
                         it.copy(
                             feedItems = response.content,
@@ -207,7 +203,7 @@ class HomeViewModel @Inject constructor(
         val nextPageIndex = homeUi.value.currentPage + 1
         val isLast = homeUi.value.isLastPage
 
-        // 1. 이미 로딩 중이거나 마지막 페이지면 더 이상 호출하지 않음
+        // 이미 로딩 중이거나 마지막 페이지면 더 이상 호출하지 않음
         if (homeUi.value.isPaginating || isLast) return
 
 
@@ -247,7 +243,6 @@ class HomeViewModel @Inject constructor(
     fun onCategorySelected(category: Category) {
         _homeUi.update {
             it.copy(
-                // TODO - 현재는 Category.kt 에 저장해둔 dummy list 에서 찾지만 나중에 categories 찾는 api 구현 시 programRepository 통해 api 로 찾아서 저장해둔 category 에서 찾아오기
                 selectedCategory = category
             )
         }
@@ -278,7 +273,6 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { response ->
                     _homeUi.update {
                         it.copy(
-                            // generalError = null,
                             bookmarkPrograms = response.map { it.id },
                             isLoading = false,
                             isLoadingBookmark = false,
@@ -295,7 +289,7 @@ class HomeViewModel @Inject constructor(
                 isLoadingBookmark = true, // 로딩 시작
             ) }
 
-            // 1. UI 에서 즉시 북마크 상태를 토글합니다.
+            // UI 에서 즉시 북마크 상태를 토글합니다.
             val isBookmarked = id in homeUi.value.bookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
                 _homeUi.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
@@ -304,7 +298,7 @@ class HomeViewModel @Inject constructor(
             }
 
 
-            // 3. API 호출
+            // API 호출
             val apiCall = if(isBookmarked)
                 programRepository.unbookmarkProgram(id)
             else
@@ -313,7 +307,7 @@ class HomeViewModel @Inject constructor(
             apiCall
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
-                    // 4. API 실패 시, UI 상태를 원래대로 되돌립니다.
+                    // API 실패 시, UI 상태를 원래대로 되돌립니다.
                     _homeUi.update {
                         it.copy(
                             generalError = apiError.message,
@@ -324,7 +318,7 @@ class HomeViewModel @Inject constructor(
 
                 }
                 .onSuccess { response ->
-                    // 5. API 성공
+                    // API 성공
                     _homeUi.update {
                         it.copy(
                             generalError = null,

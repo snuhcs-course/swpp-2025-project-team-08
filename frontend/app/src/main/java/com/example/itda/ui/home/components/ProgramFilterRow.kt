@@ -18,9 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.data.model.Category
-import com.example.itda.ui.common.theme.*
+import com.example.itda.ui.common.theme.scaledSp
 
 @Composable
 fun ProgramFilterRow(
@@ -39,10 +38,10 @@ fun ProgramFilterRow(
         items(categories) { category ->
             val isSelected = category.category == selectedCategory.category
 
-            // 1. 애니메이션 값을 제어할 수 있는 Animatable을 생성합니다. (Float으로 시작)
+            // 애니메이션 값을 제어할 수 있는 Animatable을 생성
             val animatedCount = remember { Animatable(0f) }
 
-            // 2. 'isSelected' 상태나 'selectedCategoryCount' 값이 변경될 때마다 이펙트를 실행합니다.
+            // isSelected 나 selectedCategoryCount 값이 변경될 때마다 이펙트 실행
             LaunchedEffect(key1 = isSelected, key2 = selectedCategoryCount) {
                 if (isSelected) {
                     val durationPerItem = 20
@@ -55,11 +54,11 @@ fun ProgramFilterRow(
 
                     animatedCount.animateTo(
                         targetValue = selectedCategoryCount.toFloat(),
-                        // 3. 계산된 'dynamicDuration'을 tween에 적용
+                        // 계산된 dynamicDuration을 tween에 적용
                         animationSpec = tween(durationMillis = dynamicDuration)
                     )
                 } else {
-                    // 5. 선택이 해제되면 즉시 '0'으로 리셋합니다.
+                    // 선택이 해제되면 0으로 리셋
                     animatedCount.snapTo(0f)
                 }
             }

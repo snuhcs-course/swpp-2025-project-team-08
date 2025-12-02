@@ -3,8 +3,8 @@ package com.example.itda.ui.feed
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.itda.data.model.DummyData
 import com.example.itda.data.model.ProgramDetailResponse
+import com.example.itda.data.model.dummyProgramDetailResponse
 import com.example.itda.data.repository.ProgramRepository
 import com.example.itda.data.source.remote.ApiErrorParser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ class FeedViewModel @Inject constructor(
 
 
     data class FeedUiState(
-        val feed: ProgramDetailResponse = DummyData.dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
+        val feed: ProgramDetailResponse = dummyProgramDetailResponse, // 피드 데이터[0], // 사용자 정보
         val isBookmarked : Boolean = false,
         val isLiked : Boolean = false,
         val isDisliked : Boolean = false,
@@ -133,7 +133,7 @@ class FeedViewModel @Inject constructor(
                         it.copy(
                             generalError = null,
                             isLiked = !isLiked,
-                            isDisliked = false, // TODO - 만약 api 에서 자동으로 isLiked 상태 변경시키지 않으면 여기서도 api 호출해야되네..
+                            isDisliked = false,
                         )
                     }
                 }
@@ -163,18 +163,10 @@ class FeedViewModel @Inject constructor(
                         it.copy(
                             generalError = null,
                             isDisliked = !isDisliked,
-                            isLiked = false // TODO - 만약 api 에서 자동으로 isLiked 상태 변경시키지 않으면 여기서도 api 호출해야되네..
+                            isLiked = false
                         )
                     }
                 }
         }
-    }
-
-    fun checkLikeStatus() {
-        // TODO -  like dislike 상태 받아오는 api 완성되면 연결시킬것. launchedEffect 로 feedscreen 들어갈 때마다 호출해서 feedUi의 isLiked/isDisliked 에 반영
-    }
-
-    fun applicationProgram(feedID: Int) {
-        // TOOD - Repository 연결해서 program 바로 신청
     }
 }

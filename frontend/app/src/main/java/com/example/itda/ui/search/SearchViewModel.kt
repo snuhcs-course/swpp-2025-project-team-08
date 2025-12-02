@@ -267,7 +267,7 @@ class SearchViewModel @Inject constructor(
     fun onFeedBookmarkClicked(id: Int) {
         viewModelScope.launch {
 
-            // 1. UI 에서 즉시 북마크 상태를 토글합니다.
+            // UI 에서 즉시 북마크 상태를 토글합니다.
             val isBookmarked = id in uiState.value.bookmarkPrograms
             val updatedBookmarkPrograms = if (isBookmarked) {
                 uiState.value.bookmarkPrograms - id // 북마크 해제 (리스트에서 제거)
@@ -276,7 +276,7 @@ class SearchViewModel @Inject constructor(
             }
 
 
-            // 3. API 호출
+            // API 호출
             val apiCall = if(isBookmarked)
                 programRepository.unbookmarkProgram(id)
             else
@@ -285,7 +285,7 @@ class SearchViewModel @Inject constructor(
             apiCall
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
-                    // 4. API 실패 시, UI 상태를 원래대로 되돌립니다.
+                    // API 실패 시, UI 상태를 원래대로 되돌립니다.
                     _uiState.update {
                         it.copy(
                             generalError = apiError.message,
@@ -295,7 +295,7 @@ class SearchViewModel @Inject constructor(
 
                 }
                 .onSuccess { response ->
-                    // 5. API 성공
+                    // API 성공
                     _uiState.update {
                         it.copy(
                             generalError = null,

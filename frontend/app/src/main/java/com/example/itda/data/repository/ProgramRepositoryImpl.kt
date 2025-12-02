@@ -119,7 +119,7 @@ class ProgramRepositoryImpl @Inject constructor(
         return runCatching {
             val allPrograms = mutableListOf<ProgramResponse>()
             var currentPage = 0
-            val pageSize = 20 // 적절한 페이지 크기 설정
+            val pageSize = 20
 
             while (true) {
                 val pageResult = getUserBookmarkPrograms(sort = "LATEST", page = currentPage, size = pageSize)

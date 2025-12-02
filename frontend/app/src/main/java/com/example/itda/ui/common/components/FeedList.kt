@@ -43,7 +43,6 @@ fun FeedList(
                         R.drawable.local,
                 onClick = { onItemClick(item) },
                 onBookmarkClicked = { onItemBookmarkClicked(item.id) },
-                onDismissRequest = {}
             )
         }
         if(isPaginating) {

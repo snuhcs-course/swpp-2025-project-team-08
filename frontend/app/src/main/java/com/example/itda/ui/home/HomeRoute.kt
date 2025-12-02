@@ -36,7 +36,6 @@ fun HomeRoute(
         onLoadNext = vm::loadNextPage,
         onRefreshProfile = vm::loadMyProfile,
         scrollToTopEventFlow = scrollToTopEventFlow,
-        onFeedDislike = vm::feedDisLike,
         modifier = modifier
     )
 }

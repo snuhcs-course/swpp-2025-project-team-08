@@ -31,11 +31,11 @@ fun getDDayLabel(endDate: String): Long {
  */
 fun formatIsoDateToYmd(isoDateString: String): String? {
     try {
-        // 1. 문자열의 앞 10자리("yyyy-MM-dd")를 잘라냅니다.
+        // 문자열의 앞 10자리("yyyy-MM-dd")를 잘라냅니다.
         // (입력: "2024-12-01T00:00:00Z" -> 결과: "2024-12-01")
         val datePart = isoDateString.substring(0, 10)
 
-        // 2. 하이픈(-)을 점(.)으로 교체합니다.
+        // 하이픈(-)을 점(.)으로 교체합니다.
         // (입력: "2024-12-01" -> 결과: "2024.12.01")
         return datePart.replace('-', '.')
 

@@ -39,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.itda.ui.common.components.BaseScreen
 import com.example.itda.ui.common.components.FeedList
 import com.example.itda.ui.common.theme.scaledSp
@@ -63,7 +62,6 @@ fun BookmarkScreen(
 
     val listState = rememberLazyListState()
 
-    // 💡 수정: 스크롤 감지 및 다음 페이지 로드 로직 재구현
     LaunchedEffect(listState) {
         val threshold = 5 // 마지막 5개 아이템이 보일 때 로드 시작
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
@@ -85,7 +83,6 @@ fun BookmarkScreen(
 
 
     LaunchedEffect(ui.bookmarkItems) {
-        // 💡 카테고리 필터링이 적용되더라도, 새 목록이 들어오면 맨 위로 스크롤
         if (ui.bookmarkItems.isNotEmpty()) {
             listState.animateScrollToItem(0)
         }
@@ -139,7 +136,6 @@ fun BookmarkScreen(
                             listState = listState,
                             onItemClick = { feed -> onFeedClick(feed.id) },
                             onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) },
-                            // 💡 수정: isPaginating 상태를 전달하여 로딩 표시기를 띄웁니다.
                             isPaginating = ui.isPaginating,
                         )
                     }
@@ -160,11 +156,9 @@ fun BookmarkSortRow(
         contentPadding = PaddingValues(horizontal = 0.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // 💡 수정: items(List<T>) 대신 items(count: Int)를 사용
         items(
             count = sortOptions.size
         ) { index ->
-            // 💡 index를 사용하여 리스트 항목에 접근합니다.
             val sortOption = sortOptions[index]
 
             val isSelected = sortOption.apiValue == selectedSort.apiValue
@@ -219,8 +213,6 @@ fun BookmarkHeader(
 
 @Composable
 private fun EmptyBookmarkState() {
-    // ... (기존 EmptyBookmarkState 컴포저블) ...
-    // Note: You must ensure this component is fully implemented in your actual file.
     Column(
         modifier = Modifier
             .fillMaxWidth()

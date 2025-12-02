@@ -28,7 +28,7 @@ fun AppNavHost() {
         navController = navController,
         startDestination = startDestination
     ) {
-        authGraph(navController, authViewModel)
+        authGraph(navController)
         mainGraph(navController, authViewModel)
     }
 }

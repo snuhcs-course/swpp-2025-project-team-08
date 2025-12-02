@@ -444,16 +444,4 @@ class FeedViewModelTest {
         verify(programRepository).likeDislikeProgram(programId)
     }
 
-    // ========== no-op functions ==========
-
-    @Test
-    fun checkLikeStatus_and_applicationProgram_doNotCrash() = runTest {
-        val before = viewModel.feedUi.value
-
-        viewModel.checkLikeStatus()
-        viewModel.applicationProgram(feedID = 123)
-
-        val after = viewModel.feedUi.value
-        assertThat(after).isEqualTo(before)
-    }
 }
