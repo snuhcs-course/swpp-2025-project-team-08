@@ -50,13 +50,13 @@ import com.example.itda.ui.common.theme.scaledSp
 
 // ⚠️ 실제 프로젝트의 R.raw. ID로 대체해야 합니다.
 private val onboardingVideos = listOf(
-    R.raw.onboarding1_1_home_feed,
-    R.raw.onboarding1_2_category,
-    R.raw.onboarding1_3_exclusion,
-    R.raw.onboarding2_search,
-    R.raw.onboarding3_bookmark,
-    R.raw.onboarding4_profile_update,
-    R.raw.onboarding5_setting
+    R.raw.onboarding_01_program,
+    R.raw.onboarding_02_category,
+    R.raw.onboarding_03_likedislike,
+    R.raw.onboarding_04_search,
+    R.raw.onboarding_05_bookmark,
+    R.raw.onboarding_06_profile,
+    R.raw.onboarding_07_setting
 )
 
 private val onboardingVideotitle = listOf(
@@ -72,7 +72,7 @@ private val onboardingVideotitle = listOf(
 private val onboardingVideoDescription = listOf(
     "📄 맞춤 정책을 확인하세요.",
     "🗂️ 카테고리 별로 확인할 수 있습니다.",
-    "❌ 관심없는 정책은 왼쪽으로 밀어 제외하세요.",
+    "♥️ 마음에 드는 정책에는 좋아요를 눌러보세요.",
     "🔍 원하는 정책을 검색해보세요.",
     "🔖 북마크한 정책들을 모아서 확인해보세요.",
     "👤 내가 입력했던 정보들을 수정할 수 있습니다.",
@@ -98,7 +98,6 @@ fun OnBoardingScreen(
             .padding(vertical = 32.dp)
     ) {
         with(density) {
-            // 2. 🚀 Box 컴포저블 전체
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,8 +114,6 @@ fun OnBoardingScreen(
                         .background(Primary50.copy(alpha = 0.2f))
                 )
 
-                // --- 배경 원 요소 2: 왼쪽 중간 원 (반대 방향 회전하며 화면 밖으로 이동) ---
-                val rotation2 = totalProgress * (-90f) // 페이지당 -90도 회전
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -126,10 +123,6 @@ fun OnBoardingScreen(
                         .background(Primary50.copy(alpha = 0.4f))
                 )
 
-                // --- 배경 원 요소 3: 우측 작은 원 (크기만 줄어들도록) ---
-                // 이 원은 회전 대신 크기만 줄어들어 부드럽게 사라지도록 합니다. // 1.0 -> 0.5 로 크기가 줄어듦
-                val rotation3 = totalProgress * 45f // 페이지당 45도 회전
-                val scale3_new = 1.0f - (totalProgress % 1.0f) * 0.2f // 0.8 ~ 1.0 사이로 크기 변화
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -179,7 +172,7 @@ fun OnBoardingScreen(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        // 2. 페이지 인디케이터 및 네비게이션 버튼
+                        // 페이지 인디케이터 및 네비게이션 버튼
                         OnBoardingBottomNavigation(
                             pagerState = pagerState,
                             pageCount = pageCount,
@@ -218,7 +211,7 @@ private fun VideoPage(
         }
     }
 
-    // ⭐️ isCurrentPage 상태가 변경될 때마다 재생/일시정지 상태를 업데이트합니다.
+    // isCurrentPage 상태가 변경될 때마다 재생/일시정지 상태를 업데이트합니다.
     DisposableEffect(isCurrentPage) {
         if (isCurrentPage) {
             exoPlayer.play()
@@ -281,8 +274,6 @@ private fun OnBoardingBottomNavigation(
     pagerState: PagerState,
     pageCount: Int,
     onSubmit: () -> Unit,
-    // onPrev: () -> Unit, // ⚠️ 제거됨
-    // onNext: () -> Unit // ⚠️ 제거됨
 ) {
     val currentPage = pagerState.currentPage
     val isLastPage = currentPage == pageCount - 1
