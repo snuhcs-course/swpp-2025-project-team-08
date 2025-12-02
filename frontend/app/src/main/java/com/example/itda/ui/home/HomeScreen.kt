@@ -155,7 +155,6 @@ fun HomeScreen(
                             bookmarkPrograms = ui.bookmarkPrograms,
                             listState = listState,
                             onItemClick = { feed -> onFeedClick(feed.id) },
-                            onItemDislike = { id -> onFeedDislike(id) },
                             onItemBookmarkClicked = { id -> onFeedBookmarkClick(id) },
                             isPaginating = ui.isPaginating,
                         )
