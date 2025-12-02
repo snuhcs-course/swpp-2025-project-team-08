@@ -48,6 +48,7 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
                 (LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))) 
                OR (LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')))
                OR (LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')))
+               OR (LOWER(p.operatingEntity) LIKE LOWER(CONCAT('%', :query, '%')))
            )
             And (:category IS NULL OR p.category = :category)
         ORDER BY p.createdAt DESC,
@@ -68,14 +69,14 @@ interface ProgramRepository : JpaRepository<ProgramEntity, Long> {
                 LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) 
                OR LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%'))
                OR LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%'))
-               OR LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(p.operatingEntity) LIKE LOWER(CONCAT('%', :query, '%'))
             )
             And (:category IS NULL OR p.category = :category)
         ORDER BY 
             (CASE WHEN LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) THEN 4 ELSE 0 END) +
             (CASE WHEN LOWER(p.preview) LIKE LOWER(CONCAT('%', :query, '%')) THEN 3 ELSE 0 END) +
             (CASE WHEN LOWER(p.summary) LIKE LOWER(CONCAT('%', :query, '%')) THEN 2 ELSE 0 END) +
-            (CASE WHEN LOWER(p.details) LIKE LOWER(CONCAT('%', :query, '%')) THEN 1 ELSE 0 END) DESC,
+            (CASE WHEN LOWER(p.operatingEntity) LIKE LOWER(CONCAT('%', :query, '%')) THEN 1 ELSE 0 END) DESC,
             p.createdAt DESC,
             p.id ASC
     """,
