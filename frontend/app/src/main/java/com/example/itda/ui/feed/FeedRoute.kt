@@ -24,7 +24,6 @@ fun FeedRoute(
     LaunchedEffect(ui.generalError) {
         ui.generalError?.let { errorMessage ->
             Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-            vm.clearGeneralError()
         }
     }
 
