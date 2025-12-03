@@ -3,8 +3,10 @@ package com.example.itda.ui.feed
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -67,61 +70,75 @@ fun FeedScreen(
             LoadingScreen()
         }
         else {
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
+            if(ui.generalError.isNullOrBlank()) {
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
 
-                // 상단 제목 / 태그
-                FeedHeaderSection(
-                    title = ui.feed.title,
-                    endDate = ui.feed.applyEndAt ?: "",
-                    tags = listOf(ui.feed.categoryValue),
-                    isBookmarked = ui.isBookmarked,
-                    onBookmarkClicked = onBookmarkClicked,
-                    toggleLike = toggleLike,
-                    isLiked = ui.isLiked,
-                    toggleDisLike = toggleDislike,
-                    isDisliked = ui.isDisliked,
-                )
+                    // 상단 제목 / 태그
+                    FeedHeaderSection(
+                        title = ui.feed.title,
+                        endDate = ui.feed.applyEndAt ?: "",
+                        tags = listOf(ui.feed.categoryValue),
+                        isBookmarked = ui.isBookmarked,
+                        onBookmarkClicked = onBookmarkClicked,
+                        toggleLike = toggleLike,
+                        isLiked = ui.isLiked,
+                        toggleDisLike = toggleDislike,
+                        isDisliked = ui.isDisliked,
+                    )
 
-                Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                // 지원혜택 카드
-                FeedInfoCard(
-                    categories = listOf(ui.feed.categoryValue),
-                    startDate = ui.feed.applyStartAt ?: "",
-                    endDate = ui.feed.applyEndAt ?: "",
-                    department =
-                        if(ui.feed.operatingEntity == "central")
-                            "중앙정부"
-                        else
-                            ui.feed.operatingEntity,
-                )
-                Spacer(Modifier.height(12.dp))
+                    // 지원혜택 카드
+                    FeedInfoCard(
+                        categories = listOf(ui.feed.categoryValue),
+                        startDate = ui.feed.applyStartAt ?: "",
+                        endDate = ui.feed.applyEndAt ?: "",
+                        department =
+                            if(ui.feed.operatingEntity == "central")
+                                "중앙정부"
+                            else
+                                ui.feed.operatingEntity,
+                    )
+                    Spacer(Modifier.height(12.dp))
 
-                FeedSummaryCard(content = ui.feed.summary)
+                    FeedSummaryCard(content = ui.feed.summary)
 
-                Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(12.dp))
 
 
 
-                FeedDetailCard(
-                    expanded = detailExpanded,
-                    onToggle = { detailExpanded = !detailExpanded },
-                    details = ui.feed.details
-                )
+                    FeedDetailCard(
+                        expanded = detailExpanded,
+                        onToggle = { detailExpanded = !detailExpanded },
+                        details = ui.feed.details
+                    )
 
-                Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(12.dp))
 
-                BottomApplyButton(
-                    url = url,
-                    context = context
-                )
-                Spacer(Modifier.height(12.dp))
+                    BottomApplyButton(
+                        url = url,
+                        context = context
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
+            else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = ui.generalError,
+                        fontSize = 18.scaledSp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
+                }
             }
         }
 

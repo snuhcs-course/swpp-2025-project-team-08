@@ -2,10 +2,12 @@ package com.example.itda.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -106,7 +108,11 @@ fun HomeScreen(
             ProgramFilterRow(
                 categories = ui.categories,
                 selectedCategory = ui.selectedCategory,
-                selectedCategoryCount = ui.totalElements,
+                selectedCategoryCount =
+                    if(ui.generalError.isNullOrBlank())
+                        ui.totalElements
+                    else
+                        0,
                 onCategorySelected = onCategorySelected
             )
 
@@ -130,17 +136,25 @@ fun HomeScreen(
                         )
                     }
                 ) {
-                    if(ui.feedItems.isEmpty()) {
+                    if(ui.isRefreshing.not() && ui.feedItems.isEmpty()) {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = ui.generalError ?: "추천 정책이 없어요 :(",
-                                fontSize = 18.scaledSp,
-                                color = MaterialTheme.colorScheme.tertiary,
-                            )
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentPadding = PaddingValues(8.dp),
+                                state = listState,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                item {
+                                    Text(
+                                        text = ui.generalError ?: "추천 정책이 없어요 :(",
+                                        fontSize = 18.scaledSp,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                    )
+                                }
+                            }
                         }
                     }
                     else {

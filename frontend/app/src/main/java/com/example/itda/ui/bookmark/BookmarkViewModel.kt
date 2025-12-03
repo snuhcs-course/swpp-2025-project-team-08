@@ -217,32 +217,6 @@ class BookmarkViewModel @Inject constructor(
             val isBookmarked = id in _uiState.value.bookmarkIds
 
 
-            // 1. UI 상태 업데이트를 위한 임시 데이터 계산
-            val currentPrograms = _uiState.value.allLoadedPrograms
-            val updatedIds = if (isBookmarked) {
-                _uiState.value.bookmarkIds - id
-            } else {
-                _uiState.value.bookmarkIds + id
-            }
-
-            val updatedPrograms = if (isBookmarked) {
-                // 북마크 해제 시, 전체 목록에서 해당 아이템을 제거
-                currentPrograms.filter { it.id != id }
-            } else {
-                // 북마크 설정 시, 목록에 이미 있는 상태이므로 프로그램 목록은 유지
-                currentPrograms
-            }
-
-            // 2. UI 상태를 먼저 업데이트하여 즉각적인 피드백 (아이콘 및 목록 제거)을 제공
-            _uiState.update {
-                it.copy(
-                    bookmarkIds = updatedIds,
-                    allLoadedPrograms = updatedPrograms,
-                    bookmarkItems = updatedPrograms
-                )
-            }
-
-            // 3. API 호출
             val apiCall = if (isBookmarked)
                 programRepository.unbookmarkProgram(id)
             else
@@ -251,20 +225,41 @@ class BookmarkViewModel @Inject constructor(
             apiCall
                 .onFailure { exception ->
                     val apiError = ApiErrorParser.parseError(exception)
-                    // 4. API 실패 시, UI 상태를 원래대로 되돌립니다.
                     _uiState.update {
                         it.copy(
                             generalError = apiError.message,
                             isLoadingBookmark = false,
-                            bookmarkIds = _uiState.value.bookmarkIds, // 원래 IDs로 롤백
-                            allLoadedPrograms = currentPrograms, // 원래 프로그램 목록으로 롤백
-                            bookmarkItems = currentPrograms
                             )
                     }
                 }
                 .onSuccess {
-                    // 5. API 성공 시, 로딩 상태만 해제합니다. (리스트는 이미 2번에서 업데이트됨)
-                    _uiState.update { it.copy(generalError = null, isLoadingBookmark = false) }
+
+                    val currentPrograms = _uiState.value.allLoadedPrograms
+
+                    if (isBookmarked) {
+                        // 북마크 해제 성공: 목록 및 ID에서 아이템을 제거합니다.
+                        val updatedPrograms = currentPrograms.filter { it.id != id }
+                        val updatedIds = _uiState.value.bookmarkIds - id
+
+                        _uiState.update {
+                            it.copy(
+                                generalError = null,
+                                isLoadingBookmark = false,
+                                bookmarkIds = updatedIds,
+                                allLoadedPrograms = updatedPrograms,
+                                bookmarkItems = updatedPrograms
+                            )
+                        }
+                    } else {
+                        // 북마크 설정 성공: ID만 추가하여 아이콘 변경을 유도하고 목록은 유지합니다.
+                        _uiState.update {
+                            it.copy(
+                                generalError = null,
+                                isLoadingBookmark = false,
+                                bookmarkIds = it.bookmarkIds + id
+                            )
+                        }
+                    }
                 }
         }
     }
