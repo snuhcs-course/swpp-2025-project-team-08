@@ -43,10 +43,8 @@ fun PersonalInfoScreen(
     var selectedAddress by remember { mutableStateOf<AddressResult?>(null) }
     val listState = rememberLazyListState()
 
-    // 생년월일 에러 발생 시 해당 위치로 스크롤
     LaunchedEffect(ui.birthDateError) {
         if (ui.birthDateError != null) {
-            // item 4 (0-indexed)가 필수 입력 항목 카드
             listState.animateScrollToItem(4)
         }
     }
