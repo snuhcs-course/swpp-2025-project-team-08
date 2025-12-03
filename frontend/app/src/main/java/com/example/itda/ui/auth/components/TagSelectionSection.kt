@@ -100,21 +100,22 @@ fun TagSelectionSection(
                 )
             )
 
+            val isEnabled = tagInput.trim().isNotEmpty()
+
             IconButton(
                 onClick = { onAddTag(tagInput) },
                 modifier = Modifier.size(48.dp),
-                enabled = tagInput.trim().isNotEmpty(),
+                enabled = isEnabled,
                 colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = if (tagInput.trim().isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                 )
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "태그 추가",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    contentDescription = "태그 추가"
                 )
             }
         }
