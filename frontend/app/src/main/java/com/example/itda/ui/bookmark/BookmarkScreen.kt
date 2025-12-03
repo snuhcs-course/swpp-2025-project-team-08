@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -127,7 +129,29 @@ fun BookmarkScreen(
                     }
                 ) {
                     if(ui.bookmarkItems.isEmpty()) {
-                        EmptyBookmarkState()
+
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentPadding = PaddingValues(8.dp),
+                                state = listState,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                item {
+                                    if (ui.generalError.isNullOrBlank())
+                                        EmptyBookmarkState()
+                                    else
+                                        Text(
+                                            text = ui.generalError,
+                                            fontSize = 18.scaledSp,
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                        )
+                                }
+                            }
+                        }
                     }
                     else {
                         FeedList(

@@ -1,10 +1,12 @@
 package com.example.itda.ui.bookmark
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
@@ -17,6 +19,12 @@ fun BookmarkRoute(
 
     LaunchedEffect(Unit) {
         vm.loadBookmarkData()
+    }
+    val context = LocalContext.current
+    LaunchedEffect(ui.generalError) {
+        ui.generalError?.let { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
     }
 
     BookmarkScreen (
