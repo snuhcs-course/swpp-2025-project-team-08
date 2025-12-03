@@ -59,7 +59,10 @@ class SearchViewModel @Inject constructor(
 
     fun onSearch() {
         val query = _uiState.value.searchQuery.trim()
-        if (query.isEmpty()) return
+        if (query.isEmpty()) {
+            _uiState.value = _uiState.value.copy(generalError = "검색어를 입력해주세요")
+            return
+        }
 
         val updatedSearches = listOf(query) +
                 _uiState.value.recentSearches.filter { it != query }
@@ -209,10 +212,11 @@ class SearchViewModel @Inject constructor(
 
 
             } catch (e: Exception) {
+                val apiError = ApiErrorParser.parseError(e)
                 _uiState.value = _uiState.value.copy(
                     isSearching = false,
                     isPaginating = false,
-                    generalError = "검색 중 오류가 발생했습니다: ${e.message}"
+                    generalError = apiError.message
                 )
             }
         }

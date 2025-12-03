@@ -80,8 +80,6 @@ fun SearchScreen(
     ) { paddingValues ->
         Column(
             modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
