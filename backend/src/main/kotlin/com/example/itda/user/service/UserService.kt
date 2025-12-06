@@ -153,6 +153,7 @@ class UserService(
         request.householdIncome?.let { userEntity.householdIncome = it }
         request.employmentStatus?.let { userEntity.employmentStatus = it }
 
+        userEntity.tags.clear()
         request.tags?.let { newTags ->
             userEntity.tags.clear()
 
