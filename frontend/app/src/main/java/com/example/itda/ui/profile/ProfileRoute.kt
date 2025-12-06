@@ -1,5 +1,6 @@
 package com.example.itda.ui.profile
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,6 +13,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.itda.ui.auth.AuthViewModel
 import com.example.itda.ui.common.theme.Primary60
@@ -27,6 +29,13 @@ fun ProfileRoute(
 ) {
     val ui by vm.profileUi.collectAsState()
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    LaunchedEffect(ui.generalError) {
+        ui.generalError?.let { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     ProfileScreen(
         ui = ui,
@@ -89,6 +98,14 @@ fun PersonalInfoRoute(
 ) {
     val ui by vm.personalInfoUi.collectAsState()
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    LaunchedEffect(ui.generalError) {
+        ui.generalError?.let { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     PersonalInfoScreen(
         ui = ui,
         onBack = onBack,

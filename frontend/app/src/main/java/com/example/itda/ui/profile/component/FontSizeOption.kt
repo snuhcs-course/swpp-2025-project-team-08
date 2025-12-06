@@ -46,7 +46,7 @@ fun FontSizeOption(
     ) {
         Text(
             text = fontSize.displayName,
-            fontSize = (14 * fontSize.scale * fontSize.scale).sp,
+            fontSize = (14 + fontSize.scale + fontSize.scale).sp,
             color = if (isSelected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal

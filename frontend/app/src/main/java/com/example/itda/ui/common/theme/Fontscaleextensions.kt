@@ -17,15 +17,15 @@ import androidx.compose.ui.unit.sp
  */
 val Int.scaledSp: TextUnit
     @Composable
-    get() = (this * LocalFontScale.current).sp
+    get() = (this + LocalFontScale.current).sp
 
 val Float.scaledSp: TextUnit
     @Composable
-    get() = (this * LocalFontScale.current).sp
+    get() = (this + LocalFontScale.current).sp
 
 val Double.scaledSp: TextUnit
     @Composable
-    get() = (this * LocalFontScale.current).sp
+    get() = (this + LocalFontScale.current).sp
 
 /**
  * 폰트 크기가 이미 TextUnit인 경우
