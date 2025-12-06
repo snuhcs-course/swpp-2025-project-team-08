@@ -41,7 +41,9 @@ class PersonalInfoViewModel @Inject constructor(
         val genderError: String? = null,
         val addressError: String? = null,
         val postcodeError: String? = null,
-        val generalError: String? = null
+        val generalError: String? = null,
+        val initialHouseholdSize: String = "",
+        val initialHouseholdIncome: String = ""
     )
 
     private val _personalInfoUi = MutableStateFlow(PersonalInfoUiState())
@@ -74,6 +76,9 @@ class PersonalInfoViewModel @Inject constructor(
                         EmploymentStatus.fromKorean(it)?.serverValue ?: EmploymentStatus.fromServerValue(it)?.serverValue ?: it
                     } ?: ""
 
+                    val householdSizeStr = profile.householdSize?.toString() ?: ""
+                    val householdIncomeStr = profile.householdIncome?.toString() ?: ""
+
                     _personalInfoUi.update {
                         it.copy(
                             name = profile.name ?: "",
@@ -83,12 +88,14 @@ class PersonalInfoViewModel @Inject constructor(
                             postcode = profile.postcode ?: "",
                             maritalStatus = maritalStatusServerValue,
                             education = educationServerValue,
-                            householdSize = profile.householdSize?.toString() ?: "",
-                            householdIncome = profile.householdIncome?.toString() ?: "",
+                            householdSize = householdSizeStr,
+                            householdIncome = householdIncomeStr,
                             employmentStatus = employmentServerValue,
                             tags = profile.tags ?: emptyList(),
                             isLoading = false,
-                            generalError = null
+                            generalError = null,
+                            initialHouseholdSize = householdSizeStr,
+                            initialHouseholdIncome = householdIncomeStr
                         )
                     }
                 }
@@ -194,6 +201,18 @@ class PersonalInfoViewModel @Inject constructor(
             )
         }
 
+        val householdSizeToSend = when {
+            ui.householdSize.isBlank() && ui.initialHouseholdSize.isNotBlank() -> 0
+            ui.householdSize == ui.initialHouseholdSize -> null
+            else -> ui.householdSize.toIntOrNull()
+        }
+
+        val householdIncomeToSend = when {
+            ui.householdIncome.isBlank() && ui.initialHouseholdIncome.isNotBlank() -> 0
+            ui.householdIncome == ui.initialHouseholdIncome -> null
+            else -> ui.householdIncome.toIntOrNull()
+        }
+
         val requestResult = ProfileUpdateRequest.builder()
             .name(ui.name)
             .birthDate(ui.birthDate)
@@ -202,8 +221,8 @@ class PersonalInfoViewModel @Inject constructor(
             .postcode(ui.postcode)
             .maritalStatus(ui.maritalStatus.ifBlank { null })
             .educationLevel(ui.education.ifBlank { null })
-            .householdSize(ui.householdSize.toIntOrNull())
-            .householdIncome(ui.householdIncome.toIntOrNull())
+            .householdSize(householdSizeToSend)
+            .householdIncome(householdIncomeToSend)
             .employmentStatus(ui.employmentStatus.ifBlank { null })
             .tags(ui.tags.ifEmpty { null })
             .build()
