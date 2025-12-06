@@ -257,29 +257,12 @@ class PersonalInfoViewModel @Inject constructor(
         val request = requestResult.getOrThrow()
         val result = authRepository.updateProfile(request)
 
+
         result.onFailure { exception ->
-            val errorMessage = when {
-                exception is retrofit2.HttpException -> {
-                    when (exception.code()) {
-                        400 -> "입력하신 정보를 다시 확인해주세요"
-                        401 -> "로그인이 만료되었습니다. 다시 로그인해주세요"
-                        403 -> "접근 권한이 없습니다"
-                        404 -> "요청하신 정보를 찾을 수 없습니다"
-                        409 -> "이미 등록된 정보입니다"
-                        422 -> "입력값이 올바르지 않습니다"
-                        500, 502, 503 -> "서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요"
-                        else -> "정보 저장에 실패했습니다. 다시 시도해주세요"
-                    }
-                }
-                exception.message?.contains("timeout", ignoreCase = true) == true -> {
-                    "네트워크 연결이 불안정합니다. 다시 시도해주세요"
-                }
-                exception.message?.contains("unable to resolve host", ignoreCase = true) == true -> {
-                    "인터넷 연결을 확인해주세요"
-                }
-                else -> "정보 저장 중 오류가 발생했습니다. 다시 시도해주세요"
+            val apiError = ApiErrorParser.parseError(exception)
+            _personalInfoUi.update {
+                it.copy(generalError = apiError.message)
             }
-            _personalInfoUi.update { it.copy(generalError = errorMessage) }
         }
 
         _personalInfoUi.update { it.copy(isLoading = false) }
