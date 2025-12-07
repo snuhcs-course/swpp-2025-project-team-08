@@ -1,5 +1,8 @@
 package com.example.itda.ui.feed.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -65,19 +68,25 @@ fun FeedDetailCard(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(expandFrom = Alignment.Top),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top)
+            ) {
+                Column {
 
-            if (expanded) {
-                Spacer(Modifier.height(8.dp))
-                MarkdownText(
-                    modifier = Modifier.padding(10.dp),
-                    markdown = details,
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.scaledSp,
-                        lineHeight = 20.scaledSp,
-                        textAlign = TextAlign.Left,
-                    ),
-                )
+                    Spacer(Modifier.height(8.dp))
+                    MarkdownText(
+                        modifier = Modifier.padding(10.dp),
+                        markdown = details,
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.scaledSp,
+                            lineHeight = 20.scaledSp,
+                            textAlign = TextAlign.Left,
+                        ),
+                    )
+                }
             }
         }
     }

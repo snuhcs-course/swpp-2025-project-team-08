@@ -143,4 +143,5 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-flowlayout:0.32.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation("androidx.compose.foundation:foundation:1.6.0")
 }

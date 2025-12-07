@@ -128,7 +128,7 @@ fun BookmarkScreen(
                         )
                     }
                 ) {
-                    if(ui.bookmarkItems.isEmpty()) {
+                    if(ui.bookmarkItems.isEmpty() && ui.bookmarkIds.isEmpty()) {
 
                         Box(
                             modifier = Modifier.fillMaxSize(),
