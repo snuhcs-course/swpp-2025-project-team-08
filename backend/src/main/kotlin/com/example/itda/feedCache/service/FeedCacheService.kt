@@ -10,6 +10,7 @@ import com.example.itda.program.persistence.ProgramLikeRepository
 import com.example.itda.program.persistence.ProgramRepository
 import com.example.itda.program.persistence.enums.ProgramCategory
 import com.example.itda.user.UserNotFoundException
+import com.example.itda.user.persistence.TagRepository
 import com.example.itda.user.persistence.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -25,6 +26,7 @@ private const val W_U = AppConstants.CACHE_W_U
 private const val W_L = AppConstants.CACHE_W_L
 private const val W_B = AppConstants.CACHE_W_B
 private const val W_S = AppConstants.CACHE_W_S
+private const val CACHE_CORRECTION = AppConstants.CACHE_CORRECTION
 
 private const val ALL = "ALL"
 
@@ -35,6 +37,7 @@ class FeedCacheService(
     private val programRepository: ProgramRepository,
     private val likeRepository: ProgramLikeRepository,
     private val bookmarkRepository: BookmarkRepository,
+    private val tagRepository: TagRepository,
 ) {
     @Transactional
     fun getUserFeedCache(
@@ -56,6 +59,8 @@ class FeedCacheService(
         val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
         val programs = programRepository.findAllByUserInfo(userId)
 
+        val keywords = listOf("장애", "탈북")
+
         val userEmbedding = userEntity.embedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
         val likesEmbedding = getLikesEmbedding(userId)
         val bookmarksEmbedding = getBookmarksEmbedding(userId)
@@ -73,7 +78,7 @@ class FeedCacheService(
                 val programId = program.id
                 val programEmbedding = program.embedding
 
-                val score = dotProduct(programEmbedding, preferenceEmbedding)
+                var score = dotProduct(programEmbedding, preferenceEmbedding)
 
                 val denominator = dotProduct(programEmbedding, preferenceWithoutSeeLessEmbedding)
                 val multiplier = if (denominator != 0f) (100f / denominator) else 0f
@@ -82,6 +87,15 @@ class FeedCacheService(
                     (W_L * dotProduct(programEmbedding, likesEmbedding) * multiplier).roundToInt()
                 val bookmarkContribution =
                     (W_B * dotProduct(programEmbedding, bookmarksEmbedding) * multiplier).roundToInt()
+
+                val targets = keywords.filter { keyword -> keyword in program.title }
+                val userMatchesAllTargets =
+                    targets.all { target ->
+                        userEntity.tags.any { tag -> target in tag.name }
+                    }
+                if (!userMatchesAllTargets) {
+                    score -= CACHE_CORRECTION
+                }
 
                 Pair(FeedCacheItem(programId, score, likeContribution, bookmarkContribution), program.category)
             }.sortedByDescending { it.first.score }

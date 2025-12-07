@@ -1,9 +1,9 @@
 package com.example.itda.user.service
 
 import com.example.itda.embedding.service.EmbeddingService
+import com.example.itda.feedCache.persistence.FeedCacheRepository
 import com.example.itda.program.controller.ProgramSummaryResponse
 import com.example.itda.program.persistence.BookmarkRepository
-import com.example.itda.program.persistence.ProgramExampleRepository
 import com.example.itda.program.persistence.enums.BookmarkSortType
 import com.example.itda.user.AuthenticateException
 import com.example.itda.user.InvalidBirthDateFormatException
@@ -39,9 +39,9 @@ import kotlin.text.clear
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val programExampleRepository: ProgramExampleRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val embeddingService: EmbeddingService,
+    private val feedCacheRepository: FeedCacheRepository,
 ) {
     @Transactional
     fun authenticate(accessToken: String): User {
@@ -172,6 +172,8 @@ class UserService(
         val embedding = embeddingService.getEmbedding(userText)
 
         userEntity.embedding = embedding
+
+        feedCacheRepository.deleteByUserId(userId)
 
         userRepository.save(userEntity)
     }
