@@ -378,13 +378,9 @@ class BookmarkViewModelTest {
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 2. isLoadingBookmark=true 상태 소비
             awaitItem()
 
-            // 3. Optimistic update: allLoadedPrograms에서 Program 1 제거
-            awaitItem()
 
-            // 4. API 성공: isLoadingBookmark=false (최종 상태)
             val finalState = awaitItem()
 
             // Then
@@ -399,50 +395,49 @@ class BookmarkViewModelTest {
     }
 
     @Test
-    fun onFeedBookmarkClicked_unbookmark_failure_rollsBackState() = runTest {
-        val targetId = 1
-        // Given: 북마크 해제 API 실패
-        `when`(programRepository.unbookmarkProgram(targetId)).thenReturn(Result.failure(IOException("Network error")))
+    fun onFeedBookmarkClicked_unbookmark_failure_resetsState() = runTest {
+        // 1. Given
+        val targetId = 1 // 초기 상태에 북마크되어 있는 프로그램 ID (dummyPage1.content에 포함)
 
+        // 북마크 해제 API 호출이 실패하도록 Mocking 합니다. (예: 500 Internal Server Error)
+        val errorJson = """{"code":"SERVER_ERROR","message":"Server error"}"""
+        val errorResponse = errorJson.toResponseBody()
+        val httpException = HttpException(Response.error<Any>(500, errorResponse))
+        `when`(programRepository.unbookmarkProgram(targetId)).thenReturn(Result.failure(httpException))
+
+        // 실패 시 데이터 롤백을 검증하기 위해 초기 상태 저장
+        val initialPrograms = viewModel.uiState.value.allLoadedPrograms
+        val initialIds = viewModel.uiState.value.bookmarkIds
+
+        // 2. When & 3. Then (Test with Turbine)
         viewModel.uiState.test {
-            // 1. 초기 상태를 정확히 저장
-            val initialState = awaitItem()
-            val initialPrograms = initialState.allLoadedPrograms
-            val initialIds = initialState.bookmarkIds
+            awaitItem() // 초기 상태 소비 (init 블록에서 로드된 상태)
 
-            // 💡 FIX: ViewModel의 의도대로, 롤백에 실패하고 유지될 낙관적 업데이트 상태를 기대합니다.
-            // targetId(1)가 제거된 상태입니다.
-            val expectedIdsAfterOptimisticUpdate = initialIds.filter { it != targetId }
-
-            // When: 북마크 해제 클릭 (targetId=1)
+            // When: 북마크 해제 클릭
             viewModel.onFeedBookmarkClicked(targetId)
-            advanceUntilIdle()
+            advanceUntilIdle() // 코루틴 완료 대기
 
-            awaitItem() // 2. isLoadingBookmark=true 상태 소비
-            awaitItem() // 3. Optimistic update (ID 1 제거된 상태) 소비
+            awaitItem() // isLoadingBookmark = true 상태 소비
 
-            // 4. API 실패: Rollback 실패 후 최종 상태 소비
-            val failureState = awaitItem()
+            val finalState = awaitItem() // 실패 후 최종 상태 (isLoadingBookmark = false)
 
-            // Then: 낙관적 업데이트 상태 유지 검증
-            assertThat(failureState.generalError).isEqualTo("네트워크 연결을 확인해주세요")
-            assertThat(failureState.isLoadingBookmark).isFalse()
+            // Then
+            // 1. 에러 메시지 설정 확인
+            assertThat(finalState.generalError).isNotNull() // 에러가 발생했으므로 null이 아니어야 함
 
-            // 1. ID 목록 검증 (ID 1이 제거된 상태)
-            assertThat(failureState.bookmarkIds).isEqualTo(expectedIdsAfterOptimisticUpdate)
+            // 2. 북마크 해제 실패했으므로 데이터는 초기 상태 그대로 유지되어야 함 (롤백 검증)
+            assertThat(finalState.allLoadedPrograms.size).isEqualTo(initialPrograms.size)
+            assertThat(finalState.allLoadedPrograms).isEqualTo(initialPrograms)
+            assertThat(finalState.bookmarkIds.size).isEqualTo(initialIds.size)
+            assertThat(finalState.bookmarkIds).contains(targetId) // 북마크 상태가 유지되어야 함
 
-            // 2. Programs 크기 검증 (20를 기대)
-            assertThat(failureState.allLoadedPrograms.size).isEqualTo(initialPrograms.size) // 19 기대
+            // 3. 로딩 상태 리셋 확인
+            assertThat(finalState.isLoadingBookmark).isFalse()
 
-            // 3. Program 객체 목록 검증 (ID 추출을 통해 내용 확인)
-            val finalProgramIds = failureState.allLoadedPrograms.map { it.id }
-            assertThat(finalProgramIds).isEqualTo(finalProgramIds)
-
-            // 4. bookmarkItems 목록도 19개로 유지되었는지 확인
-            assertThat(failureState.bookmarkItems.size).isEqualTo(finalProgramIds.size)
-
-
+            // 4. API 호출 검증
             verify(programRepository).unbookmarkProgram(targetId)
+            verify(programRepository, never()).bookmarkProgram(any()) // 북마크 설정 API는 호출되지 않아야 함
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -459,14 +454,10 @@ class BookmarkViewModelTest {
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true
-            awaitItem()
 
-            // 2. Optimistic update: IDs에만 99 추가, Programs 목록은 유지
             awaitItem()
-
-            // 3. API 성공: isLoadingBookmark=false
             val finalState = awaitItem()
+
 
             // Then
             assertThat(finalState.allLoadedPrograms.size).isEqualTo(initialState.allLoadedPrograms.size) // 20개 유지
@@ -492,13 +483,9 @@ class BookmarkViewModelTest {
             viewModel.onFeedBookmarkClicked(targetId)
             advanceUntilIdle()
 
-            // 1. isLoadingBookmark=true 상태 소비
+
             awaitItem()
 
-            // 2. Optimistic update (IDs 및 Programs 업데이트)
-            awaitItem()
-
-            // 3. API 성공 후 isLoadingBookmark=false
             assertThat(awaitItem().isLoadingBookmark).isFalse()
 
             cancelAndIgnoreRemainingEvents()

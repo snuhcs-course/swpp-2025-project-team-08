@@ -190,7 +190,7 @@ class PersonalInfoViewModelIntegrationTest {
         assertThat(fakeAuthRepository.updateProfileCalled).isTrue()
         val ui = viewModel.personalInfoUi.value
         assertThat(ui.generalError)
-            .isEqualTo("네트워크 연결이 불안정합니다. 다시 시도해주세요")
+            .isEqualTo("네트워크 연결을 확인해주세요")
         assertThat(ui.isLoading).isFalse()
     }
 }

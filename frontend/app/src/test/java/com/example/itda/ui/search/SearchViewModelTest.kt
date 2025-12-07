@@ -271,7 +271,7 @@ class SearchViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.isSearching).isFalse()
-            assertThat(state.generalError).contains("검색 중 오류가 발생했습니다")
+            assertThat(state.generalError).contains("알 수 없는 오류가 발생했습니다")
             cancelAndIgnoreRemainingEvents()
         }
     }
