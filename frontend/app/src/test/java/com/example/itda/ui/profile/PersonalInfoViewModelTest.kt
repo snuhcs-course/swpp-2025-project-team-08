@@ -13,7 +13,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -289,7 +288,7 @@ class PersonalInfoViewModelTest {
 
         assertThat(result).isFalse()
         val ui = viewModel.personalInfoUi.value
-        assertThat(ui.generalError).contains("네트워크 연결이 불안정합니다")
+        assertThat(ui.generalError).contains("알 수 없는 오류가 발생했습니다")
         assertThat(ui.isLoading).isFalse()
     }
 
@@ -510,7 +509,7 @@ class PersonalInfoViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("입력하신 정보를 다시 확인해주세요")
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("알 수 없는 오류가 발생했습니다")
     }
 
     @Test
@@ -533,7 +532,7 @@ class PersonalInfoViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("로그인이 만료되었습니다")
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("알 수 없는 오류가 발생했습니다")
     }
 
     @Test
@@ -556,7 +555,7 @@ class PersonalInfoViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("서버에 일시적인 문제가 발생했습니다")
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("알 수 없는 오류가 발생했습니다")
     }
 
     @Test
@@ -577,7 +576,7 @@ class PersonalInfoViewModelTest {
         val result = viewModel.submitPersonalInfo()
 
         assertThat(result).isFalse()
-        assertThat(viewModel.personalInfoUi.value.generalError).contains("인터넷 연결을 확인해주세요")
+        assertThat(viewModel.personalInfoUi.value.generalError).contains("알 수 없는 오류가 발생했습니다")
     }
 
     @Test

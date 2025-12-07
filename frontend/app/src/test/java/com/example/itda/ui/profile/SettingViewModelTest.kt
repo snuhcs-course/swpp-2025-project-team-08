@@ -15,8 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -245,21 +245,21 @@ class SettingViewModelTest {
     fun fontSize_SMALL_hasCorrectValues() {
         val fontSize = SettingsViewModel.FontSize.SMALL
         assertThat(fontSize.displayName).isEqualTo("작게")
-        assertThat(fontSize.scale).isEqualTo(0.9f)
+        assertThat(fontSize.scale).isEqualTo(-0.7f)
     }
 
     @Test
     fun fontSize_MEDIUM_hasCorrectValues() {
         val fontSize = SettingsViewModel.FontSize.MEDIUM
         assertThat(fontSize.displayName).isEqualTo("보통")
-        assertThat(fontSize.scale).isEqualTo(1.0f)
+        assertThat(fontSize.scale).isEqualTo(0.0f)
     }
 
     @Test
     fun fontSize_LARGE_hasCorrectValues() {
         val fontSize = SettingsViewModel.FontSize.LARGE
         assertThat(fontSize.displayName).isEqualTo("크게")
-        assertThat(fontSize.scale).isEqualTo(1.1f)
+        assertThat(fontSize.scale).isEqualTo(2.0f)
     }
 
     @Test
@@ -270,7 +270,7 @@ class SettingViewModelTest {
         val normalizedDisplayName = fontSize.displayName.replace("\n", " ").trim()
 
         assertThat(normalizedDisplayName).isEqualTo("매우 크게")
-        assertThat(fontSize.scale).isEqualTo(1.2f)
+        assertThat(fontSize.scale).isEqualTo(4.0f)
     }
 
     @Test
