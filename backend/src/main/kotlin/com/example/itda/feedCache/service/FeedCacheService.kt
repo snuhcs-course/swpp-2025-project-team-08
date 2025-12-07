@@ -59,7 +59,7 @@ class FeedCacheService(
         val userEntity = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
         val programs = programRepository.findAllByUserInfo(userId)
 
-        val keywords = listOf("장애", "탈북")
+        val keywords = listOf("장애", "탈북", "북한")
 
         val userEmbedding = userEntity.embedding ?: FloatArray(EMBEDDING_DIMENSION) { 0f }
         val likesEmbedding = getLikesEmbedding(userId)

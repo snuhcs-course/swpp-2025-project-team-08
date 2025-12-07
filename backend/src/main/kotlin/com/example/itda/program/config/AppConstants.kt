@@ -10,7 +10,7 @@ object AppConstants {
     const val CACHE_W_B = 0.2f
     const val CACHE_W_S = 0.3f
 
-    const val CACHE_CORRECTION = 0.2f
+    const val CACHE_CORRECTION = 1.0f
 
     const val PROGRAM_REASON_RATIO = 0.1
 }
