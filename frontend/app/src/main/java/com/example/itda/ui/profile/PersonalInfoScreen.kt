@@ -90,13 +90,12 @@ fun PersonalInfoScreen(
         }
     }
 
-    // 에러 발생 시 스크롤 + Snackbar
+    // 에러 발생 시 스크롤 + Snackbar (입력 형식 에러만)
     LaunchedEffect(
         ui.nameError,
         ui.birthDateError,
         ui.genderError,
-        ui.addressError,
-        ui.generalError
+        ui.addressError
     ) {
         val targetY = when {
             ui.nameError != null -> nameFieldY
@@ -117,7 +116,6 @@ fun PersonalInfoScreen(
             ?: ui.birthDateError
             ?: ui.genderError
             ?: ui.addressError
-            ?: ui.generalError
 
         if (errorMessage != null) {
             coroutineScope.launch {
@@ -391,16 +389,6 @@ fun PersonalInfoScreen(
                 }
             }
 
-            if (ui.generalError != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = ui.generalError,
-                    fontSize = 12.scaledSp,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
@@ -445,4 +433,3 @@ fun PersonalInfoScreen(
         )
     }
 }
-

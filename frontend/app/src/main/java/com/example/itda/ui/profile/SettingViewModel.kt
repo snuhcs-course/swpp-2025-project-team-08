@@ -26,10 +26,10 @@ class SettingsViewModel @Inject constructor(
     )
 
     enum class FontSize(val displayName: String, val scale: Float) {
-        SMALL("작게", 0.9f),
-        MEDIUM("보통", 1.0f),
-        LARGE("크게", 1.1f),
-        EXTRA_LARGE("매우\n크게", 1.2f)
+        SMALL("작게", -0.7f),
+        MEDIUM("보통", 0.0f),
+        LARGE("크게", 2.0f),
+        EXTRA_LARGE("매우\n크게", 4.0f)
     }
 
     private val _settingsUi = MutableStateFlow(SettingsUiState())
