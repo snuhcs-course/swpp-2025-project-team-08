@@ -1,5 +1,9 @@
 package com.example.itda.ui.feed.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
@@ -17,12 +22,14 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbDown
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -129,31 +136,78 @@ fun LikeButtonRow(
     isLiked: Boolean = true,
     toggleDisLike: () -> Unit = {},
     isDisliked: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
+    val fasterSpring = remember { spring<Float>(dampingRatio = 0.5f, stiffness = 1500f) }
+
     Row(
-        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 좋아요 버튼
-        IconButton(onClick = toggleLike) {
-            Icon(
-                imageVector = if (isLiked) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
-                contentDescription = if (isLiked) "좋아요 취소" else "좋아요",
-                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-            )
-        }
+        LikeDislikeButton(
+            isClicked = isLiked,
+            onClick = toggleLike,
+            iconFilled = Icons.Filled.ThumbUp,
+            iconOutlined = Icons.Outlined.ThumbUp,
+            tintColor = MaterialTheme.colorScheme.primary,
+            contentDescriptionOn = "좋아요 취소",
+            contentDescriptionOff = "좋아요",
+            springSpec = fasterSpring
+        )
 
         // 싫어요 버튼
-        IconButton(onClick = toggleDisLike) {
-            Icon(
-                imageVector = if (isDisliked) Icons.Filled.ThumbDown else Icons.Outlined.ThumbDown,
-                contentDescription = if (isDisliked) "싫어요 취소" else "싫어요",
-                tint = if (isDisliked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-            )
+        LikeDislikeButton(
+            isClicked = isDisliked,
+            onClick = toggleDisLike,
+            iconFilled = Icons.Filled.ThumbDown,
+            iconOutlined = Icons.Outlined.ThumbDown,
+            tintColor = MaterialTheme.colorScheme.error,
+            contentDescriptionOn = "싫어요 취소",
+            contentDescriptionOff = "싫어요",
+            springSpec = fasterSpring
+        )
+    }
+}
+
+@Composable
+fun LikeDislikeButton(
+    isClicked: Boolean,
+    onClick: () -> Unit,
+    iconFilled: androidx.compose.ui.graphics.vector.ImageVector,
+    iconOutlined: androidx.compose.ui.graphics.vector.ImageVector,
+    tintColor: androidx.compose.ui.graphics.Color,
+    contentDescriptionOn: String,
+    contentDescriptionOff: String,
+    springSpec: androidx.compose.animation.core.SpringSpec<Float>
+) {
+    val scale = remember { Animatable(1f) }
+
+    LaunchedEffect(isClicked) {
+        if (isClicked) {
+            scale.animateTo(targetValue = 1.3f, animationSpec = springSpec)
+            scale.animateTo(targetValue = 1f, animationSpec = springSpec)
+        } else {
+            scale.animateTo(1f) // 취소 시 원래 크기로 복구
         }
     }
+
+    Icon(
+        imageVector = if (isClicked) iconFilled else iconOutlined,
+        contentDescription = if (isClicked) contentDescriptionOn else contentDescriptionOff,
+        tint = if (isClicked) tintColor else MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .size(32.dp)
+            .graphicsLayer(
+                scaleX = scale.value,
+                scaleY = scale.value
+            )
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+            .padding(4.dp)
+    )
 }
 
 @Preview(showBackground = true)

@@ -241,15 +241,35 @@ class BookmarkViewModel @Inject constructor(
                         val updatedPrograms = currentPrograms.filter { it.id != id }
                         val updatedIds = _uiState.value.bookmarkIds - id
 
-                        _uiState.update {
-                            it.copy(
-                                generalError = null,
-                                isLoadingBookmark = false,
-                                bookmarkIds = updatedIds,
-                                allLoadedPrograms = updatedPrograms,
-                                bookmarkItems = updatedPrograms
-                            )
+                        if(updatedPrograms.isEmpty()) {
+                            _uiState.update {
+                                it.copy(
+                                    generalError = null,
+                                    allLoadedPrograms = updatedPrograms,
+                                    bookmarkItems = updatedPrograms
+                                )
+                            }
+                            kotlinx.coroutines.delay(300L)
+                            _uiState.update {
+                                it.copy(
+                                    isLoadingBookmark = false,
+                                    bookmarkIds = updatedIds,
+                                    )
+                            }
                         }
+                        else {
+                            _uiState.update {
+                                it.copy(
+                                    generalError = null,
+                                    isLoadingBookmark = false,
+                                    bookmarkIds = updatedIds,
+                                    allLoadedPrograms = updatedPrograms,
+                                    bookmarkItems = updatedPrograms
+                                )
+                            }
+                        }
+
+
                     } else {
                         // 북마크 설정 성공: ID만 추가하여 아이콘 변경을 유도하고 목록은 유지합니다.
                         _uiState.update {
