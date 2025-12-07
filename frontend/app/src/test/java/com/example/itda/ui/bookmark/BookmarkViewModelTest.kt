@@ -315,6 +315,50 @@ class BookmarkViewModelTest {
         }
     }
 
+    @Test
+    fun loadNextPage_onPaginating_preventsApiCall() = runTest {
+        // 1. Given: 다음 페이지 로드 Mock (성공하도록 설정)
+        `when`(programRepository.getUserBookmarkPrograms(
+            sort = eq("LATEST"),
+            page = eq(1),
+            size = any()
+        )).thenReturn(Result.success(dummyPage2))
+
+        viewModel.uiState.test {
+            awaitItem() // 1. 초기 상태 소비 (isPaginating = false)
+
+            // When: loadNextPage를 호출하여 isPaginating = true 상태로 만듭니다.
+            viewModel.loadNextPage()
+
+            // 2. isPaginating=true 상태를 소비합니다. (코루틴은 API 호출에서 대기 중)
+            // awaitItem()이 반환한 객체의 상태를 바로 확인하여 race condition 회피
+            assertThat(awaitItem().isPaginating).isTrue()
+
+            // When: isPaginating=true인 상태에서 다시 loadNextPage를 호출합니다.
+            viewModel.loadNextPage() // ⬅️ 이 호출은 guard clause에 의해 차단되어야 함
+
+            // API 호출을 완료하고 isPaginating을 false로 리셋하도록 시간을 진행합니다.
+            advanceUntilIdle()
+
+            // 3. API 성공 후 최종 상태 소비
+            assertThat(awaitItem().isPaginating).isFalse() // 최종 isPaginating = false
+
+            // Then:
+            // API 호출은 page 1에 대해 초기 호출 1회만 발생해야 합니다.
+            verify(programRepository, times(1)).getUserBookmarkPrograms(
+                sort = eq("LATEST"), page = eq(1), size = any()
+            )
+            // page 2에 대한 호출은 없어야 합니다.
+            verify(programRepository, never()).getUserBookmarkPrograms(
+                sort = any(), page = eq(2), size = any()
+            )
+
+            // 최종 데이터 정합성 확인
+            assertThat(viewModel.uiState.value.allLoadedPrograms.size).isEqualTo(30)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
     // ========== Sort and Filter Tests ==========
 
     @Test
@@ -441,7 +485,45 @@ class BookmarkViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+    @Test
+    fun onFeedBookmarkClicked_unbookmark_success_emptyList() = runTest {
+        // 1. Given: 20개 프로그램 중 ID=2부터 20까지의 북마크를 해제하여 ID=1만 남깁니다.
+        val targetId = 1
 
+        // ID=1 해제 API는 성공하도록 Mocking합니다.
+        `when`(programRepository.unbookmarkProgram(targetId)).thenReturn(Result.success(Unit))
+
+        // ID=2부터 20까지 해제 (목록에서 제거)
+        // 이 작업으로 인해 allLoadedPrograms 목록에 ID=1 하나만 남습니다.
+        for (id in 2..20) {
+            // 이미 setup()에서 로드된 프로그램들이므로, 북마크 해제 로직을 태웁니다.
+            `when`(programRepository.unbookmarkProgram(id)).thenReturn(Result.success(Unit))
+            viewModel.onFeedBookmarkClicked(id)
+        }
+        // 19개의 해제 작업이 완료되고, 목록이 1개만 남도록 대기합니다.
+        advanceUntilIdle()
+
+        // 현재 상태는 ID=1만 남아 있어야 합니다.
+        assertThat(viewModel.uiState.value.allLoadedPrograms).hasSize(1)
+        assertThat(viewModel.uiState.value.bookmarkIds).containsExactly(targetId)
+
+        // 2. When: 마지막 남은 ID=1을 해제합니다.
+        viewModel.onFeedBookmarkClicked(targetId)
+
+        // 3. Then: 모든 작업 (Update 1, delay(300L), Update 2) 완료를 대기하고 최종 상태를 검증합니다.
+        advanceUntilIdle()
+
+        // 최종 상태를 Flow 대신 ViewModel의 value로 직접 확인합니다.
+        val finalState = viewModel.uiState.value
+
+        // Then (최종 상태): 목록은 비어 있고, ID도 제거되어야 함
+        assertThat(finalState.allLoadedPrograms).isEmpty()
+        assertThat(finalState.bookmarkItems).isEmpty()
+        assertThat(finalState.bookmarkIds).doesNotContain(targetId) // ⬅️ ID가 성공적으로 제거되었는지 확인
+        assertThat(finalState.isLoadingBookmark).isFalse()
+
+        verify(programRepository, times(1)).unbookmarkProgram(targetId)
+    }
     @Test
     fun onFeedBookmarkClicked_bookmark_success_updatesIdsOnly() = runTest {
         val targetId = 99 // 새로운 ID (목록에 없음)
